@@ -15,5 +15,22 @@ module.exports = {
 
   assets: {
     maxInputBytes: parseInt(process.env.LYRA_ASSETS_MAX_INPUT_BYTES || FIFTEEN_MEGABYTES, 10)
+  },
+
+  cors: {
+    credentials: true,
+    maxAge: parseInt(process.env.LYRA_CORS_MAX_AGE || 600, 10),
+    origin: split(process.env.LYRA_CORS_ORIGINS) || ['http://localhost:3333'],
+    exposedHeaders: ['Content-Type', 'Content-Length', 'ETag']
+      .concat(split(process.env.LYRA_CORS_EXPOSED_HEADERS))
+      .filter(Boolean)
   }
+}
+
+function split(val, by = ',') {
+  if (!val) {
+    return undefined
+  }
+
+  return val.split(by)
 }

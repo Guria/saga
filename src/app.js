@@ -1,6 +1,8 @@
+const cors = require('cors')
 const pino = require('pino')
 const express = require('express')
 const bodyParser = require('body-parser')
+const errorHandler = require('./middleware/errorHandler')
 const pkg = require('../package.json')
 
 module.exports = config => {
@@ -9,6 +11,8 @@ module.exports = config => {
   const app = express()
   app.disable('x-powered-by')
   app.services = {log}
+
+  app.use(cors(config.cors))
 
   app.get('/', (req, res) => res.json({service: pkg.name, version: pkg.version}))
 
@@ -23,6 +27,8 @@ module.exports = config => {
     bodyParser.raw({limit: config.assets.maxInputBytes}),
     require('./controllers/assets')
   )
+
+  app.use(errorHandler)
 
   return app
 }

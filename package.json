@@ -26,6 +26,7 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "boom": "^5.2.0",
+    "cors": "^2.8.4",
     "express": "^4.16.3",
     "hard-rejection": "^1.0.0",
     "pino": "^4.16.1"
