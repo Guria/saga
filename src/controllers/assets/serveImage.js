@@ -1,7 +1,23 @@
+const mead = require('mead')
+const getMeadConfig = require('mead/src/config')
 const path = require('path')
+const config = require('../../config')
 
-module.exports = (req, res, next) => {
-  const config = req.app.services.config
-  const basePath = config.assets.options.basePath
-  res.sendFile(path.join(basePath, 'images', 'vega.png'))
-}
+const {adapter, options} = config.assets
+const meadOptions = Object.assign({}, options, {
+  basePath: path.join(options.basePath, 'images')
+})
+
+module.exports = mead(
+  getMeadConfig({
+    sources: [
+      {
+        name: 'vega',
+        adapter: {
+          type: adapter,
+          config: meadOptions
+        }
+      }
+    ]
+  })
+)

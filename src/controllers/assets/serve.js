@@ -4,7 +4,7 @@ const serveImage = require('./serveImage')
 
 const data = express.Router()
 
-data.get('/images/vega/:dataset/:assetId', serveImage)
+data.use('/images', serveImage)
 data.get('/files/vega/:dataset/:assetId', serveFile)
 
 module.exports = data

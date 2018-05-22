@@ -2,9 +2,9 @@ const Boom = require('boom')
 
 module.exports = (err, req, res, next) => {
   const error = errorResponse(res, err)
-  const log = req.app.services.log
+  const log = req.app.services && req.app.services.log
   const code = (error.output && error.output.statusCode) || error.code
-  if (!code || code >= 500) {
+  if (log && (!code || code >= 500)) {
     log.error(error)
   }
 }
@@ -19,10 +19,12 @@ function errorResponse(res, err) {
   const statusCode = isNaN(code) ? 500 : code
   const headers = error.output.headers || {}
 
-  res
-    .set(headers)
-    .status(statusCode)
-    .json(error.output.payload)
+  if (!res.headersSent) {
+    res
+      .set(headers)
+      .status(statusCode)
+      .json(error.output.payload)
+  }
 
   return error
 }

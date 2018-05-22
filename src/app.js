@@ -28,6 +28,16 @@ module.exports = config => {
     require('./controllers/assets/upload')
   )
 
+  app.get('/v1/users/me', (req, res) => {
+    res.json({
+      id: 'gm6L9ZOzi',
+      name: 'Espen Hovlandsdal',
+      email: 'espen@bengler.no',
+      profileImage:
+        'https://lh4.googleusercontent.com/-0Yrr6C1OifM/AAAAAAAAAAI/AAAAAAAAACc/0ZP_kFFrQEU/photo.jpg'
+    })
+  })
+
   app.use(require('./controllers/assets/serve'))
 
   app.use(errorHandler)
