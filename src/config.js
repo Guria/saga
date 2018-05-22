@@ -19,7 +19,7 @@ module.exports = {
     maxInputBytes: parseInt(process.env.LYRA_ASSETS_MAX_INPUT_BYTES || FIFTEEN_MEGABYTES, 10),
     adapter: 'fs',
     options: {
-      basePath: process.env.LYRA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', 'data')
+      basePath: process.env.LYRA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', 'data', 'assets')
     }
   },
 

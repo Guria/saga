@@ -10,7 +10,7 @@ module.exports = config => {
 
   const app = express()
   app.disable('x-powered-by')
-  app.services = {log}
+  app.services = {log, config}
 
   app.use(cors(config.cors))
 
@@ -25,8 +25,10 @@ module.exports = config => {
   app.use(
     '/v1/assets',
     bodyParser.raw({limit: config.assets.maxInputBytes}),
-    require('./controllers/assets')
+    require('./controllers/assets/upload')
   )
+
+  app.use(require('./controllers/assets/serve'))
 
   app.use(errorHandler)
 
