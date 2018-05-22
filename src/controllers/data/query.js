@@ -18,7 +18,7 @@ const get = (req, res, next) => {
     .reduce((acc, param) => {
       acc[param.slice(1)] = JSON.parse(req.query[param])
       return acc
-    })
+    }, {})
 
   const query = req.query.query
   return performQuery({query, params}, req, res, next)
