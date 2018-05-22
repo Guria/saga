@@ -1,0 +1,39 @@
+{
+  "name": "lyra",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Backend for Vega",
+  "main": "src/app.js",
+  "scripts": {
+    "coverage": "jest --coverage",
+    "start": "node src/server.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/VegaPublish/lyra.git"
+  },
+  "keywords": [
+    "vega",
+    "lyra"
+  ],
+  "author": "Vega Publish <hello@vegapublish.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VegaPublish/lyra/issues"
+  },
+  "homepage": "https://github.com/VegaPublish/lyra#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "boom": "^5.2.0",
+    "express": "^4.16.3",
+    "hard-rejection": "^1.0.0",
+    "pino": "^4.16.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.9.0",
+    "eslint-config-prettier": "^2.6.0",
+    "eslint-config-sanity": "^3.1.0",
+    "prettier": "^1.12.0"
+  }
+}
