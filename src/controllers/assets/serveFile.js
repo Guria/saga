@@ -1,7 +1,6 @@
 const path = require('path')
+const express = require('express')
+const config = require('../../config')
+const basePath = path.join(config.assets.options.basePath, 'files')
 
-module.exports = (req, res, next) => {
-  const config = req.app.services.config
-  const basePath = config.assets.options.basePath
-  res.sendFile(path.join(basePath, 'files', 'file.txt'))
-}
+module.exports = express.static(basePath, {fallthrough: false, index: false})
