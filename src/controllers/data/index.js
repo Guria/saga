@@ -7,16 +7,16 @@ const mutateDocs = require('./mutate')
 const data = express.Router()
 
 // Query
-data.get('/query/:datasetName', queryDocs.get)
-data.post('/query:datasetName', queryDocs.post)
+data.get('/query/:dataset', queryDocs.get)
+data.post('/query:dataset', queryDocs.post)
 
 // Mutate
-data.post('/mutate/:datasetName', mutateDocs)
+data.post('/mutate/:dataset', mutateDocs)
 
 // Listen
-data.get('/listen/:datasetName', listen)
+data.get('/listen/:dataset', listen)
 
 // Get documents by ID
-data.get('/doc/:datasetName/:documentId', getDocs)
+data.get('/doc/:dataset/:documentId', getDocs)
 
 module.exports = data

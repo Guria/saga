@@ -17,6 +17,9 @@
     "vega",
     "lyra"
   ],
+  "engines": {
+    "node": ">=7.6.0"
+  },
   "author": "Vega Publish <hello@vegapublish.com>",
   "license": "MIT",
   "bugs": {
@@ -24,11 +27,13 @@
   },
   "homepage": "https://github.com/VegaPublish/lyra#readme",
   "dependencies": {
+    "@sanity/mutator": "^0.128.3",
     "body-parser": "^1.18.2",
     "boom": "^5.2.0",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "hard-rejection": "^1.0.0",
+    "mongodb": "^3.1.0-beta4",
     "pino": "^4.16.1"
   },
   "devDependencies": {

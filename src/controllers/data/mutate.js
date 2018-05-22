@@ -1,8 +1,10 @@
-module.exports = (req, res, next) => {
-  res.json({
-    transactionId: `moop-${Math.random()
-      .toString()
-      .slice(2)}`,
-    results: [{id: 'foo', operation: 'update'}]
-  })
+const Store = require('../../datastore/Store')
+const MutationSet = require('../../datastore/MutationSet')
+
+module.exports = async (req, res, next) => {
+  const {dataset} = req.params
+  const store = await Store.forDataset(dataset)
+  const mutations = new MutationSet(req.body.mutations)
+  const results = await mutations.execute(store)
+  res.json(results)
 }

@@ -1,4 +1,6 @@
 /* eslint-disable no-process-env */
+const path = require('path')
+
 const ONE_MEGABYTE = 1024 * 1024
 const TWO_MEGABYTES = ONE_MEGABYTE * 2
 const FIFTEEN_MEGABYTES = ONE_MEGABYTE * 15
@@ -14,7 +16,11 @@ module.exports = {
   },
 
   assets: {
-    maxInputBytes: parseInt(process.env.LYRA_ASSETS_MAX_INPUT_BYTES || FIFTEEN_MEGABYTES, 10)
+    maxInputBytes: parseInt(process.env.LYRA_ASSETS_MAX_INPUT_BYTES || FIFTEEN_MEGABYTES, 10),
+    adapter: 'fs',
+    options: {
+      basePath: process.env.LYRA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', 'data')
+    }
   },
 
   cors: {
@@ -24,6 +30,10 @@ module.exports = {
     exposedHeaders: ['Content-Type', 'Content-Length', 'ETag']
       .concat(split(process.env.LYRA_CORS_EXPOSED_HEADERS))
       .filter(Boolean)
+  },
+
+  datastore: {
+    url: process.env.LYRA_MONGODB_URL || 'mongodb://localhost:27017'
   }
 }
 

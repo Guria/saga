@@ -1,13 +1,22 @@
-function performQuery(options, req, res, next) {
+const Store = require('../../datastore/Store')
+const groqQuery = require('../../groq/query')
+
+async function performQuery(options, req, res, next) {
+  const start = Date.now()
+  const {dataset} = req.params
   const {query, params} = options
-  res.json({ms: 7, query, result: []})
+
+  const store = await Store.forDataset(dataset)
+  const results = await groqQuery(query, params, store.fetcher())
+  const result = typeof results === 'undefined' ? null : results
+  res.json({ms: Date.now() - start, query, result})
 }
 
 const get = (req, res, next) => {
   const params = Object.keys(req.query)
     .filter(param => param.startsWith('$'))
     .reduce((acc, param) => {
-      acc[param.slice(1)] = req.query[param]
+      acc[param.slice(1)] = JSON.parse(req.query[param])
       return acc
     })
 
