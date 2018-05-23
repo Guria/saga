@@ -37,11 +37,11 @@ jspm_packages
 .node_repl_history
 
 # Secrets
-secrets
+/secrets
 
 # Lockfiles (for now)
 yarn.lock
 package-lock.json
 
 # Data
-data
+/data
