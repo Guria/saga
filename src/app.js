@@ -2,8 +2,8 @@ const cors = require('cors')
 const pino = require('pino')
 const express = require('express')
 const bodyParser = require('body-parser')
-const errorHandler = require('./middleware/errorHandler')
 const pkg = require('../package.json')
+const errorHandler = require('./middleware/errorHandler')
 
 module.exports = config => {
   const log = pino({level: config.logLevel})
@@ -28,15 +28,11 @@ module.exports = config => {
     require('./controllers/assets/upload')
   )
 
-  app.get('/v1/users/me', (req, res) => {
-    res.json({
-      id: 'gm6L9ZOzi',
-      name: 'Espen Hovlandsdal',
-      email: 'espen@bengler.no',
-      profileImage:
-        'https://lh4.googleusercontent.com/-0Yrr6C1OifM/AAAAAAAAAAI/AAAAAAAAACc/0ZP_kFFrQEU/photo.jpg'
-    })
-  })
+  app.use(
+    '/v1/users',
+    bodyParser.json({limit: config.data.maxInputBytes}),
+    require('./controllers/users')
+  )
 
   app.use(require('./controllers/assets/serve'))
 
