@@ -1,5 +1,6 @@
-const Store = require('../../src/datastore/Store')
+const fse = require('fs-extra')
 
-module.exports = () => {
-  return Store.closeAll()
+module.exports = async app => {
+  await app.services.dataStore.closeAll()
+  await fse.remove(app.services.config.assets.options.basePath)
 }

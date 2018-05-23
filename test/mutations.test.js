@@ -1,18 +1,17 @@
 const request = require('supertest')
 const uuid = require('uuid/v4')
-const config = require('../src/config')
 const lyra = require('..')
-const close = require('./helpers/close')
+const {close, getConfig} = require('./helpers')
 
 describe('mutations', () => {
   let app
 
   beforeAll(() => {
-    app = lyra(config)
+    app = lyra(getConfig())
   })
 
   afterAll(() => {
-    close()
+    close(app)
   })
 
   test('can create and fetch document', async () => {

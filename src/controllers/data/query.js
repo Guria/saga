@@ -1,12 +1,12 @@
-const Store = require('../../datastore/Store')
 const groqQuery = require('../../groq/query')
 
 async function performQuery(options, req, res, next) {
   const start = Date.now()
+  const {dataStore} = req.app.services
   const {dataset} = req.params
   const {query, params} = options
 
-  const store = await Store.forDataset(dataset)
+  const store = await dataStore.forDataset(dataset)
   const results = await groqQuery(query, params, store.fetcher())
   const result = typeof results === 'undefined' ? null : results
   res.json({ms: Date.now() - start, query, result})

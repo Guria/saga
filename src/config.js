@@ -16,6 +16,7 @@ module.exports = {
   },
 
   assets: {
+    baseUrl: 'http://localhost:4000',
     maxInputBytes: parseInt(process.env.LYRA_ASSETS_MAX_INPUT_BYTES || FIFTEEN_MEGABYTES, 10),
     adapter: 'fs',
     options: {
@@ -26,7 +27,12 @@ module.exports = {
   cors: {
     credentials: true,
     maxAge: parseInt(process.env.LYRA_CORS_MAX_AGE || 600, 10),
-    origin: split(process.env.LYRA_CORS_ORIGINS) || ['http://localhost:3333'],
+    origin: split(process.env.LYRA_CORS_ORIGINS) || [
+      'http://localhost:3333',
+      'http://localhost:1234',
+      'http://127.0.0.1:1234',
+      'http://0.0.0.0:1234'
+    ],
     exposedHeaders: ['Content-Type', 'Content-Length', 'ETag']
       .concat(split(process.env.LYRA_CORS_EXPOSED_HEADERS))
       .filter(Boolean)

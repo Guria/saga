@@ -1,17 +1,16 @@
 const request = require('supertest')
-const config = require('../src/config')
 const lyra = require('..')
-const close = require('./helpers/close')
+const {close, getConfig} = require('./helpers')
 
 describe('users', () => {
   let app
 
   beforeAll(() => {
-    app = lyra(config)
+    app = lyra(getConfig())
   })
 
   afterAll(() => {
-    close()
+    close(app)
   })
 
   test('can fetch current user', () =>
