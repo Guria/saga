@@ -13,12 +13,14 @@ module.exports = function filterToQuerySelector(filter) {
 function transform(operation) {
   switch (operation.op) {
     case 'and':
-      return {"$and": [transform(operation.lhs), transform(operation.rhs)]}
+      return {$and: [transform(operation.lhs), transform(operation.rhs)]}
     case 'eq':
       return {
         [operation.lhs.path.map(oper => oper.name).join('.')]: transform(operation.rhs)
       }
     case 'literal':
       return operation.value
+    default:
+      throw new Error(`Unsupported operation "${operation.op}"`)
   }
 }
