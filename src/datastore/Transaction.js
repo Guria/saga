@@ -1,11 +1,10 @@
+const uuid = require('uuid/v4')
+
 // Represents one set of crud operations on the database. Isolated like this
 // to be able to approach transaction-like semantics.
-
 module.exports = class Transaction {
   constructor(collection) {
-    // @todo create proper id
-    const id = `${Math.random()}`.slice(2)
-    this.id = `moop-${id}`
+    this.id = uuid()
     this.documents = collection
     this.time = new Date()
     // List of performed operations
@@ -51,9 +50,11 @@ module.exports = class Transaction {
       operation: 'update'
     })
     console.log('Finding by id', _id)
-    const original = this.cache[_id] || await this.documents.findOne({
+    const original =
+      this.cache[_id] ||
+      (await this.documents.findOne({
         _id
-    })
+      }))
     console.log('Found', original)
     const next = operation(original)
     this.cache[_id] = next
