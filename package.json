@@ -13,7 +13,10 @@
     "type": "git",
     "url": "git+ssh://git@github.com/VegaPublish/lyra.git"
   },
-  "keywords": ["vega", "lyra"],
+  "keywords": [
+    "vega",
+    "lyra"
+  ],
   "engines": {
     "node": ">=7.6.0"
   },

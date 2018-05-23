@@ -1,4 +1,7 @@
-const Patcher = require('@sanity/mutator').Patcher
+/* eslint-disable no-await-in-loop */
+
+const {Patcher} = require('@sanity/mutator')
+const timeStampMutations = require('./timeStampMutations')
 
 module.exports = class MutationSet {
   constructor(mutations) {
@@ -7,6 +10,7 @@ module.exports = class MutationSet {
 
   async execute(store) {
     const txn = store.newTransaction()
+    this.mutations = timeStampMutations(this.mutations, txn.time)
     for (let i = 0; i < this.mutations.length; i++) {
       const mutation = this.mutations[i]
       const operation = Object.keys(mutation)[0]
@@ -25,16 +29,16 @@ module.exports = class MutationSet {
         case 'delete':
           await txn.delete(body.id)
           break
-        case 'patch':
+        case 'patch': {
           const patch = new Patcher(body)
           await txn.update(body.id, attributes => {
-            console.log('was:', JSON.stringify(attributes))
             const next = patch.apply(attributes)
-            console.log('became:', JSON.stringify(next))
+            console.log("was:", attributes)
+            console.log("became:", next)
             return next
           })
-          // await txn.update(body.id, (attributes) => patch.apply(attributes))
           break
+        }
         default:
           throw new Error(`Unknown operation type ${operation}`)
       }
