@@ -4,12 +4,13 @@ const {Patcher} = require('@sanity/mutator')
 const timeStampMutations = require('./timeStampMutations')
 
 module.exports = class MutationSet {
-  constructor(mutations) {
+  constructor(mutations, options = {}) {
     this.mutations = mutations
+    this.options = options
   }
 
   async execute(store) {
-    const txn = store.newTransaction()
+    const txn = store.newTransaction(this.options)
     this.mutations = timeStampMutations(this.mutations, txn.time)
     for (let i = 0; i < this.mutations.length; i++) {
       const mutation = this.mutations[i]
@@ -33,8 +34,8 @@ module.exports = class MutationSet {
           const patch = new Patcher(body)
           await txn.update(body.id, attributes => {
             const next = patch.apply(attributes)
-            console.log("was:", attributes)
-            console.log("became:", next)
+            console.log('was:', attributes)
+            console.log('became:', next)
             return next
           })
           break

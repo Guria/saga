@@ -25,14 +25,19 @@ class Store {
   }
 
   disconnect() {
-    this.client.close()
+    const close = this.client.close()
     this.collection = null
     this.client = null
     this.db = null
+    return close
   }
 
-  newTransaction() {
-    return new Transaction(this.collection)
+  newTransaction(options = {}) {
+    return new Transaction(this.collection, options)
+  }
+
+  getDocumentsById(ids) {
+    return this.collection.find({_id: {$in: ids}}).toArray()
   }
 
   fetcher() {
@@ -54,6 +59,10 @@ Store.forDataset = async dataset => {
   await store.connect()
   stores.set(dataset, store)
   return store
+}
+
+Store.closeAll = () => {
+  return Promise.all(Array.from(stores.values()).map(store => store.disconnect()))
 }
 
 module.exports = Store

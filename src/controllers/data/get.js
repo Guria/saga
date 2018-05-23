@@ -1,10 +1,12 @@
-const getDocuments = (dataset, ids) => []
+const Store = require('../../datastore/Store')
 
-module.exports = function getDocumentsById(req, res, next) {
-  const {datasetName, documentId} = req.params
+module.exports = async function getDocumentsById(req, res, next) {
+  const {dataset, documentId} = req.params
   const documentIds = documentId.split(',')
 
-  const documents = getDocuments(datasetName, documentIds)
+  // @todo security
+  const store = await Store.forDataset(dataset)
+  const documents = await store.getDocumentsById(documentIds)
 
   res.json({documents})
 }

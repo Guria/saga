@@ -3,8 +3,9 @@ const uuid = require('uuid/v4')
 // Represents one set of crud operations on the database. Isolated like this
 // to be able to approach transaction-like semantics.
 module.exports = class Transaction {
-  constructor(collection) {
-    this.id = uuid()
+  constructor(collection, options = {}) {
+    const {transactionId} = options
+    this.id = typeof transactionId === 'string' ? transactionId : uuid()
     this.documents = collection
     this.time = new Date()
     // List of performed operations
