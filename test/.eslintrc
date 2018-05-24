@@ -5,6 +5,7 @@
   },
   "rules": {
     "no-sync": 0,
+    "max-statements": 0,
     "max-nested-callbacks": ["error", 4]
   }
 }
