@@ -1,7 +1,7 @@
 const config = require('../../../config')
 
 const getAssetProps = options => {
-  const {type, sha1hash, imageData, extension, req} = options
+  const {type, sha1hash, imageData, extension, req, mimeType, size} = options
   const {width, height} = imageData ? imageData.dimensions : {}
   const datasetName = req.params.dataset
   const projectId = 'vega'
@@ -18,7 +18,9 @@ const getAssetProps = options => {
     path: dstPath,
     url: generateAssetUrl(dstPath),
     originalFilename,
-    extension
+    extension,
+    mimeType,
+    size
   }
 
   if (type === 'image') {

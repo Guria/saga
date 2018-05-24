@@ -7,7 +7,6 @@ const removeUndefined = require('../../util/removeUndefined')
 const verifyPermissions = require('./actions/verifyPermissions')
 const getAssetProps = require('./actions/getAssetProps')
 
-// eslint-disable-next-line complexity, max-statements
 module.exports = async (req, res, next) => {
   const requestId = randomString({length: 16})
   const {dataset} = req.params
@@ -17,52 +16,25 @@ module.exports = async (req, res, next) => {
   const store = await dataStore.forDataset(dataset)
 
   // Verify that the session has access to create the document
-  const asset = {
-    _type: `sanity.fileAsset`,
-    label,
-    title,
-    description
-  }
+  const doc = removeUndefined(
+    Object.assign(
+      {
+        _type: `sanity.fileAsset`,
+        label,
+        title,
+        description
+      },
+      getAssetMeta(req)
+    )
+  )
 
   try {
     log.trace('[%s] Verifying permissions to write file', requestId)
-    await verifyPermissions(store, asset)
+    await verifyPermissions(store, doc)
   } catch (error) {
     next(error)
     return
   }
-
-  const metadata = fileType(req.body.slice(0, 5000)) || {}
-  const sha1hash = crypto
-    .createHash('sha1')
-    .update(req.body)
-    .digest('hex')
-
-  // Resolve "best possible" metadata based on file content, hash and request headers
-  let mimeType = (
-    req.headers['content-type'] ||
-    metadata.mime ||
-    'application/octet-stream'
-  ).replace(/(.*?);.*/, '$1')
-
-  let extension = req.query.filename && path.extname(req.query.filename).replace(/^\./, '')
-  if (!extension || extension === 'bin') {
-    extension = metadata.ext || mime.extension(mimeType) || extension
-  }
-
-  if (mimeType === 'application/octet-stream') {
-    mimeType = mime.lookup(extension) || mimeType
-  }
-
-  const assetProps = getAssetProps({type: 'file', sha1hash, extension, req})
-
-  // Piece together the final asset document
-  const doc = removeUndefined(
-    Object.assign({}, asset, assetProps, {
-      mimeType,
-      size: req.body.length
-    })
-  )
 
   // Write the asset to its final location
   try {
@@ -83,4 +55,39 @@ module.exports = async (req, res, next) => {
   }
 
   res.json({document: doc})
+}
+
+function getAssetMeta(req) {
+  const size = req.body.length
+  const metadata = fileType(req.body.slice(0, 5000)) || {}
+  const sha1hash = crypto
+    .createHash('sha1')
+    .update(req.body)
+    .digest('hex')
+
+  let mimeType = resolveMimeType(req, metadata)
+  const extension = resolveExtension(req, metadata, mimeType)
+
+  if (mimeType === 'application/octet-stream') {
+    mimeType = mime.lookup(extension) || mimeType
+  }
+
+  return getAssetProps({type: 'file', sha1hash, extension, req, mimeType, size})
+}
+
+function resolveMimeType(req, metadata) {
+  // Resolve "best possible" metadata based on file content, hash and request headers
+  return (req.headers['content-type'] || metadata.mime || 'application/octet-stream').replace(
+    /(.*?);.*/,
+    '$1'
+  )
+}
+
+function resolveExtension(req, metadata, mimeType) {
+  let extension = req.query.filename && path.extname(req.query.filename).replace(/^\./, '')
+  if (!extension || extension === 'bin') {
+    extension = metadata.ext || mime.extension(mimeType) || extension
+  }
+
+  return extension
 }
