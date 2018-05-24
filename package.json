@@ -15,7 +15,7 @@
   },
   "keywords": ["vega", "lyra"],
   "engines": {
-    "node": ">=7.6.0"
+    "node": ">=8.6.0"
   },
   "author": "Vega Publish <hello@vegapublish.com>",
   "license": "MIT",
@@ -40,6 +40,7 @@
     "mongodb": "^3.1.0-beta4",
     "pino": "^4.16.1",
     "randomstring": "^1.1.5",
+    "sharp": "^0.20.2",
     "uuid": "^3.2.1"
   },
   "devDependencies": {

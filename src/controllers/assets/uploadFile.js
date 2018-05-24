@@ -1,6 +1,5 @@
 const path = require('path')
 const crypto = require('crypto')
-const randomString = require('randomstring').generate
 const mime = require('mime-types')
 const fileType = require('file-type')
 const removeUndefined = require('../../util/removeUndefined')
@@ -8,28 +7,21 @@ const verifyPermissions = require('./actions/verifyPermissions')
 const getAssetProps = require('./actions/getAssetProps')
 
 module.exports = async (req, res, next) => {
-  const requestId = randomString({length: 16})
   const {dataset} = req.params
-  const {dataStore} = req.app.services
-  const {log, fileStore} = req.app.services
+  const {dataStore, fileStore} = req.app.services
   const {label, title, description} = req.query
   const store = await dataStore.forDataset(dataset)
 
   // Verify that the session has access to create the document
-  const doc = removeUndefined(
-    Object.assign(
-      {
-        _type: `sanity.fileAsset`,
-        label,
-        title,
-        description
-      },
-      getAssetMeta(req)
-    )
-  )
+  const doc = removeUndefined({
+    _type: `sanity.fileAsset`,
+    label,
+    title,
+    description,
+    ...getAssetMeta(req)
+  })
 
   try {
-    log.trace('[%s] Verifying permissions to write file', requestId)
     await verifyPermissions(store, doc)
   } catch (error) {
     next(error)
