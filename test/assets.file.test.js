@@ -9,9 +9,7 @@ const getDocument = (app, id) => {
   return request(app)
     .get(`/v1/data/doc/lyra-test/${id}`)
     .expect(200)
-    .then(res => {
-      return res.body.documents[0]
-    })
+    .then(res => res.body.documents[0])
 }
 
 // @todo

@@ -1,10 +1,11 @@
 const generateId = require('randomstring').generate
 
-module.exports = async (store, asset) => {
+module.exports = (store, asset) => {
   const _id = `perm-check-${generateId({length: 16})}`
   const permAsset = Object.assign({}, asset, {_id})
-  const trx = store.newTransaction()
-  await trx.create(permAsset)
-  await trx.delete(_id)
-  return trx.close()
+  return store
+    .newTransaction()
+    .create(permAsset)
+    .delete(_id)
+    .commit()
 }

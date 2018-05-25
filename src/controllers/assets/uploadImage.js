@@ -44,10 +44,12 @@ module.exports = async (req, res, next) => {
 
   // Write the asset document, exposing it to the world
   try {
-    const trx = await store.newTransaction()
-    await trx.createOrReplace(doc)
-    await trx.close()
+    await store
+      .newTransaction()
+      .createOrReplace(doc)
+      .commit()
   } catch (error) {
+    fileStore.delete(doc.path)
     next(error)
     return
   }

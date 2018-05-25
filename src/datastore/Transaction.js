@@ -1,73 +1,86 @@
 const uuid = require('uuid/v4')
+const Patch = require('./Patch')
+const validators = require('./validators')
 
-// Represents one set of crud operations on the database. Isolated like this
-// to be able to approach transaction-like semantics.
 module.exports = class Transaction {
   constructor(store, options = {}) {
-    const {transactionId} = options
-    this.id = typeof transactionId === 'string' ? transactionId : uuid()
+    const {transactionId, mutations} = options
+    this.trxId = transactionId || uuid()
+    this.mutations = mutations || []
     this.store = store
-    this.time = new Date()
-    // List of performed operations
-    this.operations = []
-    // Cache of the current state of the documents touched during this txn
-    this.cache = {}
   }
 
-  // Must be called when the set of operations is completed. If the backing store
-  // has transactional support, this should commit the changes.
-  // TODO: Asynchronously return transaction report including all modified documents + the ids of
-  // all touched documents.
-  close() {
-    return Promise.resolve({
-      transactionId: this.id,
-      results: this.operations
-    })
+  create(doc) {
+    validators.validateObject('create', doc)
+    return this._add({create: doc})
   }
 
-  async create(attributes) {
-    this.operations.push({
-      id: attributes._id,
-      operation: 'create'
-    })
-    this.cache[attributes._id] = attributes
-
-    await this.store.connect()
-    return this.store.collection.insertOne(attributes)
+  createIfNotExists(doc) {
+    const op = 'createIfNotExists'
+    validators.validateObject(op, doc)
+    validators.requireDocumentId(op, doc)
+    return this._add({[op]: doc})
   }
 
-  async delete(_id) {
-    this.operations.push({
-      id: _id,
-      operation: 'delete'
-    })
-    delete this.cache[_id]
-
-    await this.store.connect()
-    return this.store.collection.deleteOne({_id})
+  createOrReplace(doc) {
+    const op = 'createOrReplace'
+    validators.validateObject(op, doc)
+    validators.requireDocumentId(op, doc)
+    return this._add({[op]: doc})
   }
 
-  async update(_id, operation) {
-    this.operations.push({
-      id: _id,
-      operation: 'update'
-    })
-
-    const original = this.cache[_id] || (await this.documents.findOne({_id}))
-    const next = operation(original)
-    this.cache[_id] = next
-
-    await this.store.connect()
-    return this.store.collection.save(next)
+  delete(documentId) {
+    validators.validateDocumentId('delete', documentId)
+    return this._add({delete: {id: documentId}})
   }
 
-  async createOrReplace(attributes) {
-    this.operations.push({
-      id: attributes._id,
-      operation: 'create'
-    })
+  patch(documentId, patchOps) {
+    const isBuilder = typeof patchOps === 'function'
 
-    await this.store.connect()
-    return this.store.collection.save(attributes)
+    if (isBuilder) {
+      const patch = patchOps(new Patch(documentId, {}, this.client))
+      if (!(patch instanceof Patch)) {
+        throw new Error('function passed to `patch()` must return the patch')
+      }
+
+      return this._add({patch: patch.serialize()})
+    }
+
+    return this._add({patch: {id: documentId, ...patchOps}})
+  }
+
+  transactionId(id) {
+    if (!id) {
+      return this.trxId
+    }
+
+    this.trxId = id
+    return this
+  }
+
+  serialize() {
+    return this.mutations.slice()
+  }
+
+  toJSON() {
+    return this.serialize()
+  }
+
+  async commit(options = {}) {
+    const results = await this.store.executeTransaction(this.serialize(), options)
+    return {
+      transactionId: this.trxId,
+      results
+    }
+  }
+
+  reset() {
+    this.mutations = []
+    return this
+  }
+
+  _add(mut) {
+    this.mutations.push(mut)
+    return this
   }
 }
