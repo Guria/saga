@@ -1,8 +1,8 @@
 const PQueue = require('p-queue')
 const Transaction = require('./Transaction')
-const timeStampMutations = require('./timeStampMutations')
 const TransactionError = require('./errors/TransactionError')
 const MutationError = require('./errors/MutationError')
+const mapMutations = require('./mutationModifiers/mapMutations')
 
 class Store {
   constructor(adapter) {
@@ -40,27 +40,28 @@ class Store {
       throw new Error('Transaction cannot be performed; store is closing')
     }
 
-    const mutations = timeStampMutations(muts, new Date())
+    const timestamp = new Date()
+    const mutations = mapMutations(muts, {timestamp})
+
     return this.mutationQueue.add(async () => {
       const transaction = await this.adapter.startTransaction()
 
       const results = []
       try {
         for (let m = 0; m < mutations.length; m++) {
-          const mutation = mutations[m]
-          const operations = Object.keys(mutation)
-          for (let o = 0; o < operations.length; o++) {
-            const operation = operations[o]
-            const body = mutation[operation]
-            try {
-              results.push(await this.adapter[operation](body, {transaction}))
-            } catch (err) {
-              if (err instanceof MutationError) {
-                throw new TransactionError({errors: [{error: err.payload, index: m}]})
-              }
+          const {operation, body} = mutations[m]
+          if (!this.adapter[operation]) {
+            throw new Error(`Operation "${operation}" not implemented`)
+          }
 
-              throw err
+          try {
+            results.push(await this.adapter[operation](body, {transaction}))
+          } catch (err) {
+            if (err instanceof MutationError) {
+              throw new TransactionError({errors: [{error: err.payload, index: m}]})
             }
+
+            throw err
           }
         }
         await this.adapter.commitTransaction(transaction)
