@@ -151,4 +151,45 @@ describe('mutations', () => {
         expect(res.body.documents[0]).toMatchObject({...doc, counter: 20})
       })
   })
+
+  test('generates document ID if none is given', async () => {
+    const doc = {_type: 'test', random: uuid()}
+    await request(app)
+      .post('/v1/data/mutate/lyra-test')
+      .send({mutations: [{create: doc}]})
+      .expect(200)
+      .then(res => {
+        expect(res.body.results[0]).toHaveProperty('id')
+        doc._id = res.body.results[0].id
+      })
+
+    await request(app)
+      .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.documents).toHaveLength(1)
+        expect(res.body.documents[0]).toMatchObject(doc)
+      })
+  })
+
+  test('generates document ID if prefix given', async () => {
+    const doc = {_id: 'test.', _type: 'test', random: uuid()}
+    await request(app)
+      .post('/v1/data/mutate/lyra-test')
+      .send({mutations: [{create: doc}]})
+      .expect(200)
+      .then(res => {
+        expect(res.body.results[0]).toHaveProperty('id')
+        doc._id = res.body.results[0].id
+        expect(doc._id).toMatch(/^test\.[a-zA-Z0-9]{16,}$/)
+      })
+
+    await request(app)
+      .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.documents).toHaveLength(1)
+        expect(res.body.documents[0]).toMatchObject(doc)
+      })
+  })
 })

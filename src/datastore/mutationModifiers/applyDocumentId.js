@@ -6,7 +6,7 @@ const applyDocumentId = doc => {
   }
 
   if (doc._id.endsWith('.')) {
-    return {_id: `${doc._id}${randomstring()}`, ...doc}
+    return {...doc, _id: `${doc._id}${randomstring()}`}
   }
 
   return doc
