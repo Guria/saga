@@ -1,44 +1,16 @@
 const {Patcher} = require('@sanity/mutator')
-const MongoClient = require('mongodb').MongoClient
 const filterToQuerySelector = require('./filterToQuerySelector')
 const MutationError = require('../../errors/MutationError')
 
+// eslint-disable-next-line id-length
 const writeOptions = {writeConcern: {w: 'majority', j: true}}
 
 module.exports = class MongoDbAdapter {
-  constructor(config, options) {
-    this.config = config
-    this.url = config.url
+  constructor(client, config, options) {
     this.databaseName = options.dataset
-    this.collection = null
-    this.client = null
-    this.db = null
-  }
-
-  async connect() {
-    // Already connected?
-    if (this.client) {
-      return this
-    }
-
-    this.client = await MongoClient.connect(this.url, {useNewUrlParser: true})
+    this.client = client
     this.db = this.client.db(this.databaseName)
-    this.collection = this.db.collection('documents')
-
-    return this
-  }
-
-  disconnect() {
-    if (!this.client) {
-      return Promise.resolve()
-    }
-
-    const close = this.client.close()
-    this.collection = null
-    this.client = null
-    this.db = null
-
-    return close
+    this.collection = this.db.collection(config.options.collection || 'documents')
   }
 
   getDocumentsById(ids) {
@@ -134,7 +106,7 @@ module.exports = class MongoDbAdapter {
   }
 
   truncate() {
-    return this.collection.deleteMany({}, writeOptions)
+    return this.collection.drop()
   }
 }
 

@@ -39,7 +39,11 @@ module.exports = {
   },
 
   datastore: {
-    url: process.env.LYRA_MONGODB_URL || 'mongodb://localhost:27017'
+    adapter: 'MongoDB',
+    url: process.env.LYRA_MONGODB_URL || 'mongodb://localhost:27017',
+    options: {
+      collection: 'documents'
+    }
   }
 }
 

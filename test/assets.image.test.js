@@ -1,8 +1,7 @@
 const request = require('supertest')
 const fs = require('fs')
 const path = require('path')
-const lyra = require('..')
-const {close, getConfig, getAuthHeader} = require('./helpers')
+const {close, getApp, getAuthHeader} = require('./helpers')
 
 const getDocument = (app, id) => {
   return request(app)
@@ -31,7 +30,7 @@ describe('asset image uploads', () => {
   const sortaBrokenImage = fs.readFileSync(path.join(__dirname, 'fixtures', 'sorta-broken.png'))
 
   beforeAll(() => {
-    app = lyra(getConfig())
+    app = getApp()
   })
 
   afterAll(async () => {

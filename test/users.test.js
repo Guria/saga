@@ -1,12 +1,11 @@
 const request = require('supertest')
-const lyra = require('..')
-const {close, getConfig} = require('./helpers')
+const {close, getApp} = require('./helpers')
 
 describe('users', () => {
   let app
 
   beforeAll(() => {
-    app = lyra(getConfig())
+    app = getApp()
   })
 
   afterAll(() => {

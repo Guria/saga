@@ -1,13 +1,12 @@
 const request = require('supertest')
 const uuid = require('uuid/v4')
-const lyra = require('..')
-const {close, getConfig} = require('./helpers')
+const {close, getApp} = require('./helpers')
 
 describe('mutations', () => {
   let app
 
   beforeAll(() => {
-    app = lyra(getConfig())
+    app = getApp()
   })
 
   afterAll(() => {

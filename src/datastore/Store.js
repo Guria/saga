@@ -1,23 +1,19 @@
 const PQueue = require('p-queue')
-const MongoDb = require('./adapters/MongoDB/MongoDB')
 const Transaction = require('./Transaction')
 const timeStampMutations = require('./timeStampMutations')
 const TransactionError = require('./errors/TransactionError')
 const MutationError = require('./errors/MutationError')
 
 class Store {
-  constructor(config, options) {
-    this.adapter = new MongoDb(config, options)
+  constructor(adapter) {
+    this.adapter = adapter
     this.mutationQueue = new PQueue({concurrency: 1})
+    this.isClosing = false
   }
 
-  async connect() {
-    await this.adapter.connect()
-    return this
-  }
-
-  async disconnect() {
-    await this.adapter.disconnect()
+  async close() {
+    this.isClosing = true
+    await this.mutationQueue.onIdle()
     return this
   }
 
@@ -40,6 +36,10 @@ class Store {
 
   /* eslint-disable no-await-in-loop, max-depth, id-length */
   executeTransaction(muts, options) {
+    if (this.isClosing) {
+      throw new Error('Transaction cannot be performed; store is closing')
+    }
+
     const mutations = timeStampMutations(muts, new Date())
     return this.mutationQueue.add(async () => {
       const transaction = await this.adapter.startTransaction()
@@ -75,6 +75,7 @@ class Store {
   /* eslint-enable no-await-in-loop, max-depth, id-length */
 
   truncate() {
+    // eslint-disable-next-line no-process-env
     if (process.env.NODE_ENV !== 'test') {
       throw new Error('Refusing to truncate when NODE_ENV is not "test"')
     }

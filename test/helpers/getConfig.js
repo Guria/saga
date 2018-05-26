@@ -1,16 +1,26 @@
-const {merge} = require('lodash')
+const {merge, uniqueId} = require('lodash')
 const path = require('path')
 const os = require('os')
 const randomstring = require('randomstring').generate
 const defaultConfig = require('../../src/config')
 
-const testConfig = {
-  env: 'test',
-  assets: {
-    options: {
-      basePath: path.join(os.tmpdir(), 'lyra-test', randomstring())
+const executionId = randomstring()
+
+const getTestConfig = () => {
+  const testId = uniqueId(`lyra-test-${executionId}`)
+  return {
+    env: 'test',
+    assets: {
+      options: {
+        basePath: path.join(os.tmpdir(), executionId)
+      }
+    },
+    datastore: {
+      options: {
+        collection: testId
+      }
     }
   }
 }
 
-module.exports = (cfg = {}) => merge({}, defaultConfig, testConfig, cfg)
+module.exports = (cfg = {}) => merge({}, defaultConfig, getTestConfig(), cfg)
