@@ -4,9 +4,10 @@ const validators = require('./validators')
 
 module.exports = class Transaction {
   constructor(store, options = {}) {
-    const {transactionId, mutations} = options
+    const {transactionId, mutations, identity} = options
     this.trxId = transactionId || uuid()
     this.mutations = mutations || []
+    this.identity = identity
     this.store = store
   }
 
@@ -49,17 +50,20 @@ module.exports = class Transaction {
     return this._add({patch: {id: documentId, ...patchOps}})
   }
 
-  transactionId(id) {
-    if (!id) {
-      return this.trxId
-    }
+  getIdentity() {
+    return this.identity
+  }
 
-    this.trxId = id
-    return this
+  getTransactionId() {
+    return this.trxId
   }
 
   serialize() {
     return this.mutations.slice()
+  }
+
+  getMutations() {
+    return this.serialize()
   }
 
   toJSON() {
@@ -67,7 +71,7 @@ module.exports = class Transaction {
   }
 
   async commit(options = {}) {
-    const results = await this.store.executeTransaction(this.serialize(), options)
+    const results = await this.store.executeTransaction(this, options)
     return {
       transactionId: this.trxId,
       results

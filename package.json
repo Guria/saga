@@ -13,7 +13,10 @@
     "type": "git",
     "url": "git+ssh://git@github.com/VegaPublish/lyra.git"
   },
-  "keywords": ["vega", "lyra"],
+  "keywords": [
+    "vega",
+    "lyra"
+  ],
   "engines": {
     "node": ">=8.6.0"
   },
@@ -29,6 +32,7 @@
     "boom": "^5.2.0",
     "celebrate": "^7.0.6",
     "cors": "^2.8.4",
+    "end-of-stream": "^1.4.1",
     "express": "^4.16.3",
     "file-type": "^8.0.0",
     "fs-extra": "^6.0.1",
@@ -56,6 +60,8 @@
     "verbose": true,
     "testEnvironment": "node",
     "transform": {},
-    "setupFiles": ["./test/helpers/setup.js"]
+    "setupFiles": [
+      "./test/helpers/setup.js"
+    ]
   }
 }

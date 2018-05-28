@@ -1,4 +1,8 @@
-const modifiers = [require('./timestampMutation'), require('./applyDocumentId')]
+const modifiers = [
+  require('./timestampMutation'),
+  require('./applyDocumentId'),
+  require('./applyRevision')
+]
 
 function flattenMutations(mutations) {
   return mutations.reduce((acc, mutation) => {

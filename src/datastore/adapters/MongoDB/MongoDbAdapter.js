@@ -97,7 +97,7 @@ module.exports = class MongoDbAdapter {
 
     return this.collection
       .findOneAndDelete({_id: selector.id}, withSession(options))
-      .then(res => (res.value ? {id: selector.id, document: res.value, operation: 'delete'} : null))
+      .then(res => (res.value ? {id: selector.id, operation: 'delete'} : null))
   }
 
   async patch(patches, options) {
