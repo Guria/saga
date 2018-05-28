@@ -22,7 +22,7 @@ describe('mutations', () => {
     const doc = {_id: 'foo', _type: 'test', random: uuid()}
     const transactionId = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -45,7 +45,7 @@ describe('mutations', () => {
 
     // Create
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -63,7 +63,7 @@ describe('mutations', () => {
     // Replace
     random = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{createOrReplace: {...doc, random}}], transactionId})
       .expect(200, {
         transactionId,
@@ -80,7 +80,7 @@ describe('mutations', () => {
 
     // Delete
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{delete: {id: doc._id}}], transactionId})
       .expect(200, {
         transactionId,
@@ -102,7 +102,7 @@ describe('mutations', () => {
 
     // Create
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{createOrReplace: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -120,7 +120,7 @@ describe('mutations', () => {
     // Replace
     random = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{createOrReplace: {...doc, random}}], transactionId})
       .expect(200, {
         transactionId,
@@ -140,7 +140,7 @@ describe('mutations', () => {
     const doc = {_id: 'datpatch', _type: 'test', random: uuid(), counter: 1}
     const transactionId = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -149,7 +149,7 @@ describe('mutations', () => {
 
     const random = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{patch: {id: doc._id, set: {random}, inc: {counter: 1}}}], transactionId})
       .expect(200, {
         transactionId,
@@ -168,7 +168,7 @@ describe('mutations', () => {
   test('performs mutations in the order they are received', async () => {
     const doc = {_id: 'target', _type: 'test', counter: 1}
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}]})
       .expect(200)
 
@@ -176,9 +176,10 @@ describe('mutations', () => {
     for (let i = 0; i <= 20; i++) {
       ops.push(
         request(app)
-          .post('/v1/data/mutate/lyra-test')
+          .post('/v1/data/mutate/lyra-test?returnIds=true&returnDocuments=true')
           .send({mutations: [{patch: {id: doc._id, set: {counter: i}}}]})
           .expect(200)
+          .then(res => expect(res.body.results[0]).toHaveProperty('document._id'))
       )
     }
 
@@ -196,7 +197,7 @@ describe('mutations', () => {
   test('generates document ID if none is given', async () => {
     const doc = {_type: 'test', random: uuid()}
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}]})
       .expect(200)
       .then(res => {
@@ -216,7 +217,7 @@ describe('mutations', () => {
   test('generates document ID if prefix given', async () => {
     const doc = {_id: 'test.', _type: 'test', random: uuid()}
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}]})
       .expect(200)
       .then(res => {

@@ -47,6 +47,7 @@ module.exports = class MongoDbAdapter {
       .insertOne(doc, withSession(options))
       .then(() => ({
         id: doc._id,
+        document: doc,
         operation: 'create'
       }))
       .catch(err => {
@@ -67,6 +68,7 @@ module.exports = class MongoDbAdapter {
       .insertOne(doc, withSession(options))
       .then(() => ({
         id: doc._id,
+        document: doc,
         operation: 'create'
       }))
       .catch(err => {
@@ -83,6 +85,7 @@ module.exports = class MongoDbAdapter {
       .findOneAndReplace({_id: doc._id}, doc, withSession(options, {upsert: true}))
       .then(res => ({
         id: doc._id,
+        document: doc,
         operation: res.lastErrorObject && res.lastErrorObject.updatedExisting ? 'update' : 'create'
       }))
   }
@@ -93,8 +96,8 @@ module.exports = class MongoDbAdapter {
     }
 
     return this.collection
-      .deleteOne({_id: selector.id}, withSession(options))
-      .then(res => (res.deletedCount > 0 ? {id: selector.id, operation: 'delete'} : null))
+      .findOneAndDelete({_id: selector.id}, withSession(options))
+      .then(res => (res.value ? {id: selector.id, document: res.value, operation: 'delete'} : null))
   }
 
   async patch(patches, options) {
@@ -110,8 +113,12 @@ module.exports = class MongoDbAdapter {
     const patch = new Patcher(patches)
     const next = patch.apply(doc)
     return this.collection
-      .save(next, withSession(options))
-      .then(() => ({id: patches.id, operation: 'update'}))
+      .findOneAndReplace({_id: next._id}, next, withSession(options, {upsert: true}))
+      .then(res => ({
+        id: next._id,
+        document: next,
+        operation: 'update'
+      }))
   }
 
   truncate() {

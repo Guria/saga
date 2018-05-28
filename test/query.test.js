@@ -22,7 +22,7 @@ describe('query', () => {
     const doc = {_id: 'foo', _type: 'test', random: uuid()}
     const transactionId = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test')
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
