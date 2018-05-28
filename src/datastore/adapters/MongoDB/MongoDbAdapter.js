@@ -1,10 +1,15 @@
+const {noop} = require('lodash')
 const {Patcher} = require('@sanity/mutator')
 const filterToQuerySelector = require('./filterToQuerySelector')
 const MutationError = require('../../errors/MutationError')
 
 // eslint-disable-next-line id-length
-const writeOptions = {writeConcern: {w: 'majority', j: true}}
-const withSession = ({transaction}) => Object.assign({session: transaction.session}, writeOptions)
+const writeOptions = {w: 'majority', j: true}
+const supportsSession = false
+const withSession = ({transaction}, options = {}) =>
+  supportsSession
+    ? {session: transaction.session, ...writeOptions, ...options}
+    : {...writeOptions, ...options}
 
 module.exports = class MongoDbAdapter {
   constructor(client, config, options) {
@@ -25,6 +30,10 @@ module.exports = class MongoDbAdapter {
   }
 
   startTransaction() {
+    if (!supportsSession) {
+      return {commit: noop, abort: noop}
+    }
+
     const session = this.client.startSession()
     // @todo implement actual transaction commit
     const commit = () => session.endSession()
@@ -70,10 +79,12 @@ module.exports = class MongoDbAdapter {
   }
 
   createOrReplace(doc, options) {
-    return this.collection.save(doc, withSession(options)).then(res => ({
-      id: doc._id,
-      operation: res.result.nModified > 0 ? 'update' : 'create'
-    }))
+    return this.collection
+      .findOneAndReplace({_id: doc._id}, doc, withSession(options, {upsert: true}))
+      .then(res => ({
+        id: doc._id,
+        operation: res.lastErrorObject && res.lastErrorObject.updatedExisting ? 'update' : 'create'
+      }))
   }
 
   delete(selector, options) {
@@ -104,7 +115,7 @@ module.exports = class MongoDbAdapter {
   }
 
   truncate() {
-    return this.collection.drop()
+    return this.collection.drop().catch(noop)
   }
 }
 
