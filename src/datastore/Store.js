@@ -64,9 +64,9 @@ class Store {
             throw err
           }
         }
-        await this.adapter.commitTransaction(transaction)
+        await transaction.commit()
       } catch (err) {
-        this.adapter.abortTransaction()
+        await transaction.abort()
         throw err
       }
 

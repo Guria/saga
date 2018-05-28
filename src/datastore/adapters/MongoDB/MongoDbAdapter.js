@@ -4,6 +4,7 @@ const MutationError = require('../../errors/MutationError')
 
 // eslint-disable-next-line id-length
 const writeOptions = {writeConcern: {w: 'majority', j: true}}
+const withSession = ({transaction}) => Object.assign({session: transaction.session}, writeOptions)
 
 module.exports = class MongoDbAdapter {
   constructor(client, config, options) {
@@ -24,20 +25,17 @@ module.exports = class MongoDbAdapter {
   }
 
   startTransaction() {
-    // @todo implement
-  }
-
-  commitTransaction() {
-    // @todo implement
-  }
-
-  abortTransaction() {
-    // @todo implement
+    const session = this.client.startSession()
+    // @todo implement actual transaction commit
+    const commit = () => session.endSession()
+    // @todo implement actual transaction abort
+    const abort = () => session.endSession()
+    return {session, commit, abort}
   }
 
   create(doc, options) {
     return this.collection
-      .insertOne(doc, writeOptions)
+      .insertOne(doc, withSession(options))
       .then(() => ({
         id: doc._id,
         operation: 'create'
@@ -57,7 +55,7 @@ module.exports = class MongoDbAdapter {
 
   createIfNotExists(doc, options) {
     return this.collection
-      .insertOne(doc, writeOptions)
+      .insertOne(doc, withSession(options))
       .then(() => ({
         id: doc._id,
         operation: 'create'
@@ -72,7 +70,7 @@ module.exports = class MongoDbAdapter {
   }
 
   createOrReplace(doc, options) {
-    return this.collection.save(doc, writeOptions).then(res => ({
+    return this.collection.save(doc, withSession(options)).then(res => ({
       id: doc._id,
       operation: res.result.nModified > 0 ? 'update' : 'create'
     }))
@@ -84,7 +82,7 @@ module.exports = class MongoDbAdapter {
     }
 
     return this.collection
-      .deleteOne({_id: selector.id}, writeOptions)
+      .deleteOne({_id: selector.id}, withSession(options))
       .then(res => (res.deletedCount > 0 ? {id: selector.id, operation: 'delete'} : null))
   }
 
@@ -101,7 +99,7 @@ module.exports = class MongoDbAdapter {
     const patch = new Patcher(patches)
     const next = patch.apply(doc)
     return this.collection
-      .save(next, writeOptions)
+      .save(next, withSession(options))
       .then(() => ({id: patches.id, operation: 'update'}))
   }
 
