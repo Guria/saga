@@ -4,6 +4,7 @@ const Transaction = require('./Transaction')
 const TransactionError = require('./errors/TransactionError')
 const MutationError = require('./errors/MutationError')
 const mapMutations = require('./mutationModifiers/mapMutations')
+const groqQuery = require('../groq/query')
 
 class Store extends EventEmitter {
   constructor(adapter) {
@@ -28,8 +29,22 @@ class Store extends EventEmitter {
     return this.adapter.getDocumentsById(ids)
   }
 
-  fetch(filter) {
-    return this.adapter.fetch(filter)
+  async fetch(filter, params = {}) {
+    // @todo remove try/catch/fallback logic once groq works
+    try {
+      const result = await (typeof filter === 'string'
+        ? groqQuery(filter, params, this.fetch)
+        : this.adapter.fetch(filter, params))
+      return result
+    } catch (err) {
+      try {
+        return this.adapter.__fetch(filter, params)
+      } catch (fallbackErr) {
+        // noop
+      }
+
+      throw err
+    }
   }
 
   async getDocumentById(id) {

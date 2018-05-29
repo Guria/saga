@@ -1,12 +1,3 @@
-const adapters = {
-  fs: require('./fs/fsFileStore')
-}
+const FileStore = require('./FileStore')
 
-module.exports = config => {
-  if (!adapters[config.adapter]) {
-    throw new Error(`Unknown filestore adapter "${config.adapter}"`)
-  }
-
-  const FileStore = adapters[config.adapter]
-  return new FileStore(config)
-}
+module.exports = FileStore

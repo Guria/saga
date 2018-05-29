@@ -57,7 +57,7 @@ module.exports = class MongoDbAdapter {
 
         throw new MutationError({
           description: `Document by ID "${doc._id}" already exists`,
-          id: doc._id,
+          id: doc && doc._id,
           type: 'documentAlreadyExistsError'
         })
       })
@@ -105,7 +105,7 @@ module.exports = class MongoDbAdapter {
     if (!doc) {
       throw new MutationError({
         description: `The document with the ID "${patches.id}" was not found`,
-        id: doc._id,
+        id: patches.id,
         type: 'documentNotFoundError'
       })
     }
@@ -123,6 +123,22 @@ module.exports = class MongoDbAdapter {
 
   truncate() {
     return this.collection.drop().catch(noop)
+  }
+
+  // @todo remove when groq works
+  // this is a fallback because groq doesnt work but we want to develop as if it did
+  __fetch(query, params = {}) {
+    if (
+      query === '*[_type == "identity" && provider == $provider && providerId == $providerId][0]'
+    ) {
+      return this.collection.findOne({_type: 'identity', ...params})
+    }
+
+    if (query === '*[_type == "vega.user" && identityId == $identityId][0]') {
+      return this.collection.findOne({_type: 'vega.user', ...params})
+    }
+
+    throw new Error('Unknown query, nothing to fall back on')
   }
 }
 

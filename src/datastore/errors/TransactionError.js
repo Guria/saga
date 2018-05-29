@@ -6,7 +6,7 @@ class TransactionError extends LyraError {
 
     let description = payload && payload.description
     if (errors && errors.length > 0 && !description) {
-      description = errors[0].description
+      description = errors[0].error.description
     } else if (!description) {
       description = 'An unknown error occured'
     }

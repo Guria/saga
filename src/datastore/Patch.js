@@ -87,10 +87,6 @@ module.exports = class Patch {
     return this.serialize()
   }
 
-  commit(options = {}) {
-    MUTATE()
-  }
-
   reset() {
     this.operations = {}
     return this
@@ -100,11 +96,11 @@ module.exports = class Patch {
     return this._assign(op, props, false)
   }
 
-  _assign(op, props, merge = true) {
+  _assign(op, props, mergeProps = true) {
     validators.validateObject(op, props)
     this.operations = {
       ...this.operations,
-      [op]: merge ? {...(this.operations[op] || {}), ...props} : props
+      [op]: mergeProps ? {...(this.operations[op] || {}), ...props} : props
     }
     return this
   }

@@ -6,16 +6,18 @@ const {errors} = require('celebrate')
 const pkg = require('../package.json')
 const errorHandler = require('./middleware/errorHandler')
 const StoreManager = require('./datastore/StoreManager')
+const UserStore = require('./userstore')
 const getFileStore = require('./filestore')
 
 module.exports = config => {
   const log = pino({level: config.logLevel})
   const fileStore = getFileStore(config.assets)
   const dataStore = new StoreManager(config.datastore)
+  const userStore = new UserStore({dataStore})
 
   const app = express()
   app.disable('x-powered-by')
-  app.services = {log, config, fileStore, dataStore}
+  app.services = {log, config, fileStore, dataStore, userStore}
 
   app.use(cors(config.cors))
 
