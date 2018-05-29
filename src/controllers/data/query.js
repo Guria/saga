@@ -7,7 +7,7 @@ async function performQuery(options, req, res, next) {
   const {query, params} = options
 
   const store = await dataStore.forDataset(dataset)
-  const results = await groqQuery(query, params, store.fetch.bind(store))
+  const results = await groqQuery(query, params, store.fetch)
   const result = typeof results === 'undefined' ? null : results
   res.json({ms: Date.now() - start, query, result})
 }

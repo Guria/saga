@@ -11,6 +11,7 @@ class Store extends EventEmitter {
     this.adapter = adapter
     this.mutationQueue = new PQueue({concurrency: 1})
     this.isClosing = false
+    this.fetch = this.fetch.bind(this)
   }
 
   async close() {
@@ -74,6 +75,7 @@ class Store extends EventEmitter {
 
         await transaction.commit()
         results = results.filter(Boolean)
+
         this.emitMutationEvents({
           mutations: muts,
           transactionId,
