@@ -5,18 +5,15 @@
   "description": "Backend for Vega",
   "main": "src/app.js",
   "scripts": {
-    "coverage": "NODE_ENV=test jest --coverage",
+    "coverage": "NODE_ENV=test jest --coverage --runInBand",
     "start": "node src/server.js",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest --runInBand"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/VegaPublish/lyra.git"
   },
-  "keywords": [
-    "vega",
-    "lyra"
-  ],
+  "keywords": ["vega", "lyra"],
   "engines": {
     "node": ">=8.6.0"
   },
@@ -60,8 +57,6 @@
     "verbose": true,
     "testEnvironment": "node",
     "transform": {},
-    "setupFiles": [
-      "./test/helpers/setup.js"
-    ]
+    "setupFiles": ["./test/helpers/setup.js"]
   }
 }
