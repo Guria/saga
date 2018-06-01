@@ -9,9 +9,7 @@ describe('mutations', () => {
     app = getApp()
   })
 
-  afterAll(() => {
-    close(app)
-  })
+  afterAll(() => close(app))
 
   afterEach(async () => {
     const ds = await app.services.dataStore.forDataset('lyra-test')

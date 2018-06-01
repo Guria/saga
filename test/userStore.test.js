@@ -14,13 +14,11 @@ describe('query', () => {
     app = getApp()
   })
 
-  afterAll(() => {
-    close(app)
-  })
+  afterAll(() => close(app))
 
   afterEach(() =>
     Promise.all(
-      ['_vega_system_', 'lyra-test'].map(dsName =>
+      ['_lyra_system_', 'lyra-test'].map(dsName =>
         app.services.dataStore.forDataset(dsName).then(ds => ds.truncate())
       )
     ))

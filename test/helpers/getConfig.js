@@ -7,9 +7,10 @@ const defaultConfig = require('../../src/config')
 const executionId = randomstring()
 
 const getTestConfig = () => {
-  const testId = uniqueId(`lyra-test-${executionId}`)
+  const testId = uniqueId(`lyra-test-${executionId}-`)
   return {
     env: 'test',
+    logLevel: 'warn',
     assets: {
       options: {
         basePath: path.join(os.tmpdir(), executionId)
@@ -17,7 +18,7 @@ const getTestConfig = () => {
     },
     datastore: {
       options: {
-        collection: testId
+        dbPrefix: testId
       }
     }
   }

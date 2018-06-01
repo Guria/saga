@@ -12,13 +12,10 @@ const exec = require('../exec')
 // every time and still be compliant, although potentially slow.
 
 module.exports = async function query(source, params, fetcher) {
-  console.log("query:", source, "params:", params, "fetcher:", fetcher)
   const ast = parse(source, params)
-  console.log(JSON.stringify(ast))
   const operations = plan(ast)
-  console.log(JSON.stringify(operations, null, 2))
   // fetcher = (filter) => {
-  //   console.log("fetch:", filter)
+
   //   return new Promise((resolve, reject) => {
   //     resolve([
   //       {

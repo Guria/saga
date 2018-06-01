@@ -1,11 +1,16 @@
 const cors = require('cors')
 const pino = require('pino')
-const express = require('express')
-const bodyParser = require('body-parser')
 const {errors} = require('celebrate')
+const passport = require('passport')
+const express = require('express')
+const session = require('express-session')
+const bodyParser = require('body-parser')
+const MongoStore = require('connect-mongo')(session)
+const cookieParser = require('cookie-parser')
 const pkg = require('../package.json')
 const errorHandler = require('./middleware/errorHandler')
 const StoreManager = require('./datastore/StoreManager')
+const applyAuthStrategies = require('./authentication/applyStrategies')
 const UserStore = require('./userstore')
 const getFileStore = require('./filestore')
 
@@ -14,14 +19,34 @@ module.exports = config => {
   const fileStore = getFileStore(config.assets)
   const dataStore = new StoreManager(config.datastore)
   const userStore = new UserStore({dataStore})
+  const sessionStore = new MongoStore({
+    ...config.sessionStore,
+    dbPromise: dataStore.connect().then(client => client.db('_lyra_system_'))
+  })
 
   const app = express()
-  app.disable('x-powered-by')
   app.services = {log, config, fileStore, dataStore, userStore}
-
+  app.disable('x-powered-by')
+  app.set('trust proxy', 1)
+  app.use(session({...config.session, store: sessionStore}))
+  app.use(cookieParser())
   app.use(cors(config.cors))
+  app.use(passport.initialize())
+  app.use(passport.session())
 
   app.get('/', (req, res) => res.json({service: pkg.name, version: pkg.version}))
+
+  app.use(
+    '/v1/auth',
+    bodyParser.json({limit: config.data.maxInputBytes}),
+    require('./controllers/auth')(applyAuthStrategies(app, config))
+  )
+
+  app.use(
+    '/v1/users',
+    bodyParser.json({limit: config.data.maxInputBytes}),
+    require('./controllers/users')
+  )
 
   app.use(
     '/v1/data',
@@ -33,12 +58,6 @@ module.exports = config => {
     '/v1/assets',
     bodyParser.raw({limit: config.assets.maxInputBytes, type: () => true}),
     require('./controllers/assets/upload')
-  )
-
-  app.use(
-    '/v1/users',
-    bodyParser.json({limit: config.data.maxInputBytes}),
-    require('./controllers/users')
   )
 
   app.use(require('./controllers/assets/serve'))

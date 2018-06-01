@@ -11,7 +11,7 @@ module.exports = class Scope {
 
   resolveAccessor(path) {
     let scope = this
-    for(let i = 0; i < path.length; i++) {
+    for (let i = 0; i < path.length; i++) {
       const operation = path[i]
       switch (operation.op) {
         case 'attribute':
@@ -19,7 +19,6 @@ module.exports = class Scope {
             parent: scope,
             value: scope.value[operation.name]
           })
-          console.log(operation.name, '=>', scope.value)
           break
         default:
           throw `Unkown accessor path element ${operation.op}`

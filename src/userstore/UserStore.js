@@ -1,12 +1,17 @@
 module.exports = class UserStore {
   constructor(options) {
     this.dataStore = options.dataStore
-    this.identityStore = this.dataStore.forDataset('_vega_system_')
+    this.identityStore = this.dataStore.forDataset('_lyra_system_')
   }
 
   async connect() {
     this.identityStore = await this.identityStore
     return this.identityStore
+  }
+
+  async fetchIdentityById(id) {
+    await this.connect()
+    return this.identityStore.getDocumentById(id)
   }
 
   async fetchIdentity(provider, providerId) {
@@ -61,7 +66,7 @@ module.exports = class UserStore {
 
     const globalUser = this.connect().then(getUserForIdentity)
     if (!journalId) {
-      return [await globalUser]
+      return [await globalUser].filter(Boolean)
     }
 
     const journalUser = this.dataStore.forDataset(journalId).then(getUserForIdentity)

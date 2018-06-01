@@ -53,9 +53,7 @@ function nodeBinaryOperator(node) {
 }
 
 function nodeAttribute(node) {
-  return new ops.Accessor([
-    new ops.Attribute(node.path)
-  ])
+  return new ops.Accessor([new ops.Attribute(node.path)])
 }
 
 function nodeLiteral(node) {

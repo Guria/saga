@@ -8,18 +8,10 @@ describe('users', () => {
     app = getApp()
   })
 
-  afterAll(() => {
-    close(app)
-  })
+  afterAll(() => close(app))
 
-  test('can fetch current user', () =>
+  test('returns empty object on logged out user', () =>
     request(app)
       .get('/v1/users/me')
-      .expect(200, {
-        id: 'pm6L9ZOzi',
-        name: 'Tilde Nielsen',
-        email: 'tilde@bengler.no',
-        profileImage:
-          'https://cdn.sanity.io/images/ppsg7ml5/test/a6a517d2ec48b2cdd98617214f60698d66d2ad52-869x917.png?w=320&h=320&fit=crop'
-      }))
+      .expect(200, {}))
 })

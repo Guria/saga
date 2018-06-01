@@ -4,6 +4,10 @@ require('hard-rejection/register')
 const server = require('./app')
 const config = require('./config')
 
+if (config.env === 'production' && config.session.secret === config.DEV_SESSION_SECRET) {
+  throw new Error('Cannot use default session secret in production')
+}
+
 const app = server(config)
 
 const httpServer = app.listen(config.port, config.hostname, () => {

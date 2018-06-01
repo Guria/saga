@@ -13,7 +13,7 @@ const withSession = ({transaction}, options = {}) =>
 
 module.exports = class MongoDbAdapter {
   constructor(client, config, options) {
-    this.databaseName = options.dataset
+    this.databaseName = `${config.options.dbPrefix || ''}${options.dataset}`
     this.client = client
     this.db = this.client.db(this.databaseName)
     this.collection = this.db.collection(config.options.collection || 'documents')

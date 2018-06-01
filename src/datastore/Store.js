@@ -29,6 +29,11 @@ class Store extends EventEmitter {
     return this.adapter.getDocumentsById(ids)
   }
 
+  async getDocumentById(id) {
+    const docs = await this.getDocumentsById([id])
+    return docs ? docs[0] : null
+  }
+
   async fetch(filter, params = {}) {
     // @todo remove try/catch/fallback logic once groq works
     try {
@@ -45,11 +50,6 @@ class Store extends EventEmitter {
 
       throw err
     }
-  }
-
-  async getDocumentById(id) {
-    const docs = await this.getDocumentsById([id])
-    return docs ? docs[0] : null
   }
 
   /* eslint-disable no-await-in-loop, max-depth, id-length */

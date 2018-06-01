@@ -14,6 +14,10 @@ module.exports = class StoreManager {
     this.stores = new Map()
   }
 
+  connect() {
+    return this.connector.connect()
+  }
+
   async forDataset(dataset) {
     const client = await this.connector.connect()
     if (this.stores.has(dataset)) {

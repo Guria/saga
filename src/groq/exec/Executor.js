@@ -1,17 +1,14 @@
 const Scope = require('./Scope')
 
 module.exports = class Executor {
-
   constructor(options) {
-    const {
-      operations,
-      scope,
-      fetcher
-    } = options
-    this.scope = scope || new Scope({
-      parent: null,
-      value: {}
-    })
+    const {operations, scope, fetcher} = options
+    this.scope =
+      scope ||
+      new Scope({
+        parent: null,
+        value: {}
+      })
     this.fetch = fetcher
     this.operations = operations
   }
@@ -21,7 +18,6 @@ module.exports = class Executor {
   }
 
   async exec(operation, scope) {
-    console.log(operation, scope)
     switch (operation.op) {
       case 'everything':
         // Make a fake no-op filter to execute a naked everything
@@ -86,19 +82,18 @@ module.exports = class Executor {
     // Extract values. Might be an array or a single value.
     const items = Array.isArray(source.value) ? source.value : [source.value]
 
-    console.log("fetched:", items)
-
     // Run the filter on every item
     const result = []
-    for(let i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       const item = new Scope({parent: source.parent, value: items[i]})
-      const filterValue = operation.filter ? await this.exec(operation.filter, item) : new Scope({value: true})
+      const filterValue = operation.filter
+        ? await this.exec(operation.filter, item)
+        : new Scope({value: true})
       if (filterValue.value) {
         result.push(item.value)
       }
     }
-    console.log("filter result:", result)
+
     return new Scope({parent: scope, value: result})
   }
 }
-

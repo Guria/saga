@@ -33,9 +33,7 @@ describe('asset image uploads', () => {
     app = getApp()
   })
 
-  afterAll(async () => {
-    await close(app)
-  })
+  afterAll(() => close(app))
 
   //
   // Validation tests

@@ -21,9 +21,7 @@ describe('asset file uploads', () => {
     app = getApp()
   })
 
-  afterAll(async () => {
-    await close(app)
-  })
+  afterAll(() => close(app))
 
   test('rejects url-encoded requests', () =>
     request(app)
