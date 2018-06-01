@@ -45,3 +45,10 @@ package-lock.json
 
 # Data
 /data
+
+# OAuth secrets
+/config/*
+
+# Visual studio code stuff
+.vscode
+
