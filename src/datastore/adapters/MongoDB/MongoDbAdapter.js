@@ -1,6 +1,6 @@
 const {noop} = require('lodash')
 const {Patcher} = require('@sanity/mutator')
-const filterToQuerySelector = require('./filterToQuerySelector')
+const {query} = require('./filterToQuerySelector')
 const MutationError = require('../../errors/MutationError')
 
 // eslint-disable-next-line id-length
@@ -23,10 +23,8 @@ module.exports = class MongoDbAdapter {
     return this.collection.find({_id: {$in: ids}}).toArray()
   }
 
-  fetch(filter) {
-    // TODO: Compile filter expression to constraints for find
-    const querySelector = filterToQuerySelector(filter)
-    return this.collection.find(querySelector).toArray()
+  fetch(filter, params) {
+    return query(this.collection, filter, params)
   }
 
   startTransaction() {
@@ -127,17 +125,19 @@ module.exports = class MongoDbAdapter {
 
   // @todo remove when groq works
   // this is a fallback because groq doesnt work but we want to develop as if it did
-  __fetch(query, params = {}) {
+  __fetch(groqQuery, params = {}) {
     if (
-      query === '*[_type == "identity" && provider == $provider && providerId == $providerId][0]'
+      groqQuery ===
+      '*[_type == "identity" && provider == $provider && providerId == $providerId][0]'
     ) {
       return this.collection.findOne({_type: 'identity', ...params})
     }
 
-    if (query === '*[_type == "vega.user" && identityId == $identityId][0]') {
+    if (groqQuery === '*[_type == "vega.user" && identityId == $identityId][0]') {
       return this.collection.findOne({_type: 'vega.user', ...params})
     }
 
+    console.log(groqQuery)
     throw new Error('Unknown query, nothing to fall back on')
   }
 }

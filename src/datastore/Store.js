@@ -34,16 +34,13 @@ class Store extends EventEmitter {
     return docs ? docs[0] : null
   }
 
-  async fetch(filter, params = {}) {
+  fetch(query, params = {}) {
     // @todo remove try/catch/fallback logic once groq works
     try {
-      const result = await (typeof filter === 'string'
-        ? groqQuery(filter, params, this.fetch)
-        : this.adapter.fetch(filter, params))
-      return result
+      return this.adapter.fetch(query, params)
     } catch (err) {
       try {
-        return this.adapter.__fetch(filter, params)
+        return this.adapter.__fetch(query, params)
       } catch (fallbackErr) {
         // noop
       }
