@@ -1,3 +1,6 @@
+const Boom = require('boom')
+const extendBoom = require('../../util/extendBoom')
+
 async function performQuery(options, req, res, next) {
   const start = Date.now()
   const {dataStore} = req.app.services
@@ -14,7 +17,7 @@ const get = (req, res, next) => {
   const params = Object.keys(req.query)
     .filter(param => param.startsWith('$'))
     .reduce((acc, param) => {
-      acc[param.slice(1)] = JSON.parse(req.query[param])
+      acc[param.slice(1)] = parseJson(param, req.query[param])
       return acc
     }, {})
 
@@ -23,5 +26,18 @@ const get = (req, res, next) => {
 }
 
 const post = (req, res, next) => performQuery(req.body, req, res, next)
+
+function parseJson(key, value) {
+  try {
+    return JSON.parse(value)
+  } catch (err) {
+    throw extendBoom(Boom.badRequest('Invalid parameter'), {
+      type: 'httpBadRequest',
+      error: {
+        description: `Unable to parse value of "${key}=${value}". Please quote string values.`
+      }
+    })
+  }
+}
 
 module.exports = {get, post}
