@@ -19,7 +19,7 @@ async function query(collection, groqQuery, params = {}) {
 
 function fetchForSpec(collection, spec) {
   const sort = spec.ordering.map(fromNode)
-  const filter = fromNode(spec.filter)
+  const filter = spec.filter ? fromNode(spec.filter) : {}
   const end = Math.max(0, spec.end || 100)
   const start = Math.max(0, (spec.start || 0) - 1)
   return collection
