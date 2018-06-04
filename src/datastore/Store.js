@@ -1,10 +1,11 @@
 const EventEmitter = require('events')
 const PQueue = require('p-queue')
+const {find} = require('lodash')
+const {Patcher} = require('@sanity/mutator')
 const Transaction = require('./Transaction')
 const TransactionError = require('./errors/TransactionError')
 const MutationError = require('./errors/MutationError')
 const mapMutations = require('./mutationModifiers/mapMutations')
-const groqQuery = require('../groq/query')
 
 class Store extends EventEmitter {
   constructor(adapter) {
@@ -65,6 +66,7 @@ class Store extends EventEmitter {
     return this.mutationQueue.add(async () => {
       const documents = await this.adapter.getDocumentsById(ids)
       const transaction = await this.adapter.startTransaction()
+      const patchDocs = mergeCreatedDocuments(mutations, documents)
 
       let results = []
       try {
@@ -74,8 +76,17 @@ class Store extends EventEmitter {
             throw new Error(`Operation "${operation}" not implemented`)
           }
 
+          // Apply patches with mutator to avoid having to the same work in each adapter
+          const isPatch = operation === 'patch'
+          const targetDoc = isPatch && patchDocs.find(doc => doc._id === body.id)
+          let next
+          if (isPatch && targetDoc) {
+            const patch = new Patcher(body)
+            next = patch.apply(targetDoc)
+          }
+
           try {
-            results.push(await this.adapter[operation](body, {transaction}))
+            results.push(await this.adapter[operation](body, {transaction, next}))
           } catch (err) {
             if (err instanceof MutationError) {
               throw new TransactionError({errors: [{error: err.payload, index: m}]})
@@ -185,6 +196,27 @@ function idFromMutation(operation, body) {
     default:
       throw new Error(`Unknown mutation type "${operation}"`)
   }
+}
+
+function mergeCreatedDocuments(mutations, existing) {
+  return (
+    mutations
+      // Remove non-create (or id-less) mutations
+      .filter(mut => mut.operation.startsWith('create') && mut.body._id)
+      // Remove create/createIfNotExists if document exists
+      .filter(mut => isReplace(mut) || !existing.find(doc => doc._id === mut.body._id))
+      // Remove creates that exist later in mutation array
+      .filter((mut, i, muts) => !find(muts, item => item.body._id === mut.body._id, i + 1))
+      // Merge remaining mutations, make sure to override existing documents with same ID
+      .reduce((docs, mut) => {
+        const prev = existing.findIndex(doc => doc._id === mut._id)
+        return prev === -1 ? docs.concat(mut.body) : docs.splice(prev, 1, mut.body) && docs
+      }, existing.slice())
+  )
+}
+
+function isReplace(mut) {
+  return mut.operation === 'createOrReplace'
 }
 
 module.exports = Store

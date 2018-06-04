@@ -1,5 +1,4 @@
 const {noop} = require('lodash')
-const {Patcher} = require('@sanity/mutator')
 const {query} = require('./filterToQuerySelector')
 const MutationError = require('../../errors/MutationError')
 
@@ -98,9 +97,9 @@ module.exports = class MongoDbAdapter {
       .then(res => (res.value ? {id: selector.id, operation: 'delete'} : null))
   }
 
-  async patch(patches, options) {
-    const doc = await this.collection.findOne({_id: patches.id})
-    if (!doc) {
+  patch(patches, options) {
+    const {next} = options
+    if (!next) {
       throw new MutationError({
         description: `The document with the ID "${patches.id}" was not found`,
         id: patches.id,
@@ -108,8 +107,6 @@ module.exports = class MongoDbAdapter {
       })
     }
 
-    const patch = new Patcher(patches)
-    const next = patch.apply(doc)
     return this.collection
       .findOneAndReplace({_id: next._id}, next, withSession(options, {upsert: true}))
       .then(res => ({

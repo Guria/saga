@@ -232,4 +232,25 @@ describe('mutations', () => {
         expect(res.body.documents[0]).toMatchObject(doc)
       })
   })
+
+  test('can create and patch document in the same transaction', async () => {
+    const create = {_id: 'createpatch', _type: 'test', counter: 1}
+    const patch = {id: 'createpatch', set: {counter: 2}}
+    const transactionId = uuid()
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .send({mutations: [{create}, {patch}], transactionId})
+      .expect(200, {
+        transactionId,
+        results: [{id: create._id, operation: 'create'}, {id: create._id, operation: 'update'}]
+      })
+
+    await request(app)
+      .get(`/v1/data/doc/lyra-test/${create._id}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.documents).toHaveLength(1)
+        expect(res.body.documents[0]).toMatchObject({...create, counter: 2})
+      })
+  })
 })
