@@ -55,6 +55,8 @@ module.exports = {
     maxAge: int(process.env.LYRA_CORS_MAX_AGE, 600),
     origin: split(process.env.LYRA_CORS_ORIGINS) || [
       'http://localhost:3333',
+      'http://127.0.0.1:3333',
+      'http://0.0.0.0:3333',
       'http://localhost:1234',
       'http://127.0.0.1:1234',
       'http://0.0.0.0:1234'
