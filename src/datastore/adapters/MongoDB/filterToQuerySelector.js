@@ -306,15 +306,7 @@ function fromAttribute(node) {
 }
 
 function fromLiteral(node) {
-  switch (node.type) {
-    case 'float':
-    case 'string':
-    case 'integer':
-    case 'bool':
-      return node.value
-    default:
-      throw new Error(`toMongo: Unhandled literal type "${node.type}"`)
-  }
+  return node.value
 }
 
 function fromArray(node) {

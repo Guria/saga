@@ -36,7 +36,7 @@ describe('query', () => {
       })
   })
 
-  test.skip('can query with joins', async () => {
+  test('can query with joins', async () => {
     const bar = {_id: 'bar', _type: 'test', isBar: true}
     const foo = {_id: 'foo', _type: 'test', isBar: false, bar: {_ref: 'bar'}}
     const transactionId = uuid()
