@@ -47,7 +47,7 @@ module.exports = async (req, res, next) => {
 
 async function queryMatchesDocument(query, doc, params) {
   const operations = plan(parse(query, params))
-  const results = await exec({operations, fetcher: spec => [doc]})
+  const results = await exec({operations, fetcher: spec => ({results: [doc], start: 0})})
   return Array.isArray(results.value) && results.value.length > 0
 }
 
