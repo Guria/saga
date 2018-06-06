@@ -1,5 +1,6 @@
 const request = require('supertest')
 const uuid = require('uuid/v4')
+const {sortBy} = require('lodash')
 const {close, getApp} = require('./helpers')
 
 describe('query', () => {
@@ -61,6 +62,48 @@ describe('query', () => {
           isBar: false,
           bar: {isBar: true}
         })
+      })
+
+    await request(app)
+      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent('*[references("bar")]{_id}')}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(1)
+        expect(res.body.result[0]).toMatchObject({_id: 'foo'})
+      })
+  })
+
+  test('can query ordering, limit and offset', async () => {
+    const documents = [
+      {_type: 'test', i: 88},
+      {_type: 'test', i: 3},
+      {_type: 'test', i: 1},
+      {_type: 'test', i: 1337},
+      {_type: 'test', i: 0.55},
+      {_type: 'test', i: 16},
+      {_type: 'test', i: 0.33},
+      {_type: 'test', i: 16}
+    ]
+
+    const sorted = sortBy(documents, 'i')
+      .slice(1, 6)
+      .map(doc => doc.i)
+
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .send({mutations: documents.map(create => ({create}))})
+      .expect(200)
+
+    await request(app)
+      .get(
+        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+          `*[_type == "test"] | order (i asc) [1...6]`
+        )}`
+      )
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(sorted.length)
+        expect(res.body.result.map(doc => doc.i)).toEqual(sorted)
       })
   })
 })

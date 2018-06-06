@@ -15,14 +15,14 @@ async function query(collection, groqQuery, params = {}) {
   const operations = plan(parse(groqQuery, params))
   const results = await exec({
     operations,
-    fetcher: spec => fetchForSpec(collection, spec).then(res => res.results)
+    fetcher: spec => fetchForSpec(collection, spec)
   })
 
   return results.value
 }
 
 async function fetchForSpec(collection, spec) {
-  const sort = spec.ordering.map(fromNode)
+  const sort = spec.ordering.map(fromNode).filter(Boolean)
   const filter = spec.filter ? fromNode(spec.filter) : {}
   const end = Math.max(0, spec.end || 100)
   const start = Math.max(0, (spec.start || 0) - 1)
@@ -36,10 +36,10 @@ async function fetchForSpec(collection, spec) {
   return documents.reduce(
     (acc, doc) => {
       acc.results.push(omit(doc, ['@refs']))
-      acc.refs = acc.refs.concat(doc['@refs'] || [])
+      acc.refs[doc._id] = doc['@refs'] || []
       return acc
     },
-    {results: [], refs: [], start}
+    {results: [], refs: {}, start}
   )
 }
 
@@ -283,8 +283,8 @@ function fromInFilter(node) {
 function fromInPathFilter(node) {
   const [path] = node.arguments.map(fromNode)
   const pattern = escapeRegExp(path)
-    .replace(/\\\*\\\*/g, '')
-    .replace(/\\\*$/g, '[^\\.]+$')
+    .replace(/\*\*$/, '')
+    .replace(/\*$/, '[^\\.]+$')
 
   return {$op: '$regex', value: `^${pattern}`}
 }
@@ -301,12 +301,13 @@ function fromReferencesFilter(node) {
 
 function fromMatchFilter(node) {
   const {type, lhs, rhs} = filterParts(node)
-  const pattern = escapeRegExp(rhs).replace(/\\*$/, '.*?')
+  const pattern = escapeRegExp(rhs).replace(/\*$/, '.*?')
+  const $regex = new RegExp(`\\b${pattern}\\b`, 'i')
   if (type === 'literalComparison') {
-    return new RegExp(pattern, 'i').test(lhs)
+    return $regex.test(lhs)
   }
 
-  return {[lhs]: {$regex: `\\b${pattern}\\b`, $options: 'i'}}
+  return {[lhs]: {$regex}}
 }
 
 function fromAccessor(node) {
@@ -333,6 +334,9 @@ function fromFunctionCall(node) {
       return fromDefinedFilter(node)
     case 'references':
       return fromReferencesFilter(node)
+    case 'coalesce':
+      // @todo See if this can be implemented at some point
+      return true
     default:
       log(node)
       throw new Error(`toMongo: Unhandled function call "${node.name}"`)
@@ -344,11 +348,14 @@ function fromSubscript(node) {
 }
 
 function fromSortDirection(node) {
-  return [fromNode(node.expression), node.direction === 'desc' ? -1 : 1]
+  const expr = fromNode(node.expression)
+  const dir = node.direction === 'desc' ? -1 : 1
+
+  return typeof expr === 'string' ? [expr, dir] : false
 }
 
 function fromOrdering(node) {
-  return {sort: node.terms.map(fromNode)}
+  return {sort: node.terms.map(fromNode).filter(Boolean)}
 }
 
 // eslint-disable-next-line complexity
@@ -386,5 +393,5 @@ function isAccessor(node) {
 
 function escapeRegExp(reg) {
   // eslint-disable-next-line no-useless-escape
-  return reg.replace(/([-.*+?^${}()|[\]\/\\])/g, '\\$1')
+  return reg.replace(/([-.+?^${}()|[\]\/\\])/g, '\\$1')
 }
