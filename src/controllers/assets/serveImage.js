@@ -5,7 +5,7 @@ const config = require('../../config')
 
 const {adapter, options} = config.assets
 const meadOptions = Object.assign({}, options, {
-  basePath: path.join(options.basePath, 'images')
+  basePath: path.join(options.basePath, 'images', 'vega')
 })
 
 module.exports = mead(
