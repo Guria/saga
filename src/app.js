@@ -36,6 +36,8 @@ module.exports = config => {
 
   app.get('/', (req, res) => res.json({service: pkg.name, version: pkg.version}))
 
+  app.get('/v1/versions', require('./controllers/versions'))
+
   app.use(
     '/v1/auth',
     bodyParser.json({limit: config.data.maxInputBytes}),
