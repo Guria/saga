@@ -253,4 +253,84 @@ describe('mutations', () => {
         expect(res.body.documents[0]).toMatchObject({...create, counter: 2})
       })
   })
+
+  test.skip('can create documents with references to existing documents', async () => {
+    const target = {_id: 'target', _type: 'test', is: 'target'}
+    const source = {_id: 'source', _type: 'test', is: 'source', target: {_ref: 'target'}}
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .send({mutations: [{create: target}]})
+      .expect(200)
+
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .send({mutations: [{create: source}]})
+      .expect(200)
+
+    await request(app)
+      .get(`/v1/data/doc/lyra-test/${source._id}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.documents).toHaveLength(1)
+        expect(res.body.documents[0]).toMatchObject(source)
+        expect(res.body.documents[0]).not.toHaveProperty('@refs')
+      })
+
+    await request(app)
+      .get(`/v1/data/query/lyra-test?query=${encodeURIComponent('*[references("target")]')}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(1)
+        expect(res.body.result[0]).toMatchObject(source)
+        expect(res.body.result[0]).not.toHaveProperty('@refs')
+      })
+  })
+
+  test('cannot create documents with references to non-existing documents', async () => {
+    const source = {_id: 'source', _type: 'test', is: 'source', target: {_ref: 'target404'}}
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .send({mutations: [{create: source}]})
+      .expect(409)
+      .then(res => {
+        expect(res.body).toMatchObject({
+          statusCode: 409,
+          error: 'Conflict',
+          description:
+            'The mutation(s) failed: Document "source" references non-existent document "target404"',
+          type: 'mutationError'
+        })
+
+        expect(res.body.items).toHaveLength(1)
+      })
+  })
+
+  test('cannot delete documents with strong references', async () => {
+    const mutations = [
+      {create: {_id: 'ref-foo', _type: 'test'}},
+      {create: {_id: 'ref-bar', _type: 'test', parent: {_ref: 'ref-foo'}}},
+      {create: {_id: 'ref-baz', _type: 'test', refs: [{_ref: 'ref-foo'}, {_ref: 'ref-bar'}]}}
+    ]
+
+    await request(app)
+      .post('/v1/data/mutate/lyra-test')
+      .send({mutations})
+      .expect(200)
+
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .send({mutations: [{delete: {id: 'ref-foo'}}]})
+      .expect(409)
+      .then(res => {
+        expect(res.body).toMatchObject({
+          statusCode: 409,
+          error: 'Conflict',
+          description:
+            'The mutation(s) failed: Document "ref-foo" cannot be deleted as there are references to it from "ref-bar"',
+          type: 'mutationError'
+        })
+
+        expect(res.body.items).toHaveLength(1)
+      })
+  })
 })

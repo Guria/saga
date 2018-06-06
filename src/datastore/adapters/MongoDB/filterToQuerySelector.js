@@ -24,6 +24,7 @@ function fetchForSpec(collection, spec) {
   const start = Math.max(0, (spec.start || 0) - 1)
   return collection
     .find(filter)
+    .project({'@refs': 0})
     .skip(start)
     .limit(end - start)
     .sort(sort)
@@ -41,6 +42,8 @@ function fromNode(node) {
       return fromPipe(node)
     case 'source':
       return fromSource(node)
+    case 'parent':
+      return fromParent(node)
     case 'filter':
       return wrapQuery(fromFilter(node))
     case 'not':
@@ -107,6 +110,11 @@ function fromPipe(pipe) {
   }
 
   return acc
+}
+
+function fromParent(node) {
+  log(node)
+  return {}
 }
 
 function fromAndOperator(node) {
@@ -276,7 +284,7 @@ function fromDefinedFilter(node) {
 
 function fromReferencesFilter(node) {
   const [id] = node.arguments.map(fromNode)
-  return {'@references': id}
+  return {'@refs': {$elemMatch: {id}}}
 }
 
 function fromMatchFilter(node) {

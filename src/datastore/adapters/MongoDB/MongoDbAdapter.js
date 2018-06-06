@@ -1,8 +1,9 @@
-const {noop} = require('lodash')
+const {noop, uniq} = require('lodash')
 const {query} = require('./filterToQuerySelector')
 const MutationError = require('../../errors/MutationError')
 
 // eslint-disable-next-line id-length
+const getIds = docs => docs.map(doc => doc._id)
 const writeOptions = {w: 'majority', j: true}
 const supportsSession = false
 const withSession = ({transaction}, options = {}) =>
@@ -19,7 +20,18 @@ module.exports = class MongoDbAdapter {
   }
 
   getDocumentsById(ids) {
-    return this.collection.find({_id: {$in: ids}}).toArray()
+    return this.collection
+      .find({_id: {$in: ids}})
+      .project({'@refs': 0})
+      .toArray()
+  }
+
+  documentsExists(ids) {
+    return this.collection
+      .find({_id: {$in: ids}})
+      .project({_id: 1})
+      .toArray()
+      .then(getIds)
   }
 
   fetch(filter, params) {
@@ -114,6 +126,22 @@ module.exports = class MongoDbAdapter {
         document: next,
         operation: 'update'
       }))
+  }
+
+  setReferences(documentId, references, options) {
+    const {transaction} = options
+    return this.collection.findOneAndUpdate({_id: documentId}, {$set: {'@refs': references}})
+  }
+
+  findReferencingDocuments(id, options = {}) {
+    const {includeWeak} = {includeWeak: true, ...options}
+    const $elemMatch = includeWeak ? {id} : {id, weak: false}
+    return this.collection
+      .find({'@refs': {$elemMatch}})
+      .project({_id: 1})
+      .toArray()
+      .then(getIds)
+      .then(uniq)
   }
 
   truncate() {

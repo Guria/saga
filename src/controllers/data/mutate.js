@@ -6,9 +6,19 @@ module.exports = async (req, res, next) => {
   const {returnIds, returnDocuments} = req.query
   const {mutations, transactionId} = req.body
   const identity = 'fixme' // @todo
+
   const store = await dataStore.forDataset(dataset)
   const trx = store.newTransaction({transactionId, mutations, identity})
-  const {results, ...rest} = await trx.commit()
+
+  let commitResult
+  try {
+    commitResult = await trx.commit()
+  } catch (err) {
+    return next(err)
+  }
+
+  const {results, ...rest} = commitResult
+
   if (returnIds && returnDocuments) {
     return res.json({results, ...rest})
   }

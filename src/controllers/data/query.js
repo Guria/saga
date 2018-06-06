@@ -7,9 +7,16 @@ async function performQuery(options, req, res, next) {
   const {dataset} = req.params
   const {query, params} = options
 
-  const store = await dataStore.forDataset(dataset)
-  const results = await store.fetch(query, params)
-  const result = typeof results === 'undefined' ? null : results
+  let result
+  try {
+    const store = await dataStore.forDataset(dataset)
+    const results = await store.fetch(query, params)
+    result = typeof results === 'undefined' ? null : results
+  } catch (err) {
+    next(Boom.wrap(err))
+    return
+  }
+
   res.json({ms: Date.now() - start, query, result})
 }
 

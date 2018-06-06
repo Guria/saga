@@ -1,11 +1,12 @@
 const EventEmitter = require('events')
 const PQueue = require('p-queue')
-const {find} = require('lodash')
+const {find, isEqual} = require('lodash')
 const {Patcher} = require('@sanity/mutator')
 const Transaction = require('./Transaction')
 const TransactionError = require('./errors/TransactionError')
 const MutationError = require('./errors/MutationError')
 const mapMutations = require('./mutationModifiers/mapMutations')
+const findReferences = require('../util/findReferences')
 
 class Store extends EventEmitter {
   constructor(adapter) {
@@ -63,6 +64,7 @@ class Store extends EventEmitter {
     const ids = getTouchedDocumentIds(muts)
     const mutations = mapMutations(muts, {timestamp, transaction: trx})
 
+    // eslint-disable-next-line complexity
     return this.mutationQueue.add(async () => {
       const documents = await this.adapter.getDocumentsById(ids)
       const transaction = await this.adapter.startTransaction()
@@ -77,12 +79,22 @@ class Store extends EventEmitter {
           }
 
           // Apply patches with mutator to avoid having to the same work in each adapter
+          const isDelete = operation === 'delete'
           const isPatch = operation === 'patch'
           const targetDoc = isPatch && patchDocs.find(doc => doc._id === body.id)
           let next
           if (isPatch && targetDoc) {
             const patch = new Patcher(body)
             next = patch.apply(targetDoc)
+          }
+
+          if (isPatch || operation.startsWith('create')) {
+            await this.checkForeignKeysCreation(next || body, patchDocs, m)
+          }
+
+          const deleteDoc = isDelete && documents.find(doc => doc._id === body.id)
+          if (deleteDoc) {
+            await this.checkForeignKeysDeletion(deleteDoc, null, m)
           }
 
           try {
@@ -96,8 +108,15 @@ class Store extends EventEmitter {
           }
         }
 
-        await transaction.commit()
         results = results.filter(Boolean)
+
+        const refPatches = generateDocumentReferencePatches(results, documents)
+        for (let i = 0; i < refPatches.length; i++) {
+          const patch = refPatches[i]
+          await this.adapter.setReferences(patch.id, patch.references, {transaction})
+        }
+
+        await transaction.commit()
 
         this.emitMutationEvents({
           mutations: muts,
@@ -116,6 +135,65 @@ class Store extends EventEmitter {
     })
   }
   /* eslint-enable no-await-in-loop, max-depth, id-length */
+
+  async checkForeignKeysDeletion(targetDoc, patchDocs, i) {
+    const referencingIDs = await this.adapter.findReferencingDocuments(targetDoc._id, {
+      includeWeak: false
+    })
+
+    if (referencingIDs.length === 0) {
+      return
+    }
+
+    const description = `Document "${
+      targetDoc._id
+    }" cannot be deleted as there are references to it from "${referencingIDs[0]}"`
+
+    throw new TransactionError({
+      errors: [
+        {
+          error: {
+            description,
+            id: targetDoc._id,
+            referencingIDs,
+            type: 'documentHasExistingReferencesError'
+          },
+          index: i
+        }
+      ],
+      statusCode: 409
+    })
+  }
+
+  async checkForeignKeysCreation(next, patchDocs, i) {
+    // See if the document references any items strongly, and validate that the documents exist
+    const strongRefs = findReferences(next)
+      .filter(ref => !ref.weak)
+      .map(ref => ref.id)
+
+    const existingIds = strongRefs && (await this.adapter.documentsExists(strongRefs))
+    const allExistingIds = (existingIds || []).concat(patchDocs.map(doc => doc._id))
+    const missing = strongRefs && strongRefs.find(id => !allExistingIds.includes(id))
+    if (!missing) {
+      return
+    }
+
+    const description = `Document "${next._id}" references non-existent document "${missing}"`
+    throw new TransactionError({
+      errors: [
+        {
+          error: {
+            description,
+            id: next._id,
+            referenceID: missing,
+            type: 'documentReferenceDoesNotExistError'
+          },
+          index: i
+        }
+      ],
+      statusCode: 409
+    })
+  }
 
   emitMutationEvents(options) {
     const {mutations, transactionId, timestamp, identity, results, documents} = options
@@ -217,6 +295,34 @@ function mergeCreatedDocuments(mutations, existing) {
 
 function isReplace(mut) {
   return mut.operation === 'createOrReplace'
+}
+
+function generateDocumentReferencePatches(results, prevDocs) {
+  const mutationResults = getUniqueDocumentResults(results)
+
+  const refs = mutationResults.map(result => {
+    const prevDoc = prevDocs.find(doc => doc._id === result.id)
+    const prevRefs = prevDoc && findReferences(prevDoc)
+    const newRefs = findReferences(result.document)
+
+    if (!prevDoc && newRefs.length === 0) {
+      return false
+    }
+
+    const hasDiff =
+      !prevDoc ||
+      prevRefs.length !== newRefs.length ||
+      prevRefs.some((prevRef, idx) => !isEqual(prevRef, newRefs[idx]))
+
+    return (
+      hasDiff && {
+        id: result.id,
+        references: newRefs
+      }
+    )
+  })
+
+  return refs.filter(Boolean)
 }
 
 module.exports = Store
