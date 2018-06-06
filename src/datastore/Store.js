@@ -37,18 +37,7 @@ class Store extends EventEmitter {
   }
 
   fetch(query, params = {}) {
-    // @todo remove try/catch/fallback logic once groq works
-    try {
-      return this.adapter.fetch(query, params)
-    } catch (err) {
-      try {
-        return this.adapter.__fetch(query, params)
-      } catch (fallbackErr) {
-        // noop
-      }
-
-      throw err
-    }
+    return this.adapter.fetch(query, params)
   }
 
   /* eslint-disable no-await-in-loop, max-depth, id-length */

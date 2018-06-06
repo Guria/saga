@@ -20,10 +20,7 @@ module.exports = class MongoDbAdapter {
   }
 
   getDocumentsById(ids) {
-    return this.collection
-      .find({_id: {$in: ids}})
-      .project({'@refs': 0})
-      .toArray()
+    return this.collection.find({_id: {$in: ids}}).toArray()
   }
 
   documentsExists(ids) {
@@ -146,24 +143,6 @@ module.exports = class MongoDbAdapter {
 
   truncate() {
     return this.collection.drop().catch(noop)
-  }
-
-  // @todo remove when groq works
-  // this is a fallback because groq doesnt work but we want to develop as if it did
-  __fetch(groqQuery, params = {}) {
-    if (
-      groqQuery ===
-      '*[_type == "identity" && provider == $provider && providerId == $providerId][0]'
-    ) {
-      return this.collection.findOne({_type: 'identity', ...params})
-    }
-
-    if (groqQuery === '*[_type == "vega.user" && identityId == $identityId][0]') {
-      return this.collection.findOne({_type: 'vega.user', ...params})
-    }
-
-    console.log(groqQuery)
-    throw new Error('Unknown query, nothing to fall back on')
   }
 }
 

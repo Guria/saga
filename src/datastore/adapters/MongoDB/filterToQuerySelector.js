@@ -1,5 +1,5 @@
 const util = require('util')
-const {merge} = require('lodash')
+const {merge, omit} = require('lodash')
 const {plan, parse, exec} = require('groq')
 
 // eslint-disable-next-line no-console
@@ -13,22 +13,34 @@ module.exports = {
 
 async function query(collection, groqQuery, params = {}) {
   const operations = plan(parse(groqQuery, params))
-  const results = await exec({operations, fetcher: spec => fetchForSpec(collection, spec)})
+  const results = await exec({
+    operations,
+    fetcher: spec => fetchForSpec(collection, spec).then(res => res.results)
+  })
+
   return results.value
 }
 
-function fetchForSpec(collection, spec) {
+async function fetchForSpec(collection, spec) {
   const sort = spec.ordering.map(fromNode)
   const filter = spec.filter ? fromNode(spec.filter) : {}
   const end = Math.max(0, spec.end || 100)
   const start = Math.max(0, (spec.start || 0) - 1)
-  return collection
+  const documents = await collection
     .find(filter)
-    .project({'@refs': 0})
     .skip(start)
     .limit(end - start)
     .sort(sort)
     .toArray()
+
+  return documents.reduce(
+    (acc, doc) => {
+      acc.results.push(omit(doc, ['@refs']))
+      acc.refs = acc.refs.concat(doc['@refs'] || [])
+      return acc
+    },
+    {results: [], refs: [], start}
+  )
 }
 
 function toMongo(node) {
