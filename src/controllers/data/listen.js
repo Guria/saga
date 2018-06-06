@@ -12,7 +12,8 @@ module.exports = async (req, res, next) => {
 
   const channel = new SseChannel({
     historySize: 250,
-    jsonEncode: true
+    jsonEncode: true,
+    cors: false
   })
 
   channel.addClient(req, res)
