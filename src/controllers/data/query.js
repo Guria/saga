@@ -13,7 +13,7 @@ async function performQuery(options, req, res, next) {
     const results = await store.fetch(query, params)
     result = typeof results === 'undefined' ? null : results
   } catch (err) {
-    next(Boom.wrap(err))
+    next(err)
     return
   }
 
