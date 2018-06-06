@@ -202,12 +202,6 @@ class Store extends EventEmitter {
       const documentId = result.id
       const previous = documents.find(doc => doc._id === documentId)
 
-      // @todo Hmmz? How do we determine? Query/filter is also a part of this equation
-      let transition = 'update'
-      if (!previous || !result) {
-        transition = !previous && result ? 'appear' : 'disappear'
-      }
-
       this.emit('mutation', {
         type: 'mutation',
         eventId: `${transactionId}#${documentId}`,
@@ -219,8 +213,7 @@ class Store extends EventEmitter {
         previousRev: previous ? previous._rev : undefined,
         previous,
         mutations,
-        result: result.document,
-        transition
+        result: result.document
       })
     })
   }
