@@ -1,3 +1,3 @@
 # Lyra
 
-Backend for Vega
+Backend for Vega.
