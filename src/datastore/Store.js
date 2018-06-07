@@ -201,7 +201,7 @@ class Store extends EventEmitter {
         timestamp: timestamp.toISOString(),
         previousRev: previous ? previous._rev : undefined,
         previous,
-        mutations,
+        mutations: getMutationsForDocumentId(mutations, documentId),
         result: result.document
       })
     })
@@ -242,6 +242,13 @@ function getTouchedDocumentIds(mutations) {
       return set.add(idFromMutation(operation, body))
     }, new Set())
   )
+}
+
+function getMutationsForDocumentId(mutations, documentId) {
+  return mutations.filter(mutation => {
+    const [operation] = Object.keys(mutation)
+    return operation && idFromMutation(operation, mutation[operation]) === documentId
+  })
 }
 
 function idFromMutation(operation, body) {
