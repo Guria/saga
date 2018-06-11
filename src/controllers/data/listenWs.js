@@ -1,9 +1,12 @@
-const uuid = require('uuid/v4')
 const {omit} = require('lodash')
 const {plan, parse, exec} = require('groq')
 const formatRpcMessage = require('../../util/formatRpcMessage')
 
-module.exports = async (msg, ws, req) => {
+module.exports = listen
+
+const listeners = new Map()
+
+async function listen(msg, ws, req) {
   const {dataset, app} = req
   const {dataStore, log} = app.services
   const {query, params, includeResult, includePreviousRevision} = msg.params
@@ -16,15 +19,22 @@ module.exports = async (msg, ws, req) => {
 
   const emitOptions = {ws, id, params, query, omitProps}
   const onMutation = mut => emitOnMutationMatch(mut, emitOptions)
-
-  ws.send(formatRpcMessage({listenerName: uuid(), event: 'welcome'}, msg.id, {stream: true}))
-
-  store.on('mutation', onMutation)
-  ws.on('close', () => {
-    log.info('End of WS stream, unsubscribing from mutations')
+  const cancel = () => {
+    log.info('Cancelling listener with ID %s', id)
     store.removeListener('mutation', onMutation)
-  })
+    return ws
+  }
+
+  listeners.set(msg.id, {cancel})
+  ws.send(formatRpcMessage({listenerName: msg.id, event: 'welcome'}, msg.id, {stream: true}))
+  store.on('mutation', onMutation)
+  ws.on('close', () => cancel)
 }
+
+listen.cancel = (msg, ws, req) =>
+  listeners.has(msg.id) &&
+  listeners.get(msg.id).cancel() &&
+  ws.send(formatRpcMessage({event: 'complete'}, msg.id, {complete: true}))
 
 async function queryMatchesDocument(query, doc, params) {
   const operations = plan(parse(query, params))

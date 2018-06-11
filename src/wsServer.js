@@ -1,10 +1,12 @@
 const WebSocket = require('ws')
 const passport = require('passport')
 const {isPlainObject} = require('lodash')
+const listen = require('./controllers/data/listenWs')
 
 const pathMatch = /^\/v1\/data\/channel\/([-\w]+)($|\/)/
 const methods = {
-  listen: require('./controllers/data/listenWs')
+  listen,
+  cancel: listen.cancel
 }
 
 const initPassport = passport.initialize()
