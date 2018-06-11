@@ -6,18 +6,18 @@ module.exports = function applyStrategies(app, config) {
   const {userStore, log} = app.services
 
   passport.serializeUser((user, done) => {
-    log.info(`Serializing user to ${user._id}`)
+    log.trace(`Serializing user to ${user._id}`)
     done(null, `${user._id}`)
   })
 
   passport.deserializeUser(async (id, done) => {
-    log.info(`Fetching users for identity ${id}`)
+    log.trace(`Fetching users for identity ${id}`)
     const [identity, users] = await Promise.all([
       userStore.fetchIdentityById(id),
       userStore.fetchUsersForIdentity(id)
     ])
 
-    log.info(`Found %d users`, users ? users.length : 0)
+    log.trace(`Found %d users`, users ? users.length : 0)
     done(null, {id, identity, users})
   })
 

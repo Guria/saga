@@ -24,11 +24,13 @@ module.exports = config => {
     dbPromise: dataStore.connect().then(client => client.db('_lyra_system_'))
   })
 
+  const sessionParser = session({...config.session, store: sessionStore})
+
   const app = express()
-  app.services = {log, config, fileStore, dataStore, userStore}
+  app.services = {log, config, fileStore, dataStore, userStore, sessionParser}
   app.disable('x-powered-by')
   app.set('trust proxy', 1)
-  app.use(session({...config.session, store: sessionStore}))
+  app.use(sessionParser)
   app.use(cookieParser())
   app.use(cors(config.cors))
   app.use(passport.initialize())
