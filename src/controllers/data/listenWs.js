@@ -1,5 +1,6 @@
 const {omit} = require('lodash')
 const {plan, parse, exec} = require('groq')
+const WebSocket = require('ws')
 const formatRpcMessage = require('../../util/formatRpcMessage')
 
 module.exports = listen
@@ -9,7 +10,7 @@ const listeners = new Map()
 async function listen(msg, ws, req) {
   const {dataset, app} = req
   const {dataStore, log} = app.services
-  const {query, params, includeResult, includePreviousRevision} = msg.params
+  const {query, params, includeResult, includePreviousRevision} = msg.params || {}
   const id = msg.id
 
   const store = await dataStore.forDataset(dataset)
@@ -21,20 +22,27 @@ async function listen(msg, ws, req) {
   const onMutation = mut => emitOnMutationMatch(mut, emitOptions)
   const cancel = () => {
     log.info('Cancelling listener with ID %s', id)
+    listeners.delete(id)
     store.removeListener('mutation', onMutation)
     return ws
   }
 
-  listeners.set(msg.id, {cancel})
-  ws.send(formatRpcMessage({listenerName: msg.id, event: 'welcome'}, msg.id, {stream: true}))
+  listeners.set(id, {cancel})
+  send(ws, formatRpcMessage({listenerName: id, type: 'welcome'}, id, {stream: true}))
   store.on('mutation', onMutation)
-  ws.on('close', () => cancel)
+  ws.on('close', cancel)
 }
 
 listen.cancel = (msg, ws, req) =>
   listeners.has(msg.id) &&
   listeners.get(msg.id).cancel() &&
-  ws.send(formatRpcMessage({event: 'complete'}, msg.id, {complete: true}))
+  send(ws, formatRpcMessage({type: 'complete'}, msg.id, {complete: true}))
+
+function send(ws, data) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(data)
+  }
+}
 
 async function queryMatchesDocument(query, doc, params) {
   const operations = plan(parse(query, params))
@@ -61,5 +69,5 @@ async function emitOnMutationMatch(mut, options) {
 
   const data = omitProps.length > 0 ? omit(mut, omitProps) : mut
 
-  ws.send(formatRpcMessage({...data, event: 'mutation', transition}, id))
+  send(ws, formatRpcMessage({...data, type: 'mutation', transition}, id))
 }
