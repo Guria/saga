@@ -1,6 +1,6 @@
 const util = require('util')
 const {merge, omit} = require('lodash')
-const {plan, parse, exec} = require('groq')
+const {query: execQuery} = require('groq')
 
 // eslint-disable-next-line no-console
 const log = ast => console.log(util.inspect(ast, {colors: true, depth: 15}))
@@ -11,14 +11,13 @@ module.exports = {
   query
 }
 
-async function query(collection, groqQuery, params = {}) {
-  const operations = plan(parse(groqQuery, params))
-  const results = await exec({
-    operations,
+function query(collection, groqQuery, params = {}) {
+  return execQuery({
+    source: groqQuery,
+    globalFilter: null,
+    params,
     fetcher: spec => fetchForSpec(collection, spec)
   })
-
-  return results.value
 }
 
 async function fetchForSpec(collection, spec) {
