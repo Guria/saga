@@ -31,8 +31,8 @@ module.exports = class MongoDbAdapter {
       .then(getIds)
   }
 
-  fetch(filter, params) {
-    return query(this.collection, filter, params)
+  fetch(filter, params, options) {
+    return query(this.collection, filter, params, options)
   }
 
   startTransaction() {

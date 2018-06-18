@@ -11,10 +11,10 @@ module.exports = {
   query
 }
 
-function query(collection, groqQuery, params = {}) {
+function query(collection, groqQuery, params = {}, options) {
   return execQuery({
     source: groqQuery,
-    globalFilter: null,
+    globalFilter: options.globalFilter || undefined,
     params,
     fetcher: spec => fetchForSpec(collection, spec)
   })

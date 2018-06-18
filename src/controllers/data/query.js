@@ -1,16 +1,21 @@
 const Boom = require('boom')
 const extendBoom = require('../../util/extendBoom')
+const securityManager = require('../../security/securityManager')
 
 async function performQuery(options, req, res, next) {
   const start = Date.now()
   const {dataStore} = req.app.services
   const {dataset} = req.params
   const {query, params} = options
+  const globalFilters = securityManager.getFilterExpressionsForUser(
+    dataset,
+    req.user && req.user.id
+  )
 
   let result
   try {
     const store = await dataStore.forDataset(dataset)
-    const results = await store.fetch(query, params)
+    const results = await store.fetch(query, params, {globalFilter: globalFilters.read})
     result = typeof results === 'undefined' ? null : results
   } catch (err) {
     next(err)

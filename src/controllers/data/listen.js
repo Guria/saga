@@ -29,7 +29,7 @@ module.exports = async (req, res, next) => {
     }, {})
 
   const store = await dataStore.forDataset(dataset)
-  const omitProps = []
+  const omitProps = ['annotations']
     .concat(includeResult ? [] : ['result'])
     .concat(includePreviousRevision ? [] : ['previous'])
 

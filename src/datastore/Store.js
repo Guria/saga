@@ -9,12 +9,13 @@ const mapMutations = require('./mutationModifiers/mapMutations')
 const findReferences = require('../util/findReferences')
 
 class Store extends EventEmitter {
-  constructor(adapter) {
+  constructor(adapter, options) {
     super()
     this.adapter = adapter
     this.mutationQueue = new PQueue({concurrency: 1})
     this.isClosing = false
     this.fetch = this.fetch.bind(this)
+    this.dataset = options.dataset
   }
 
   async close() {
@@ -36,16 +37,17 @@ class Store extends EventEmitter {
     return docs ? docs[0] : null
   }
 
-  fetch(query, params = {}) {
-    return this.adapter.fetch(query, params)
+  fetch(query, params = {}, options = {}) {
+    return this.adapter.fetch(query, params, options)
   }
 
   /* eslint-disable no-await-in-loop, max-depth, id-length */
-  executeTransaction(trx, options) {
+  executeTransaction(trx, options = {}) {
     if (this.isClosing) {
       throw new Error('Transaction cannot be performed; store is closing')
     }
 
+    const annotations = {...(options.annotations || {}), journalId: this.dataset}
     const muts = trx.getMutations()
     const transactionId = trx.getTransactionId()
     const identity = trx.getIdentity()
@@ -113,7 +115,8 @@ class Store extends EventEmitter {
           timestamp,
           identity,
           results,
-          documents
+          documents,
+          annotations
         })
       } catch (err) {
         await transaction.abort()
@@ -185,7 +188,7 @@ class Store extends EventEmitter {
   }
 
   emitMutationEvents(options) {
-    const {mutations, transactionId, timestamp, identity, results, documents} = options
+    const {mutations, transactionId, timestamp, identity, results, documents, annotations} = options
     const mutationResults = getUniqueDocumentResults(results)
     mutationResults.forEach(result => {
       const documentId = result.id
@@ -202,7 +205,8 @@ class Store extends EventEmitter {
         previousRev: previous ? previous._rev : undefined,
         previous,
         mutations: getMutationsForDocumentId(mutations, documentId),
-        result: result.document
+        result: result.document,
+        annotations
       })
     })
   }

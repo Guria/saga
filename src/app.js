@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser')
 const pkg = require('../package.json')
 const errorHandler = require('./middleware/errorHandler')
 const StoreManager = require('./datastore/StoreManager')
+const securityManager = require('./security/securityManager')
 const applyAuthStrategies = require('./authentication/applyStrategies')
 const UserStore = require('./userstore')
 const getFileStore = require('./filestore')
@@ -25,6 +26,8 @@ module.exports = config => {
   })
 
   const sessionParser = session({...config.session, store: sessionStore})
+
+  dataStore.on('mutation', securityManager.onMutation)
 
   const app = express()
   app.services = {log, config, fileStore, dataStore, userStore, sessionParser}

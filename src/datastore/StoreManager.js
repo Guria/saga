@@ -1,8 +1,11 @@
+const {EventEmitter} = require('events')
 const Store = require('./Store')
 const adapters = require('./adapters')
 
-module.exports = class StoreManager {
+module.exports = class StoreManager extends EventEmitter {
   constructor(config) {
+    super()
+
     const storeImplementation = adapters[config.adapter]
     if (!storeImplementation) {
       throw new Error(`Could not find DataStore adapter for type "${config.adapter}"`)
@@ -12,6 +15,7 @@ module.exports = class StoreManager {
     this.storeImplementation = storeImplementation
     this.connector = new storeImplementation.Connector(config)
     this.stores = new Map()
+    this.onMutation = this.onMutation.bind(this)
   }
 
   connect() {
@@ -26,8 +30,9 @@ module.exports = class StoreManager {
 
     const Adapter = this.storeImplementation.Adapter
     const adapter = new Adapter(client, this.config, {dataset})
-    const store = new Store(adapter)
+    const store = new Store(adapter, {dataset})
     this.stores.set(dataset, store)
+    store.on('mutation', this.onMutation)
     return store
   }
 
@@ -35,6 +40,10 @@ module.exports = class StoreManager {
     const stores = Array.from(this.stores.entries())
     const ops = stores.map(([dataset, store]) => this.stores.delete(dataset) && store.close())
     return Promise.all(ops)
+  }
+
+  onMutation(mut) {
+    this.emit('mutation', mut)
   }
 
   disconnect() {
