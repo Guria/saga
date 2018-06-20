@@ -1,10 +1,11 @@
 const Boom = require('boom')
 const uuid = require('uuid/v4')
 const {omit} = require('lodash')
-const {plan, parse, exec} = require('groq')
+const {query: execQuery} = require('groq')
 const endOfStream = require('end-of-stream')
 const SseChannel = require('sse-channel')
 const extendBoom = require('../../util/extendBoom')
+const securityManager = require('../../security/securityManager')
 
 module.exports = async (req, res, next) => {
   let messageIndex = 0
@@ -33,7 +34,12 @@ module.exports = async (req, res, next) => {
     .concat(includeResult ? [] : ['result'])
     .concat(includePreviousRevision ? [] : ['previous'])
 
-  const emitOptions = {channel, params, query, omitProps}
+  const filterOptions = {
+    user: req.user && req.user.id,
+    dataset
+  }
+
+  const emitOptions = {channel, params, query, omitProps, filterOptions}
   const onMutation = mut => emitOnMutationMatch(mut, getMessageId(), emitOptions)
 
   channel.send({id: getMessageId(), data: {listenerName: uuid()}, event: 'welcome'})
@@ -45,17 +51,28 @@ module.exports = async (req, res, next) => {
   })
 }
 
-async function queryMatchesDocument(query, doc, params) {
-  const operations = plan(parse(query, params))
-  const results = await exec({operations, fetcher: spec => ({results: [doc], start: 0})})
+async function queryMatchesDocument(query, doc, params, filterOptions) {
+  const {dataset, user} = filterOptions
+  const globalFilter = securityManager.getFilterExpressionsForUser(dataset, user).read
+
+  const results = await execQuery({
+    source: query,
+    globalFilter: globalFilter,
+    params,
+    fetcher: spec => ({results: [doc], start: 0})
+  })
+
   return Array.isArray(results.value) && results.value.length > 0
 }
 
 async function emitOnMutationMatch(mut, messageId, options) {
-  const {query, params, channel, omitProps} = options
+  const {query, params, channel, omitProps, filterOptions} = options
 
-  const matchesPrev = mut.previous && (await queryMatchesDocument(query, mut.previous, params))
-  const matchesNext = mut.result && (await queryMatchesDocument(query, mut.result, params))
+  const matchesPrev =
+    mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
+
+  const matchesNext =
+    mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
 
   let transition
   if (matchesPrev && matchesNext) {

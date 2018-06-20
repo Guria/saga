@@ -1,7 +1,8 @@
 const {omit} = require('lodash')
-const {plan, parse, exec} = require('groq')
+const {query: execQuery} = require('groq')
 const WebSocket = require('ws')
 const formatRpcMessage = require('../../util/formatRpcMessage')
+const securityManager = require('../../security/securityManager')
 
 module.exports = listen
 
@@ -18,7 +19,12 @@ async function listen(msg, ws, req) {
     .concat(includeResult ? [] : ['result'])
     .concat(includePreviousRevision ? [] : ['previous'])
 
-  const emitOptions = {ws, id, params, query, omitProps}
+  const filterOptions = {
+    user: req.user && req.user.id,
+    dataset
+  }
+
+  const emitOptions = {ws, id, params, query, omitProps, filterOptions}
   const onMutation = mut => emitOnMutationMatch(mut, emitOptions)
   const cancel = () => {
     log.info('Cancelling listener with ID %s', id)
@@ -44,17 +50,28 @@ function send(ws, data) {
   }
 }
 
-async function queryMatchesDocument(query, doc, params) {
-  const operations = plan(parse(query, params))
-  const results = await exec({operations, fetcher: spec => ({results: [doc], start: 0})})
+async function queryMatchesDocument(query, doc, params, filterOptions) {
+  const {dataset, user} = filterOptions
+  const globalFilter = securityManager.getFilterExpressionsForUser(dataset, user).read
+
+  const results = await execQuery({
+    source: query,
+    globalFilter: globalFilter,
+    params,
+    fetcher: spec => ({results: [doc], start: 0})
+  })
+
   return Array.isArray(results.value) && results.value.length > 0
 }
 
 async function emitOnMutationMatch(mut, options) {
-  const {id, query, params, ws, omitProps} = options
+  const {id, query, params, ws, omitProps, filterOptions} = options
 
-  const matchesPrev = mut.previous && (await queryMatchesDocument(query, mut.previous, params))
-  const matchesNext = mut.result && (await queryMatchesDocument(query, mut.result, params))
+  const matchesPrev =
+    mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
+
+  const matchesNext =
+    mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
 
   let transition
   if (matchesPrev && matchesNext) {
