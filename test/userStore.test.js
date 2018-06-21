@@ -18,7 +18,7 @@ describe('query', () => {
 
   afterEach(() =>
     Promise.all(
-      ['_lyra_system_', 'lyra-test'].map(dsName =>
+      ['lyra-system-test', 'lyra-test'].map(dsName =>
         app.services.dataStore.forDataset(dsName).then(ds => ds.truncate())
       )
     ))
@@ -36,11 +36,11 @@ describe('query', () => {
     const ident = await userStore.createIdentity(identity)
     expect(ident).toMatchObject(identity)
 
-    const stub = await userStore.createAdminUserStub()
+    const stub = await userStore.createAdminUser()
     expect(stub).toMatchObject({isAdmin: true})
 
     const claimed = await userStore.claimUser(stub._id, ident._id, null, {name: 'Espen', arb: 'i'})
-    expect(claimed).toMatchObject({isAdmin: true, identityId: ident._id, name: 'Espen'})
+    expect(claimed).toMatchObject({isAdmin: true, identity: ident._id, name: 'Espen'})
     expect(claimed).not.toHaveProperty('arb')
 
     const users = await userStore.fetchUsersForIdentity(ident._id)
@@ -53,14 +53,14 @@ describe('query', () => {
     const ident = await userStore.createIdentity(identity)
     expect(ident).toMatchObject(identity)
 
-    const stub = await userStore.createAdminUserStub('lyra-test')
+    const stub = await userStore.createAdminUser({}, 'lyra-test')
     expect(stub).toMatchObject({isAdmin: true})
 
     const claimed = await userStore.claimUser(stub._id, ident._id, 'lyra-test', {
       name: 'Espen',
       arb: 'i'
     })
-    expect(claimed).toMatchObject({isAdmin: true, identityId: ident._id, name: 'Espen'})
+    expect(claimed).toMatchObject({isAdmin: true, identity: ident._id, name: 'Espen'})
     expect(claimed).not.toHaveProperty('arb')
 
     const users = await userStore.fetchUsersForIdentity(ident._id, 'lyra-test')

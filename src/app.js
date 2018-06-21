@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser')
 const pkg = require('../package.json')
 const errorHandler = require('./middleware/errorHandler')
 const StoreManager = require('./datastore/StoreManager')
-const securityManager = require('./security/securityManager')
+const SecurityManager = require('./security/SecurityManager')
 const applyAuthStrategies = require('./authentication/applyStrategies')
 const UserStore = require('./userstore')
 const getFileStore = require('./filestore')
@@ -19,18 +19,30 @@ module.exports = config => {
   const log = pino({level: config.logLevel})
   const fileStore = getFileStore(config.assets)
   const dataStore = new StoreManager(config.datastore)
-  const userStore = new UserStore({dataStore})
+  const userStore = new UserStore({dataStore, db: config.datastore.options.systemDb})
+  const securityManager = new SecurityManager({userStore})
   const sessionStore = new MongoStore({
     ...config.sessionStore,
-    dbPromise: dataStore.connect().then(client => client.db('_lyra_system_'))
+    dbPromise: dataStore.connect().then(client => client.db(config.datastore.options.systemDb))
   })
 
   const sessionParser = session({...config.session, store: sessionStore})
 
+  dataStore.setSecurityManager(securityManager)
   dataStore.on('mutation', securityManager.onMutation)
 
   const app = express()
-  app.services = {log, config, fileStore, dataStore, userStore, sessionParser}
+  app.services = {
+    log,
+    config,
+    sessionStore,
+    fileStore,
+    dataStore,
+    userStore,
+    sessionParser,
+    securityManager
+  }
+
   app.disable('x-powered-by')
   app.set('trust proxy', 1)
   app.use(sessionParser)

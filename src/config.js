@@ -70,7 +70,8 @@ module.exports = {
     adapter: 'MongoDB',
     url: process.env.LYRA_MONGODB_URL || 'mongodb://localhost:27017',
     options: {
-      collection: 'documents'
+      collection: 'documents',
+      systemDb: env === 'test' ? 'lyra-system-test' : 'lyra-system'
     }
   },
 

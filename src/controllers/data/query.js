@@ -1,13 +1,12 @@
 const Boom = require('boom')
 const extendBoom = require('../../util/extendBoom')
-const securityManager = require('../../security/securityManager')
 
 async function performQuery(options, req, res, next) {
   const start = Date.now()
-  const {dataStore} = req.app.services
+  const {dataStore, securityManager} = req.app.services
   const {dataset} = req.params
   const {query, params} = options
-  const globalFilters = securityManager.getFilterExpressionsForUser(
+  const globalFilters = await securityManager.getFilterExpressionsForUser(
     dataset,
     req.user && req.user.id
   )

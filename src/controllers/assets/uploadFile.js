@@ -22,7 +22,7 @@ module.exports = async (req, res, next) => {
   })
 
   try {
-    await verifyPermissions(store, doc)
+    await verifyPermissions(req, store, doc)
   } catch (error) {
     next(error)
     return
@@ -39,7 +39,7 @@ module.exports = async (req, res, next) => {
   // Write the asset document, exposing it to the world
   try {
     await store
-      .newTransaction()
+      .newTransaction({identity: req.user && req.user.id})
       .createOrReplace(doc)
       .commit()
   } catch (error) {

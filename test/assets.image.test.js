@@ -1,22 +1,25 @@
 const request = require('supertest')
 const fs = require('fs')
 const path = require('path')
-const {close, getApp, getAuthHeader} = require('./helpers')
-
-const getDocument = (app, id) => {
-  return request(app)
-    .get(`/v1/data/doc/lyra-test/${id}`)
-    .expect(200)
-    .then(async res => {
-      return res.body.documents[0]
-    })
-}
+const {close, getApp, createAdminUser, getSessionCookie} = require('./helpers')
 
 // @todo
 const getPermissionError = () => {}
 
 describe('asset image uploads', () => {
   let app
+  let adminUser
+
+  const getDocument = id => {
+    return request(app)
+      .get(`/v1/data/doc/lyra-test/${id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .expect(200)
+      .then(async res => {
+        return res.body.documents[0]
+      })
+  }
+
   const tiny = fs.readFileSync(path.join(__dirname, 'fixtures', 'tiny.png'))
   const gpsJpegImage = fs.readFileSync(path.join(__dirname, 'fixtures', 'gps.jpg'))
   const rotatedImage = fs.readFileSync(path.join(__dirname, 'fixtures', 'rotated.jpg'))
@@ -33,6 +36,16 @@ describe('asset image uploads', () => {
     app = getApp()
   })
 
+  beforeEach(async () => {
+    const dataStore = app.services.dataStore
+    await Promise.all([
+      dataStore.forDataset('lyra-test').then(ds => ds.truncate()),
+      dataStore.forDataset('lyra-system-test').then(ds => ds.truncate())
+    ])
+
+    adminUser = await createAdminUser(app)
+  })
+
   afterAll(() => close(app))
 
   //
@@ -41,7 +54,7 @@ describe('asset image uploads', () => {
   test('rejects url-encoded requests', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .send(tiny)
       .expect(400, {
@@ -54,7 +67,7 @@ describe('asset image uploads', () => {
   test('rejects form-data requests', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .send(tiny)
       .expect(400, {
@@ -67,7 +80,7 @@ describe('asset image uploads', () => {
   test('rejects invalid dataset names', () =>
     request(app)
       .post('/v1/assets/images/my%20dataset')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(tiny)
       .expect(400, {
@@ -84,7 +97,7 @@ describe('asset image uploads', () => {
     const label = new Array(70).join('label')
     return request(app)
       .post(`/v1/assets/images/lyra-test?label=${label}`)
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(tiny)
       .expect(400, {
@@ -102,7 +115,7 @@ describe('asset image uploads', () => {
     const filename = new Array(70).join('filename')
     return request(app)
       .post(`/v1/assets/images/lyra-test?filename=${filename}`)
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(tiny)
       .expect(400, {
@@ -119,7 +132,7 @@ describe('asset image uploads', () => {
   test.skip('rejects with 400 on insufficient permissions', () => {
     return request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(tiny)
       .expect(400, getPermissionError('create'))
@@ -128,7 +141,7 @@ describe('asset image uploads', () => {
   test('rejects with 400 on empty body', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(Buffer.from(''))
       .expect(400, {
@@ -140,7 +153,7 @@ describe('asset image uploads', () => {
   test('rejects with 400 on invalid images', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(Buffer.from('moop'))
       .expect(400, {
@@ -153,7 +166,7 @@ describe('asset image uploads', () => {
   test('rejects with 400 on broken images', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/jpeg')
       .send(brokenImage)
       .expect(400, {
@@ -166,7 +179,7 @@ describe('asset image uploads', () => {
   test('rejects with 400 on broken images (#2)', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(sortaBrokenImage)
       .expect(400, {
@@ -179,7 +192,7 @@ describe('asset image uploads', () => {
   test('rejects with 400 on broken images (#3)', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(brokenDifferentlyImage)
       .expect(400, {
@@ -192,7 +205,7 @@ describe('asset image uploads', () => {
   test('rejects with 400 on broken images (#4)', () =>
     request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(brokenHuffmanImage)
       .expect(400, {
@@ -208,7 +221,7 @@ describe('asset image uploads', () => {
   test('uploads images', () => {
     return request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(tiny)
       .expect(200)
@@ -219,7 +232,7 @@ describe('asset image uploads', () => {
         const file = await app.services.fileStore.read(res.body.document.path)
         expect(file).toEqual(tiny)
 
-        const doc = await getDocument(app, res.body.document._id)
+        const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
           _type: 'sanity.imageAsset',
           assetId: '89174d1b2cd414d46910dd68bc93839492c6bd42',
@@ -237,7 +250,7 @@ describe('asset image uploads', () => {
     const originalFilename = 'blåbærsyltetøy på skiva.png'
     return request(app)
       .post(`/v1/assets/images/lyra-test?filename=${encodeURIComponent(originalFilename)}`)
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/png')
       .send(tiny)
       .then(async res => {
@@ -248,7 +261,7 @@ describe('asset image uploads', () => {
         const file = await app.services.fileStore.read(res.body.document.path)
         expect(file).toEqual(tiny)
 
-        const doc = await getDocument(app, res.body.document._id)
+        const doc = await getDocument(res.body.document._id)
         expect(doc).toHaveProperty('originalFilename', originalFilename)
       })
   })
@@ -256,10 +269,10 @@ describe('asset image uploads', () => {
   test('infers images with no content-type to their actual mime type', () => {
     return request(app)
       .post('/v1/assets/images/lyra-test')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send(gpsJpegImage)
       .then(async res => {
-        const doc = await getDocument(app, res.body.document._id)
+        const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
           mimeType: 'image/jpeg',
           extension: 'jpg'
@@ -270,7 +283,7 @@ describe('asset image uploads', () => {
   test('extracts correct width/height info for rotated images', () => {
     return request(app)
       .post('/v1/assets/images/lyra-test?meta=none')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send(rotatedImage)
       .then(res => {
         expect(res.body.document.metadata).toMatchObject({
@@ -284,7 +297,7 @@ describe('asset image uploads', () => {
   test('supports webp uploads', () => {
     return request(app)
       .post('/v1/assets/images/lyra-test?meta=none')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send(webpImage)
       .then(res => {
         expect(res.body.document).toMatchObject({
@@ -300,7 +313,7 @@ describe('asset image uploads', () => {
   test('rejects unknown formats', () =>
     request(app)
       .post('/v1/assets/images/lyra-test?meta=none')
-      .set('Authorization', getAuthHeader())
+      .set('Cookie', getSessionCookie(app, adminUser))
       .set('Content-Type', 'image/x-targa')
       .send(targaImage)
       .expect(400, {

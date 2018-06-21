@@ -1,26 +1,34 @@
 const request = require('supertest')
 const uuid = require('uuid/v4')
-const {close, getApp} = require('./helpers')
+const promiseEvent = require('p-event')
+const {close, getApp, delay, createAdminUser, getSessionCookie} = require('./helpers')
 
 describe('mutations', () => {
   let app
+  let adminUser
 
   beforeAll(() => {
     app = getApp()
   })
 
-  afterAll(() => close(app))
+  beforeEach(async () => {
+    const dataStore = app.services.dataStore
+    await Promise.all([
+      dataStore.forDataset('lyra-test').then(ds => ds.truncate()),
+      dataStore.forDataset('lyra-system-test').then(ds => ds.truncate())
+    ])
 
-  afterEach(async () => {
-    const ds = await app.services.dataStore.forDataset('lyra-test')
-    return ds.truncate()
+    adminUser = await createAdminUser(app)
   })
+
+  afterAll(() => close(app))
 
   test('can create and fetch document', async () => {
     const doc = {_id: 'foo', _type: 'test', random: uuid()}
     const transactionId = uuid()
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -29,6 +37,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -44,6 +53,7 @@ describe('mutations', () => {
     // Create
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -52,6 +62,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -62,6 +73,7 @@ describe('mutations', () => {
     random = uuid()
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{createOrReplace: {...doc, random}}], transactionId})
       .expect(200, {
         transactionId,
@@ -70,6 +82,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -79,6 +92,7 @@ describe('mutations', () => {
     // Delete
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{delete: {id: doc._id}}], transactionId})
       .expect(200, {
         transactionId,
@@ -87,6 +101,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(0)
@@ -101,6 +116,7 @@ describe('mutations', () => {
     // Create
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{createOrReplace: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -109,6 +125,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1) // Create
@@ -119,6 +136,7 @@ describe('mutations', () => {
     random = uuid()
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{createOrReplace: {...doc, random}}], transactionId})
       .expect(200, {
         transactionId,
@@ -127,6 +145,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1) // Replace
@@ -139,6 +158,7 @@ describe('mutations', () => {
     const transactionId = uuid()
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: doc}], transactionId})
       .expect(200, {
         transactionId,
@@ -148,6 +168,7 @@ describe('mutations', () => {
     const random = uuid()
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{patch: {id: doc._id, set: {random}, inc: {counter: 1}}}], transactionId})
       .expect(200, {
         transactionId,
@@ -156,6 +177,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -164,9 +186,10 @@ describe('mutations', () => {
   })
 
   test('performs mutations in the order they are received', async () => {
-    const doc = {_id: 'target', _type: 'test', counter: 1}
+    const doc = {_id: 'target-race', _type: 'test', counter: 1}
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: doc}]})
       .expect(200)
 
@@ -175,16 +198,21 @@ describe('mutations', () => {
       ops.push(
         request(app)
           .post('/v1/data/mutate/lyra-test?returnIds=true&returnDocuments=true')
+          .set('Cookie', getSessionCookie(app, adminUser))
           .send({mutations: [{patch: {id: doc._id, set: {counter: i}}}]})
           .expect(200)
           .then(res => expect(res.body.results[0]).toHaveProperty('document._id'))
       )
+
+      // eslint-disable-next-line no-await-in-loop
+      await promiseEvent(app.services.dataStore, 'queue-mutation')
     }
 
     await Promise.all(ops)
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -196,6 +224,7 @@ describe('mutations', () => {
     const doc = {_type: 'test', random: uuid()}
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: doc}]})
       .expect(200)
       .then(res => {
@@ -205,6 +234,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -216,6 +246,7 @@ describe('mutations', () => {
     const doc = {_id: 'test.', _type: 'test', random: uuid()}
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: doc}]})
       .expect(200)
       .then(res => {
@@ -226,6 +257,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -239,6 +271,7 @@ describe('mutations', () => {
     const transactionId = uuid()
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create}, {patch}], transactionId})
       .expect(200, {
         transactionId,
@@ -247,6 +280,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${create._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -254,21 +288,24 @@ describe('mutations', () => {
       })
   })
 
-  test.skip('can create documents with references to existing documents', async () => {
+  test('can create documents with references to existing documents', async () => {
     const target = {_id: 'target', _type: 'test', is: 'target'}
     const source = {_id: 'source', _type: 'test', is: 'source', target: {_ref: 'target'}}
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: target}]})
       .expect(200)
 
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: source}]})
       .expect(200)
 
     await request(app)
       .get(`/v1/data/doc/lyra-test/${source._id}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.documents).toHaveLength(1)
@@ -278,6 +315,7 @@ describe('mutations', () => {
 
     await request(app)
       .get(`/v1/data/query/lyra-test?query=${encodeURIComponent('*[references("target")]')}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.result).toHaveLength(1)
@@ -290,6 +328,7 @@ describe('mutations', () => {
     const source = {_id: 'source', _type: 'test', is: 'source', target: {_ref: 'target404'}}
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{create: source}]})
       .expect(409)
       .then(res => {
@@ -314,11 +353,13 @@ describe('mutations', () => {
 
     await request(app)
       .post('/v1/data/mutate/lyra-test')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations})
       .expect(200)
 
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: [{delete: {id: 'ref-foo'}}]})
       .expect(409)
       .then(res => {

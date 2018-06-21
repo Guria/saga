@@ -2,6 +2,7 @@ const EventEmitter = require('events')
 const PQueue = require('p-queue')
 const {find, isEqual} = require('lodash')
 const {Patcher} = require('@sanity/mutator')
+const {query: execQuery} = require('groq')
 const Transaction = require('./Transaction')
 const TransactionError = require('./errors/TransactionError')
 const MutationError = require('./errors/MutationError')
@@ -9,18 +10,24 @@ const mapMutations = require('./mutationModifiers/mapMutations')
 const findReferences = require('../util/findReferences')
 
 class Store extends EventEmitter {
-  constructor(adapter, options) {
+  constructor(adapter, options = {}) {
     super()
     this.adapter = adapter
     this.mutationQueue = new PQueue({concurrency: 1})
     this.isClosing = false
     this.fetch = this.fetch.bind(this)
     this.dataset = options.dataset
+    this.securityManager = options.securityManager
   }
 
   async close() {
     this.isClosing = true
     await this.mutationQueue.onIdle()
+    return this
+  }
+
+  setSecurityManager(manager) {
+    this.securityManager = manager
     return this
   }
 
@@ -42,10 +49,19 @@ class Store extends EventEmitter {
   }
 
   /* eslint-disable no-await-in-loop, max-depth, id-length */
-  executeTransaction(trx, options = {}) {
+  async executeTransaction(trx, options = {}) {
+    if (!this.securityManager) {
+      throw new Error('No security manager provided to store')
+    }
+
     if (this.isClosing) {
       throw new Error('Transaction cannot be performed; store is closing')
     }
+
+    const filters = await this.securityManager.getFilterExpressionsForUser(
+      this.dataset,
+      options.identity
+    )
 
     const annotations = {...(options.annotations || {}), journalId: this.dataset}
     const muts = trx.getMutations()
@@ -55,10 +71,17 @@ class Store extends EventEmitter {
     const ids = getTouchedDocumentIds(muts)
     const mutations = mapMutations(muts, {timestamp, transaction: trx})
 
+    this.emit('queue-mutation', {
+      blocked: this.mutationQueue.pending > 0,
+      dataset: this.dataset
+    })
+
     // eslint-disable-next-line complexity
     return this.mutationQueue.add(async () => {
       const documents = await this.adapter.getDocumentsById(ids)
       const transaction = await this.adapter.startTransaction()
+
+      // @todo refactor/test that patches are applied on _existing_ documents
       const patchDocs = mergeCreatedDocuments(mutations, documents)
 
       let results = []
@@ -79,15 +102,36 @@ class Store extends EventEmitter {
             next = patch.apply(targetDoc)
           }
 
-          if (isPatch || operation.startsWith('create')) {
-            await this.checkForeignKeysCreation(next || body, patchDocs, m)
+          // Permission and foreign keys checks
+          if (isPatch && targetDoc) {
+            await checkPermissions(filters.update, targetDoc, 'update', m)
+          }
+
+          if (operation === 'create' || operation === 'createIfNotExists') {
+            await checkPermissions(filters.create, body, 'create', m)
+          }
+
+          if (operation === 'createOrReplace') {
+            const prev = documents.find(doc => doc._id === body._id)
+            await (prev
+              ? Promise.all([
+                  checkPermissions(filters.delete, prev, 'delete', m),
+                  checkPermissions(filters.create, body, 'create', m)
+                ])
+              : checkPermissions(filters.create, body, 'create', m))
           }
 
           const deleteDoc = isDelete && documents.find(doc => doc._id === body.id)
           if (deleteDoc) {
+            await checkPermissions(filters.delete, deleteDoc, 'delete', m)
             await this.checkForeignKeysDeletion(deleteDoc, null, m)
           }
 
+          if (isPatch || operation.startsWith('create')) {
+            await this.checkForeignKeysCreation(next || body, patchDocs, m)
+          }
+
+          // Execute operation
           try {
             results.push(await this.adapter[operation](body, {transaction, next}))
           } catch (err) {
@@ -316,6 +360,41 @@ function generateDocumentReferencePatches(results, prevDocs) {
   })
 
   return refs.filter(Boolean)
+}
+
+async function checkPermissions(filter, doc, permission, i) {
+  const hasAccess = await filterMatchesDocument(filter, doc)
+  if (hasAccess) {
+    return true
+  }
+
+  throw new TransactionError({
+    errors: [
+      {
+        error: {
+          description: `Insufficient permissions; permission "${permission}" required`,
+          permission,
+          type: 'insufficientPermissionsError'
+        },
+        index: i
+      }
+    ],
+    statusCode: 403
+  })
+}
+
+async function filterMatchesDocument(filter, doc) {
+  if (!filter) {
+    return true
+  }
+
+  const results = await execQuery({
+    source: filter,
+    params: {},
+    fetcher: spec => ({results: [doc], start: 0})
+  })
+
+  return Array.isArray(results && results.value) && results.value.length > 0
 }
 
 module.exports = Store

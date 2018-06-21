@@ -2,8 +2,9 @@ const util = require('util')
 const {merge, omit} = require('lodash')
 const {query: execQuery} = require('groq')
 
-// eslint-disable-next-line no-console
-const log = ast => console.log(util.inspect(ast, {colors: true, depth: 15}))
+const log = (prefix, ast) =>
+  // eslint-disable-next-line no-console
+  console.log('%s: ', prefix, util.inspect(ast, {colors: true, depth: 15}))
 
 module.exports = {
   toMongo,
@@ -14,7 +15,7 @@ module.exports = {
 function query(collection, groqQuery, params = {}, options) {
   return execQuery({
     source: groqQuery,
-    globalFilter: options.globalFilter || undefined,
+    globalFilter: options.globalFilter || undefined || 'true',
     params,
     fetcher: spec => fetchForSpec(collection, spec)
   })
@@ -25,12 +26,18 @@ async function fetchForSpec(collection, spec) {
   const filter = spec.filter ? fromNode(spec.filter) : {}
   const end = Math.max(0, spec.end || 100)
   const start = Math.max(0, (spec.start || 0) - 1)
-  const documents = await collection
-    .find(filter)
-    .skip(start)
-    .limit(end - start)
-    .sort(sort)
-    .toArray()
+
+  // Filter might be short-circuited to `false`,
+  // don't query mongodb if this is the case
+  let documents = []
+  if (filter) {
+    documents = await collection
+      .find(filter)
+      .skip(start)
+      .limit(end - start)
+      .sort(sort)
+      .toArray()
+  }
 
   return documents.reduce(
     (acc, doc) => {
@@ -124,16 +131,32 @@ function fromPipe(pipe) {
 }
 
 function fromParent(node) {
-  log(node)
   return {}
 }
 
 function fromAndOperator(node) {
-  return {$and: [node.lhs, node.rhs].map(asFilter)}
+  const [lhs, rhs] = [node.lhs, node.rhs].map(asFilter)
+  // Short circuit on "false" or "true"
+  if (lhs === false || rhs === false) {
+    return false
+  } else if (lhs === true && rhs === true) {
+    return {}
+  } else if (lhs === true || rhs === true) {
+    return lhs === true ? rhs : lhs
+  }
+
+  return {$and: [lhs, rhs]}
 }
 
 function fromOrOperator(node) {
-  return {$or: [node.lhs, node.rhs].map(asFilter)}
+  const [lhs, rhs] = [node.lhs, node.rhs].map(asFilter)
+  // Short circuit on any side being literal true
+  if (lhs === true || rhs === true) {
+    return {}
+  }
+
+  // Remove any falsey parts
+  return {$or: [lhs, rhs].filter(Boolean)}
 }
 
 function asFilter(node) {
@@ -337,7 +360,7 @@ function fromFunctionCall(node) {
       // @todo See if this can be implemented at some point
       return true
     default:
-      log(node)
+      log(node.name, node)
       throw new Error(`toMongo: Unhandled function call "${node.name}"`)
   }
 }

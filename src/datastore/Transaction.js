@@ -71,7 +71,11 @@ module.exports = class Transaction {
   }
 
   async commit(options = {}) {
-    const results = await this.store.executeTransaction(this, options)
+    const results = await this.store.executeTransaction(this, {
+      identity: this.getIdentity(),
+      ...options
+    })
+
     return {
       transactionId: this.trxId,
       results

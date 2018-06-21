@@ -14,12 +14,19 @@ module.exports = class StoreManager extends EventEmitter {
     this.config = config
     this.storeImplementation = storeImplementation
     this.connector = new storeImplementation.Connector(config)
-    this.stores = new Map()
     this.onMutation = this.onMutation.bind(this)
+    this.onMutationQueued = this.onMutationQueued.bind(this)
+    this.stores = new Map()
   }
 
   connect() {
     return this.connector.connect()
+  }
+
+  setSecurityManager(manager) {
+    this.securityManager = manager
+    this.stores.forEach(store => store.setSecurityManager(manager))
+    return this
   }
 
   async forDataset(dataset) {
@@ -28,11 +35,13 @@ module.exports = class StoreManager extends EventEmitter {
       return this.stores.get(dataset)
     }
 
+    const securityManager = this.securityManager
     const Adapter = this.storeImplementation.Adapter
     const adapter = new Adapter(client, this.config, {dataset})
-    const store = new Store(adapter, {dataset})
+    const store = new Store(adapter, {dataset, securityManager})
     this.stores.set(dataset, store)
     store.on('mutation', this.onMutation)
+    store.on('queue-mutation', this.onMutationQueued)
     return store
   }
 
@@ -44,6 +53,10 @@ module.exports = class StoreManager extends EventEmitter {
 
   onMutation(mut) {
     this.emit('mutation', mut)
+  }
+
+  onMutationQueued(data) {
+    this.emit('queue-mutation', data)
   }
 
   disconnect() {

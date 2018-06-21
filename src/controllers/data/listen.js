@@ -5,7 +5,6 @@ const {query: execQuery} = require('groq')
 const endOfStream = require('end-of-stream')
 const SseChannel = require('sse-channel')
 const extendBoom = require('../../util/extendBoom')
-const securityManager = require('../../security/securityManager')
 
 module.exports = async (req, res, next) => {
   let messageIndex = 0
@@ -20,7 +19,7 @@ module.exports = async (req, res, next) => {
   channel.addClient(req, res)
 
   const {dataset} = req.params
-  const {dataStore} = req.app.services
+  const {dataStore, securityManager} = req.app.services
   const {query, includeResult, includePreviousRevision} = req.query
   const params = Object.keys(req.query)
     .filter(param => param.startsWith('$'))
@@ -36,6 +35,7 @@ module.exports = async (req, res, next) => {
 
   const filterOptions = {
     user: req.user && req.user.id,
+    securityManager,
     dataset
   }
 
@@ -49,20 +49,6 @@ module.exports = async (req, res, next) => {
     store.removeListener('mutation', onMutation)
     channel.close()
   })
-}
-
-async function queryMatchesDocument(query, doc, params, filterOptions) {
-  const {dataset, user} = filterOptions
-  const globalFilter = securityManager.getFilterExpressionsForUser(dataset, user).read
-
-  const results = await execQuery({
-    source: query,
-    globalFilter: globalFilter,
-    params,
-    fetcher: spec => ({results: [doc], start: 0})
-  })
-
-  return Array.isArray(results.value) && results.value.length > 0
 }
 
 async function emitOnMutationMatch(mut, messageId, options) {
@@ -92,6 +78,20 @@ async function emitOnMutationMatch(mut, messageId, options) {
     event: 'mutation',
     data: {...data, transition}
   })
+}
+
+async function queryMatchesDocument(query, doc, params, filterOptions) {
+  const {dataset, user, securityManager} = filterOptions
+  const globalFilter = (await securityManager.getFilterExpressionsForUser(dataset, user)).read
+
+  const results = await execQuery({
+    source: query,
+    globalFilter: globalFilter,
+    params,
+    fetcher: spec => ({results: [doc], start: 0})
+  })
+
+  return Array.isArray(results && results.value) && results.value.length > 0
 }
 
 function parseJson(key, value) {

@@ -1,7 +1,9 @@
+const removeUndefined = require('../util/removeUndefined')
+
 module.exports = class UserStore {
   constructor(options) {
     this.dataStore = options.dataStore
-    this.identityStore = this.dataStore.forDataset('_lyra_system_')
+    this.identityStore = this.dataStore.forDataset(options.systemDb)
   }
 
   async connect() {
@@ -26,7 +28,7 @@ module.exports = class UserStore {
     const {provider, providerId, name, email, profileImage} = identity
     await this.connect()
     return this.identityStore
-      .newTransaction()
+      .newTransaction({identity: '_system_'})
       .create({
         _type: 'identity',
         provider,
@@ -39,30 +41,40 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async claimUser(userId, identityId, journalId = null, props = {}) {
+  async claimUser(userId, identity, journalId = null, props = {}) {
     const {name, email, profileImage} = props
-    const userProps = {identityId, name, email, profileImage}
+    const userProps = removeUndefined({identity, name, email, profileImage})
     const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
 
     return store
-      .newTransaction()
+      .newTransaction({identity: '_system_'})
       .patch(userId, patch => patch.set(userProps))
       .commit()
       .then(getFirstDocument)
   }
 
-  async createAdminUserStub(journalId = null) {
+  async createAdminUser(identity = {}, journalId = null) {
+    const {_id, name, email, profileImage} = identity
     const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
     return store
-      .newTransaction()
-      .create({_id: 'users.', _type: 'vega.user', isAdmin: true})
+      .newTransaction({identity: '_system_'})
+      .create({
+        _id: 'users.',
+        _type: 'vega.user',
+        identity: _id,
+        isAdmin: true,
+        name,
+        email,
+        profileImage
+      })
       .commit()
       .then(getFirstDocument)
   }
 
   async fetchUsersForIdentity(identityId, journalId = null) {
-    const getUserForIdentity = store =>
-      store.fetch('*[_type == "vega.user" && identityId == $identityId][0]', {identityId})
+    const getUserForIdentity = store => {
+      return store.fetch('*[_type == "vega.user" && identity == $identityId][0]', {identityId})
+    }
 
     const globalUser = this.connect().then(getUserForIdentity)
     if (!journalId) {

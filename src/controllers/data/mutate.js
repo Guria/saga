@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
   const {dataStore} = req.app.services
   const {returnIds, returnDocuments} = req.query
   const {mutations, transactionId} = req.body
-  const identity = 'fixme' // @todo
+  const identity = req.user && req.user.id
 
   const store = await dataStore.forDataset(dataset)
   const trx = store.newTransaction({transactionId, mutations, identity})

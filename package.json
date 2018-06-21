@@ -47,6 +47,7 @@
     "mead": "^1.3.5",
     "mime-types": "^2.1.18",
     "mongodb": "^3.1.0-beta4",
+    "p-event": "^2.0.0",
     "p-queue": "^2.4.2",
     "passport": "^0.4.0",
     "passport-google-oauth20": "^1.0.0",
@@ -58,6 +59,7 @@
     "ws": "^5.2.0"
   },
   "devDependencies": {
+    "cookie-signature": "^1.0.6",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-sanity": "^0.132.2",

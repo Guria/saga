@@ -2,7 +2,6 @@ const {omit} = require('lodash')
 const {query: execQuery} = require('groq')
 const WebSocket = require('ws')
 const formatRpcMessage = require('../../util/formatRpcMessage')
-const securityManager = require('../../security/securityManager')
 
 module.exports = listen
 
@@ -10,7 +9,7 @@ const listeners = new Map()
 
 async function listen(msg, ws, req) {
   const {dataset, app} = req
-  const {dataStore, log} = app.services
+  const {dataStore, securityManager, log} = app.services
   const {query, params, includeResult, includePreviousRevision} = msg.params || {}
   const id = msg.id
 
@@ -21,6 +20,7 @@ async function listen(msg, ws, req) {
 
   const filterOptions = {
     user: req.user && req.user.id,
+    securityManager,
     dataset
   }
 
@@ -51,8 +51,8 @@ function send(ws, data) {
 }
 
 async function queryMatchesDocument(query, doc, params, filterOptions) {
-  const {dataset, user} = filterOptions
-  const globalFilter = securityManager.getFilterExpressionsForUser(dataset, user).read
+  const {dataset, user, securityManager} = filterOptions
+  const globalFilter = (await securityManager.getFilterExpressionsForUser(dataset, user)).read
 
   const results = await execQuery({
     source: query,
@@ -61,7 +61,7 @@ async function queryMatchesDocument(query, doc, params, filterOptions) {
     fetcher: spec => ({results: [doc], start: 0})
   })
 
-  return Array.isArray(results.value) && results.value.length > 0
+  return Array.isArray(results && results.value) && results.value.length > 0
 }
 
 async function emitOnMutationMatch(mut, options) {
