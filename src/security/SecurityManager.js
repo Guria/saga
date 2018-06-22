@@ -19,7 +19,7 @@ class SecurityManager {
   }
 
   async getFilterExpressionsForUser(journalId, identityId) {
-    if (identityId === '_system_') {
+    if (identityId === SecurityManager.SYSTEM_IDENTITY) {
       return {} // Allow all
     }
 
@@ -67,6 +67,8 @@ class SecurityManager {
     })
   }
 }
+
+SecurityManager.SYSTEM_IDENTITY = '_system_'
 
 function getCacheKey(journalId, userId) {
   return `sm-${journalId}-${userId}`

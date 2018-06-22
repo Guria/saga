@@ -1,4 +1,5 @@
 const removeUndefined = require('../util/removeUndefined')
+const SecurityManager = require('../security/SecurityManager')
 
 module.exports = class UserStore {
   constructor(options) {
@@ -28,7 +29,7 @@ module.exports = class UserStore {
     const {provider, providerId, name, email, profileImage} = identity
     await this.connect()
     return this.identityStore
-      .newTransaction({identity: '_system_'})
+      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
       .create({
         _type: 'identity',
         provider,
@@ -47,7 +48,7 @@ module.exports = class UserStore {
     const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
 
     return store
-      .newTransaction({identity: '_system_'})
+      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
       .patch(userId, patch => patch.set(userProps))
       .commit()
       .then(getFirstDocument)
@@ -57,7 +58,7 @@ module.exports = class UserStore {
     const {_id, name, email, profileImage} = identity
     const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
     return store
-      .newTransaction({identity: '_system_'})
+      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
       .create({
         _id: 'users.',
         _type: 'vega.user',
