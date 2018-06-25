@@ -403,6 +403,9 @@ function filterParts(node) {
   } else if (lhsIsLiteral && rhsIsLiteral) {
     // 'some value' == 'other value'
     return {type: 'literalComparison', lhs, rhs}
+  } else if (lhsIsAccessor && rhs.$op) {
+    // 'some.field' $mongo-operator
+    return {type: 'mongoComparison', lhs, rhs}
   }
 
   throw new Error('Unable to determine filter type')
