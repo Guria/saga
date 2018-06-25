@@ -16,7 +16,7 @@ module.exports = async function handleLogin(app, provider, accessToken, refreshT
       providerId: profile.id,
       name: profile.displayName || profile.username || 'Anonymous Aardvark',
       email: findEmail(profile.emails),
-      profileImage: findImage(profile.photos)
+      externalProfileImageUrl: findImage(profile.photos)
     })
   }
 

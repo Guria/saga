@@ -68,6 +68,12 @@ module.exports = config => {
   )
 
   app.use(
+    '/v1/invitations',
+    bodyParser.json({limit: config.data.maxInputBytes}),
+    require('./controllers/invitations')
+  )
+
+  app.use(
     '/v1/data',
     bodyParser.json({limit: config.data.maxInputBytes}),
     require('./controllers/data')

@@ -58,7 +58,7 @@ describe('auth', () => {
         expect(res.body).toMatchObject({
           name: 'Jon Smith',
           email: 'jon.smith@example.com',
-          profileImage: 'http://some.img.host/me.jpg'
+          externalProfileImageUrl: 'http://some.img.host/me.jpg'
         })
       )
 

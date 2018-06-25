@@ -26,7 +26,7 @@ module.exports = class UserStore {
   }
 
   async createIdentity(identity) {
-    const {provider, providerId, name, email, profileImage} = identity
+    const {provider, providerId, name, email, externalProfileImageUrl} = identity
     await this.connect()
     return this.identityStore
       .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
@@ -36,16 +36,22 @@ module.exports = class UserStore {
         providerId,
         name,
         email,
-        profileImage
+        externalProfileImageUrl
       })
       .commit()
       .then(getFirstDocument)
   }
 
   async claimUser(userId, identity, journalId = null, props = {}) {
-    const {name, email, profileImage} = props
-    const userProps = removeUndefined({identity, name, email, profileImage})
+    const {name, email, profileImage, externalProfileImageUrl} = props
     const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
+    const userProps = removeUndefined({
+      identity,
+      name,
+      email,
+      profileImage,
+      externalProfileImageUrl
+    })
 
     return store
       .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
@@ -56,17 +62,18 @@ module.exports = class UserStore {
 
   async createAdminUser(identity = {}, journalId = null) {
     const {_id, name, email, profileImage} = identity
+    const externalProfileImageUrl = profileImage
+
     const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
     return store
       .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
       .create({
-        _id: 'users.',
-        _type: 'vega.user',
+        _type: 'user',
         identity: _id,
         isAdmin: true,
         name,
         email,
-        profileImage
+        externalProfileImageUrl
       })
       .commit()
       .then(getFirstDocument)
@@ -74,7 +81,7 @@ module.exports = class UserStore {
 
   async fetchUsersForIdentity(identityId, journalId = null) {
     const getUserForIdentity = store => {
-      return store.fetch('*[_type == "vega.user" && identity == $identityId][0]', {identityId})
+      return store.fetch('*[_type == "user" && identity == $identityId][0]', {identityId})
     }
 
     const globalUser = this.connect().then(getUserForIdentity)

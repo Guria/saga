@@ -1,7 +1,7 @@
 const request = require('supertest')
 const uuid = require('uuid/v4')
 const promiseEvent = require('p-event')
-const {close, getApp, delay, createAdminUser, getSessionCookie} = require('./helpers')
+const {close, getApp, createAdminUser, getSessionCookie} = require('./helpers')
 
 describe('mutations', () => {
   let app
