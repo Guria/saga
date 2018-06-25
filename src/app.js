@@ -53,6 +53,7 @@ module.exports = config => {
 
   app.get('/', (req, res) => res.json({service: pkg.name, version: pkg.version}))
 
+  app.get('/v1/ping', (req, res) => res.json({pong: true}))
   app.get('/v1/versions', require('./controllers/versions'))
 
   app.use(
