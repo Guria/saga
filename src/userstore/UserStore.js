@@ -1,3 +1,4 @@
+const randomstring = require('randomstring').generate
 const removeUndefined = require('../util/removeUndefined')
 const SecurityManager = require('../security/SecurityManager')
 
@@ -60,7 +61,7 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async createAdminUser(identity = {}, journalId = null) {
+  async createAdminUser(identity = {}, journalId = null, isRootUser = false) {
     const {_id, name, email, profileImage} = identity
     const externalProfileImageUrl = profileImage
 
@@ -71,6 +72,7 @@ module.exports = class UserStore {
         _type: 'user',
         identity: _id,
         isAdmin: true,
+        isRootUser,
         name,
         email,
         externalProfileImageUrl
@@ -91,6 +93,37 @@ module.exports = class UserStore {
 
     const journalUser = this.dataStore.forDataset(journalId).then(getUserForIdentity)
     return Promise.all([globalUser, journalUser]).then(users => users.filter(Boolean))
+  }
+
+  hasRootUser() {
+    return this.connect().then(store => store.fetch('*[_type == "user" && isRootUser == true][0]'))
+  }
+
+  getRootInvite() {
+    return this.connect().then(store =>
+      store.fetch('*[_type == "invite" && isRootUser == true && isAccepted == false][0]')
+    )
+  }
+
+  async createRootUser() {
+    const admin = await this.createAdminUser({}, null, true)
+    const userStore = await this.connect()
+    const invite = {
+      _id: randomstring(),
+      _type: 'invite',
+      targetType: 'user',
+      target: {_ref: admin._id},
+      isAccepted: false,
+      isRevoked: false,
+      isRootUser: true
+    }
+
+    await userStore
+      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
+      .create(invite)
+      .commit()
+
+    return invite._id
   }
 }
 

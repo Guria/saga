@@ -26,7 +26,7 @@ module.exports = strategies => {
             .uri()
             .when('type', {
               is: 'cookie',
-              then: Joi.required(),
+              then: Joi.optional(), // @todo
               otherwise: Joi.optional()
             }),
           uuid: Joi.string().when('type', {
@@ -38,6 +38,7 @@ module.exports = strategies => {
       }),
       (req, res, next) => {
         req.session.loginInfo = req.query
+        req.session.save()
         next()
       },
       passport.authenticate(strategy.name, strategy.authConfig)

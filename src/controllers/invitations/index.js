@@ -11,7 +11,7 @@ const validation = celebrate({
       .required()
   }),
   query: Joi.object({
-    journalId: Joi.string().required(),
+    journalId: Joi.string().optional(),
     origin: Joi.string()
       .uri()
       .optional()
@@ -26,6 +26,6 @@ router.get('/:token', validation, require('./getInvitation'))
 /**
  * Accept an invitation
  */
-router.post('/:token', validation, require('./claimInvitation'))
+router.get('/claim/:token', validation, require('./claimInvitation'))
 
 module.exports = router

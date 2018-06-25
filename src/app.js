@@ -90,5 +90,40 @@ module.exports = config => {
   app.use(errors())
   app.use(errorHandler)
 
+  if (config.env !== 'test') {
+    checkRootUser(app.services)
+  }
+
   return app
 }
+
+function getClaimUrl(baseUrl, invite) {
+  return `${baseUrl}/invitations/claim/${invite._id}`
+}
+
+/* eslint-disable no-console */
+async function checkRootUser(services) {
+  const {userStore, config} = services
+  const baseUrl = `http://localhost:${config.port}/v1`
+
+  const rootInvite = await userStore.getRootInvite()
+  if (rootInvite) {
+    const claimUrl = getClaimUrl(baseUrl, rootInvite)
+    console.log(`No root user found, visit:`)
+    console.log(`Login: ${baseUrl}/auth/login/google`)
+    console.log(`Claim admin: ${claimUrl}`)
+    return
+  }
+
+  const hasRootUser = await userStore.hasRootUser()
+  if (hasRootUser) {
+    return
+  }
+
+  const inviteId = await userStore.createRootUser()
+  const claimUrl = getClaimUrl(baseUrl, {_id: inviteId})
+  console.log(`No root user found, visit:`)
+  console.log(`Login: ${baseUrl}/auth/login/google`)
+  console.log(`Claim admin: ${claimUrl}`)
+}
+/* eslint-enable no-console */

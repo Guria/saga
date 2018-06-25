@@ -32,7 +32,7 @@ describe('invitations', () => {
     const invite = await createMockInvite(dataStore)
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/${invite._id}?journalId=lyra-test`)
+      .get(`/v1/invitations/claim/${invite._id}?journalId=lyra-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -46,7 +46,7 @@ describe('invitations', () => {
     const invite = await createMockInvite(dataStore)
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/${invite._id}?journalId=lyra-test`)
+      .get(`/v1/invitations/claim/${invite._id}?journalId=lyra-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -56,7 +56,7 @@ describe('invitations', () => {
       .expect('Location', '/v1/users/me')
 
     await agent
-      .post(`/v1/invitations/${invite._id}?journalId=lyra-test`)
+      .get(`/v1/invitations/claim/${invite._id}?journalId=lyra-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -73,7 +73,7 @@ describe('invitations', () => {
     })
 
     const agent = request.agent(app)
-    await agent.post(`/v1/invitations/${invite._id}?journalId=lyra-test`).then(res =>
+    await agent.get(`/v1/invitations/claim/${invite._id}?journalId=lyra-test`).then(res =>
       expect(res.body).toMatchObject({
         error: 'Unauthorized',
         message: 'Valid session required to claim invitation',
@@ -91,7 +91,21 @@ describe('invitations', () => {
     const session = await createUserlessSession(app, 'lyra-test')
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/${invite._id}?journalId=lyra-test`)
+      .get(`/v1/invitations/claim/${invite._id}?journalId=lyra-test`)
+      .set('Cookie', getSessionCookie(app, session))
+      .expect(200, {claimed: true})
+  })
+
+  test('can claim regular invitations if logged in', async () => {
+    const invite = await createMockInvite(dataStore, {
+      _id: 'someUserId',
+      _type: 'user'
+    })
+
+    const session = await createUserlessSession(app, 'lyra-test')
+    const agent = request.agent(app)
+    await agent
+      .get(`/v1/invitations/claim/${invite._id}?journalId=lyra-test`)
       .set('Cookie', getSessionCookie(app, session))
       .expect(200, {claimed: true})
   })

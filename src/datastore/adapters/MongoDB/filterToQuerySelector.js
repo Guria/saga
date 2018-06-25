@@ -385,19 +385,22 @@ function filterParts(node) {
   const lhsIsAccessor = isAccessor(node.lhs)
   const rhsIsAccessor = isAccessor(node.rhs)
 
+  const lhsIsLiteral = isValue(node.lhs)
+  const rhsIsLiteral = isValue(node.rhs)
+
   const lhs = node.lhs && fromNode(node.lhs)
   const rhs = node.rhs && fromNode(node.rhs)
 
   if (lhsIsAccessor && rhsIsAccessor) {
     // some.field == other.field
     return {type: 'fieldComparison', lhs, rhs}
-  } else if (lhsIsAccessor && rhs) {
+  } else if (lhsIsAccessor && rhsIsLiteral) {
     // some.field == 'some value'
     return {type: 'fieldLiteralComparison', lhs, rhs}
-  } else if (rhsIsAccessor && lhs) {
+  } else if (rhsIsAccessor && lhsIsLiteral) {
     // 'some value' == some.field (-> some.field == 'some value')
     return {type: 'fieldLiteralComparison', lhs: rhs, rhs: lhs}
-  } else if (lhs && rhs) {
+  } else if (lhsIsLiteral && rhsIsLiteral) {
     // 'some value' == 'other value'
     return {type: 'literalComparison', lhs, rhs}
   }
@@ -411,6 +414,10 @@ function wrapQuery(queryVal) {
 
 function isAccessor(node) {
   return node ? node.op === 'accessor' : false
+}
+
+function isValue(node) {
+  return node ? node.op === 'literal' || node.op === 'array' : false
 }
 
 function escapeRegExp(reg) {
