@@ -24,6 +24,8 @@ describe('asset file uploads', () => {
   })
 
   beforeEach(async () => {
+    jest.setTimeout(15000)
+
     const dataStore = app.services.dataStore
     await Promise.all([
       dataStore.forDataset('lyra-test').then(ds => ds.truncate()),
@@ -304,7 +306,7 @@ describe('asset file uploads', () => {
       })
   })
 
-  test('calculates correct sha1 hash for large(ish) files', () => {
+  test('calculates correct sha1 hash for large(ish) files', async () => {
     const data = '!foobar!'.repeat(655360) // 5 MB
     return request(app)
       .post('/v1/assets/files/lyra-test')

@@ -12,6 +12,8 @@ describe('query', () => {
   })
 
   beforeEach(async () => {
+    jest.setTimeout(15000)
+
     const dataStore = app.services.dataStore
     await Promise.all([
       dataStore.forDataset('lyra-test').then(ds => ds.truncate()),

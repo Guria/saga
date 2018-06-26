@@ -11,6 +11,8 @@ describe('invitations', () => {
   })
 
   beforeEach(() => {
+    jest.setTimeout(15000)
+
     dataStore = app.services.dataStore
     return Promise.all([
       dataStore.forDataset('lyra-test').then(ds => ds.truncate()),

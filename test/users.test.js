@@ -8,6 +8,10 @@ describe('users', () => {
     app = getApp()
   })
 
+  beforeEach(() => {
+    jest.setTimeout(15000)
+  })
+
   afterAll(() => close(app))
 
   test('returns empty object on logged out user', () =>

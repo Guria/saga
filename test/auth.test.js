@@ -11,6 +11,8 @@ describe('auth', () => {
     app = getApp()
   })
 
+  beforeEach(() => jest.setTimeout(15000))
+
   afterEach(() => callbackServer && callbackServer.close())
 
   afterAll(() => close(app))

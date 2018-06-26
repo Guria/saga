@@ -14,6 +14,10 @@ describe('query', () => {
     app = getApp()
   })
 
+  beforeEach(() => {
+    jest.setTimeout(15000)
+  })
+
   afterAll(() => close(app))
 
   afterEach(() =>
