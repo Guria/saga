@@ -323,7 +323,12 @@ function fromReferencesFilter(node) {
 
 function fromMatchFilter(node) {
   const {type, lhs, rhs} = filterParts(node)
-  const pattern = escapeRegExp(rhs).replace(/\*$/, '.*?')
+  const pattern = escapeRegExp(rhs)
+    // * -> .*?
+    .replace(/\*/g, '.*?')
+    // Multiple occurences -> Single occurence (*** -> .*?)
+    .replace(/(\.\*\?)+/g, '.*?')
+
   const $regex = new RegExp(`\\b${pattern}\\b`, 'i')
   if (type === 'literalComparison') {
     return $regex.test(lhs)
