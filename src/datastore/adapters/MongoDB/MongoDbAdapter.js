@@ -64,7 +64,8 @@ module.exports = class MongoDbAdapter {
         throw new MutationError({
           description: `Document by ID "${doc._id}" already exists`,
           id: doc && doc._id,
-          type: 'documentAlreadyExistsError'
+          type: 'documentAlreadyExistsError',
+          statusCode: 409
         })
       })
   }
