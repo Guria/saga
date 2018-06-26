@@ -413,6 +413,8 @@ function filterParts(node) {
     return {type: 'mongoComparison', lhs, rhs}
   }
 
+  log('ehm', {lhs, rhs: node.rhs, node})
+
   throw new Error('Unable to determine filter type')
 }
 

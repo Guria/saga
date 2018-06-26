@@ -19,13 +19,18 @@ const validation = celebrate({
 })
 
 /**
- * Fetch specific invitation
+ * Get the root invitation token for a brand new vega/lyra installation
  */
-router.get('/:token', validation, require('./getInvitation'))
+router.get('/root', require('./getRootInvite'))
 
 /**
  * Accept an invitation
  */
 router.get('/claim/:token', validation, require('./claimInvitation'))
+
+/**
+ * Fetch specific invitation
+ */
+router.get('/:token', validation, require('./getInvitation'))
 
 module.exports = router

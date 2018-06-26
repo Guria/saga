@@ -111,6 +111,49 @@ describe('invitations', () => {
       .set('Cookie', getSessionCookie(app, session))
       .expect(200, {claimed: true})
   })
+
+  test('can fetch root invitation if none is created', async () => {
+    let rootInviteId
+
+    // Should be created on first call
+    await request(app)
+      .get(`/v1/invitations/root`)
+      .expect(200)
+      .then(res => {
+        expect(res.body).toMatch(/^[A-Z0-9]{32,}$/i)
+        rootInviteId = res.body
+      })
+
+    // Should only be generated once
+    await request(app)
+      .get(`/v1/invitations/root`)
+      .expect(200)
+      .then(res => expect(res.body).toEqual(rootInviteId))
+  })
+
+  test('will not expose root invite once claimed', async () => {
+    let rootInviteId
+    const agent = request.agent(app)
+
+    await agent
+      .get(`/v1/invitations/root`)
+      .expect(200)
+      .then(res => {
+        expect(res.body).toMatch(/^[A-Z0-9]{32,}$/i)
+        rootInviteId = res.body
+      })
+
+    const session = await createUserlessSession(app, 'lyra-test')
+    await agent
+      .get(`/v1/invitations/claim/${rootInviteId}`)
+      .set('Cookie', getSessionCookie(app, session))
+      .expect(200, {claimed: true})
+
+    await request(app)
+      .get(`/v1/invitations/root`)
+      .expect(200)
+      .then(res => expect(res.body).toEqual(null))
+  })
 })
 
 async function createMockInvite(dataStore, userObject = null) {
