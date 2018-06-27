@@ -43,9 +43,9 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async claimUser(userId, identity, journalId = null, props = {}) {
+  async claimUser(userId, identity, venueId = null, props = {}) {
     const {name, email, profileImage, externalProfileImageUrl} = props
-    const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
+    const store = await (venueId ? this.dataStore.forDataset(venueId) : this.connect())
     const userProps = removeUndefined({
       identity,
       name,
@@ -61,11 +61,11 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async createAdminUser(identity = {}, journalId = null, isRootUser = false) {
+  async createAdminUser(identity = {}, venueId = null, isRootUser = false) {
     const {_id, name, email, profileImage} = identity
     const externalProfileImageUrl = profileImage
 
-    const store = await (journalId ? this.dataStore.forDataset(journalId) : this.connect())
+    const store = await (venueId ? this.dataStore.forDataset(venueId) : this.connect())
     return store
       .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
       .create({
@@ -81,18 +81,18 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async fetchUsersForIdentity(identityId, journalId = null) {
+  async fetchUsersForIdentity(identityId, venueId = null) {
     const getUserForIdentity = store => {
       return store.fetch('*[_type == "user" && identity == $identityId][0]', {identityId})
     }
 
     const globalUser = this.connect().then(getUserForIdentity)
-    if (!journalId) {
+    if (!venueId) {
       return [await globalUser].filter(Boolean)
     }
 
-    const journalUser = this.dataStore.forDataset(journalId).then(getUserForIdentity)
-    return Promise.all([globalUser, journalUser]).then(users => users.filter(Boolean))
+    const venueUser = this.dataStore.forDataset(venueId).then(getUserForIdentity)
+    return Promise.all([globalUser, venueUser]).then(users => users.filter(Boolean))
   }
 
   hasRootUser() {

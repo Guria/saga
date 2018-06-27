@@ -3,7 +3,7 @@ const SecurityManager = require('../../security/SecurityManager')
 
 module.exports = async (req, res, next, invite) => {
   const {dataStore, userStore} = req.app.services
-  const {journalId, origin} = req.query
+  const {venueId, origin} = req.query
 
   const identity = await userStore.createIdentity({
     provider: 'vega-guest',
@@ -11,8 +11,8 @@ module.exports = async (req, res, next, invite) => {
     name: 'Anonymous Aardvark'
   })
 
-  const store = await (journalId ? dataStore.forDataset(journalId) : userStore.connect())
-  await userStore.claimUser(invite.target._ref, identity._id, journalId, identity)
+  const store = await (venueId ? dataStore.forDataset(venueId) : userStore.connect())
+  await userStore.claimUser(invite.target._ref, identity._id, venueId, identity)
   await store
     .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
     .patch(invite._id, patch => patch.set({isAccepted: true}))

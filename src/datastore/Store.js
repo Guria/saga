@@ -63,7 +63,7 @@ class Store extends EventEmitter {
       options.identity
     )
 
-    const annotations = {...(options.annotations || {}), journalId: this.dataset}
+    const annotations = {...(options.annotations || {}), venueId: this.dataset}
     const muts = trx.getMutations()
     const transactionId = trx.getTransactionId()
     const identity = trx.getIdentity()

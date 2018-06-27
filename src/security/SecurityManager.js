@@ -18,7 +18,7 @@ class SecurityManager {
     this.userStore = userStore
   }
 
-  async getFilterExpressionsForUser(journalId, identityId) {
+  async getFilterExpressionsForUser(venueId, identityId) {
     if (identityId === SecurityManager.SYSTEM_IDENTITY) {
       return {} // Allow all
     }
@@ -31,12 +31,12 @@ class SecurityManager {
       return anonymousFilterExpressions
     }
 
-    const users = await this.userStore.fetchUsersForIdentity(identityId, journalId)
+    const users = await this.userStore.fetchUsersForIdentity(identityId, venueId)
     if (users.length === 0) {
       return anonymousFilterExpressions
     }
 
-    const [globalUser, journalUser] = users
+    const [globalUser, venueUser] = users
     if (globalUser.isAdmin) {
       // No filters == allow everything
       return {}
@@ -50,28 +50,28 @@ class SecurityManager {
     }
   }
 
-  accessFilterChangesForUserIds(journalId, previousDoc, nextDoc) {
+  accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
     return []
   }
 
   onMutation(mutation) {
-    const journalId = mutation.annotations.journalId
+    const venueId = mutation.annotations.venueId
     const changedFor = this.accessFilterChangesForUserIds(
-      journalId,
+      venueId,
       mutation.previous,
       mutation.result
     )
 
     changedFor.forEach(userId => {
-      this.cache.del(getCacheKey(journalId, userId))
+      this.cache.del(getCacheKey(venueId, userId))
     })
   }
 }
 
 SecurityManager.SYSTEM_IDENTITY = '_system_'
 
-function getCacheKey(journalId, userId) {
-  return `sm-${journalId}-${userId}`
+function getCacheKey(venueId, userId) {
+  return `sm-${venueId}-${userId}`
 }
 
 module.exports = SecurityManager

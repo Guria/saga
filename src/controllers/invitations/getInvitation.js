@@ -8,9 +8,9 @@ module.exports = async (req, res, next) => {
   // top of this, but that should be handled by an external layer
   const {userStore, dataStore} = req.app.services
   const {token} = req.params
-  const {journalId} = req.query
+  const {venueId} = req.query
 
-  const store = await (journalId ? dataStore.forDataset(journalId) : userStore.connect())
+  const store = await (venueId ? dataStore.forDataset(venueId) : userStore.connect())
   const invite = await store.fetch('*[_type == "invite" && _id == $id][0]', {id: token})
   if (!invite) {
     await delay()

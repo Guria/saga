@@ -11,7 +11,7 @@ const validation = celebrate({
       .required()
   }),
   query: Joi.object({
-    journalId: Joi.string().optional(),
+    venueId: Joi.string().optional(),
     origin: Joi.string()
       .uri()
       .optional()

@@ -18,7 +18,7 @@ module.exports = strategies => {
       `/login/${strategy.name}`,
       celebrate({
         query: Joi.object({
-          journal: Joi.string().optional(),
+          venue: Joi.string().optional(),
           type: Joi.string()
             .allow(['cookie', 'token', 'listen'])
             .default('cookie'),

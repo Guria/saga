@@ -52,7 +52,7 @@ describe('query', () => {
     expect(users[0]).toMatchObject(claimed)
   })
 
-  test('can claim journal user and fetch user for identity', async () => {
+  test('can claim venue user and fetch user for identity', async () => {
     const userStore = app.services.userStore
     const ident = await userStore.createIdentity(identity)
     expect(ident).toMatchObject(identity)
