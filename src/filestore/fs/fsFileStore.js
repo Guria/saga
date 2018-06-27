@@ -7,8 +7,16 @@ module.exports = class FsFileStore {
     this.options = config.options
   }
 
+  getBasePath() {
+    return this.options.basePath
+  }
+
   getPath(dstPath) {
     return path.join(this.options.basePath, dstPath)
+  }
+
+  getReadStream(srcPath) {
+    return fse.getReadStream(this.getPath(srcPath))
   }
 
   read(srcPath) {

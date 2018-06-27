@@ -1,7 +1,7 @@
-const qs = require('querystring')
-const request = require('supertest')
 const fs = require('fs')
 const path = require('path')
+const qs = require('querystring')
+const request = require('supertest')
 const {close, getApp, createAdminUser, getSessionCookie} = require('./helpers')
 
 // @todo
@@ -342,4 +342,27 @@ describe('asset file uploads', () => {
         })
       })
   })
+
+  test('deleting asset document deletes asset', () =>
+    request(app)
+      .post('/v1/assets/files/lyra-test')
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .send(fs.readFileSync(path.join(__dirname, 'fixtures', 'some.zip')))
+      .then(async res => {
+        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+
+        await request(app)
+          .get(`/files/vega/lyra-test/${path.basename(res.body.document.path)}`)
+          .expect(200)
+
+        await request(app)
+          .post('/v1/data/mutate/lyra-test?returnIds=true')
+          .set('Cookie', getSessionCookie(app, adminUser))
+          .send({mutations: [{delete: {id: res.body.document._id}}]})
+          .expect(200)
+
+        await request(app)
+          .get(`/files/vega/lyra-test/${path.basename(res.body.document.path)}`)
+          .expect(404)
+      }))
 })

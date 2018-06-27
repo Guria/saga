@@ -10,12 +10,14 @@ const cookieParser = require('cookie-parser')
 const pkg = require('../package.json')
 const errorHandler = require('./middleware/errorHandler')
 const StoreManager = require('./datastore/StoreManager')
+const checkForAssetDelete = require('./controllers/assets/actions/checkForAssetDelete')
 const SecurityManager = require('./security/SecurityManager')
 const applyAuthStrategies = require('./authentication/applyStrategies')
 const UserStore = require('./userstore')
 const getFileStore = require('./filestore')
 
 module.exports = config => {
+  const app = express()
   const log = pino({level: config.logLevel})
   const fileStore = getFileStore(config.assets)
   const dataStore = new StoreManager(config.datastore)
@@ -30,8 +32,8 @@ module.exports = config => {
 
   dataStore.setSecurityManager(securityManager)
   dataStore.on('mutation', securityManager.onMutation)
+  dataStore.on('mutation', checkForAssetDelete.bind(null, app))
 
-  const app = express()
   app.services = {
     log,
     config,
