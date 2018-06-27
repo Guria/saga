@@ -26,7 +26,7 @@ router.get('/root', require('./getRootInvite'))
 /**
  * Accept an invitation
  */
-router.get('/claim/:token', validation, require('./claimInvitation'))
+router.post('/claim/:token', validation, require('./claimInvitation'))
 
 /**
  * Fetch specific invitation
