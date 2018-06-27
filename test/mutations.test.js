@@ -47,6 +47,28 @@ describe('mutations', () => {
       })
   })
 
+  test('can create and fetch document using bearer token', async () => {
+    const doc = {_id: 'foo', _type: 'test', random: uuid()}
+    const transactionId = uuid()
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Authorization', `Bearer ${getSessionCookie(app, adminUser, true)}`)
+      .send({mutations: [{create: doc}], transactionId})
+      .expect(200, {
+        transactionId,
+        results: [{id: doc._id, operation: 'create'}]
+      })
+
+    await request(app)
+      .get(`/v1/data/doc/lyra-test/${doc._id}`)
+      .set('Authorization', `Bearer ${getSessionCookie(app, adminUser, true)}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.documents).toHaveLength(1)
+        expect(res.body.documents[0]).toMatchObject(doc)
+      })
+  })
+
   test('can create, replace and delete document', async () => {
     let random = uuid()
     const doc = {_id: uuid(), _type: 'test', random}

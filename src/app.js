@@ -15,6 +15,7 @@ const SecurityManager = require('./security/SecurityManager')
 const applyAuthStrategies = require('./authentication/applyStrategies')
 const UserStore = require('./userstore')
 const getFileStore = require('./filestore')
+const bearerToCookie = require('./middleware/bearerToCookie')
 
 module.exports = config => {
   const app = express()
@@ -47,6 +48,7 @@ module.exports = config => {
 
   app.disable('x-powered-by')
   app.set('trust proxy', 1)
+  app.use(bearerToCookie)
   app.use(sessionParser)
   app.use(cookieParser())
   app.use(cors(config.cors))
