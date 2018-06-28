@@ -86,6 +86,53 @@ describe('query', () => {
       })
   })
 
+  test('can query with array joins', async () => {
+    const baz1 = {_id: 'baz1', _type: 'test', isBaz: true}
+    const baz2 = {_id: 'baz2', _type: 'test', isBaz: true}
+    const bar1 = {_id: 'bar1', _type: 'test', isBar: true, bazs: [{_ref: 'baz1'}, {_ref: 'baz2'}]}
+    const bar2 = {_id: 'bar2', _type: 'test', isBar: true}
+    const foo = {_id: 'foo', _type: 'test', isBar: false, refs: [{_ref: 'bar1'}, {_ref: 'bar2'}]}
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .send({mutations: [baz1, baz2, bar1, bar2, foo].map(create => ({create}))})
+      .expect(200)
+
+    await request(app)
+      .get(
+        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+          `*[_id == "foo"]{isBar, "refs": refs[]->{
+            _id, isBar, "bazs": bazs[]->{_id, isBaz}
+          }}`
+        )}`
+      )
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(1)
+        expect(res.body.result[0]).toMatchObject({
+          isBar: false,
+          refs: [
+            {
+              _id: 'bar1',
+              isBar: true,
+              bazs: [{_id: 'baz1', isBaz: true}, {_id: 'baz2', isBaz: true}]
+            },
+            {_id: 'bar2', isBar: true}
+          ]
+        })
+      })
+
+    await request(app)
+      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent('*[references("bar1")]{_id}')}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(1)
+        expect(res.body.result[0]).toMatchObject({_id: 'foo'})
+      })
+  })
+
   test('can query ordering, limit and offset', async () => {
     const documents = [
       {_type: 'test', i: 88},
