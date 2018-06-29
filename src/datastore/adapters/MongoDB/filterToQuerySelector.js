@@ -22,21 +22,27 @@ function query(collection, groqQuery, params = {}, options) {
 }
 
 async function fetchForSpec(collection, spec) {
-  const sort = spec.ordering.map(fromNode).filter(Boolean)
+  const sort = spec.ordering.map(fromNode)
+  const canSort = sort.every(Boolean)
   const filter = spec.filter ? fromNode(spec.filter) : {}
-  const end = Math.max(0, spec.end || 100)
-  const start = Math.max(0, (spec.start || 0) - 1)
+  const end = canSort ? Math.max(0, spec.end || 100) : 0
+  const start = canSort ? Math.max(0, (spec.start || 0) - 1) : 0
 
   // Filter might be short-circuited to `false`,
   // don't query mongodb if this is the case
   let documents = []
-  if (filter) {
-    documents = await collection
-      .find(filter)
-      .skip(start)
-      .limit(end - start)
-      .sort(sort)
-      .toArray()
+  if (filter !== false) {
+    const docQuery = collection.find(filter)
+
+    // If there are things that cannot be sorted...
+    if (canSort) {
+      docQuery
+        .skip(start)
+        .limit(end - start)
+        .sort(sort)
+    }
+
+    documents = await docQuery.toArray()
   }
 
   return documents.reduce(

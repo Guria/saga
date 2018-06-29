@@ -168,4 +168,39 @@ describe('query', () => {
         expect(res.body.result.map(doc => doc.i)).toEqual(sorted)
       })
   })
+
+  test('can query with coalesce/ordering', async () => {
+    const documents = [
+      {_id: 'a1', _type: 'test', i: 88},
+      {_id: 'a2', _type: 'test', i: 0.66},
+      {_id: 'a3', _type: 'test', i: 1337},
+      {_id: 'a4', _type: 'test'},
+      {_id: 'a5', _type: 'test', i: 17},
+      {_id: 'a6', _type: 'test', i: 0.33},
+      {_id: 'a7', _type: 'test', i: 105}
+    ]
+
+    const sorted = sortBy(documents.map(doc => Object.assign({i: 100}, doc)), 'i')
+      .slice(1, 6)
+      .map(doc => doc.i)
+
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .send({mutations: documents.map(create => ({create}))})
+      .expect(200)
+
+    await request(app)
+      .get(
+        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+          `*[_type == "test"] | order(coalesce(i,100) asc) [1...6]`
+        )}`
+      )
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(sorted.length)
+        expect(res.body.result.map(doc => doc.i)).toEqual([0.66, 17, 88, undefined, 105])
+      })
+  })
 })
