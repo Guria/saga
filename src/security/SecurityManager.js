@@ -41,13 +41,12 @@ class SecurityManager {
       // No filters == allow everything
       return {}
     }
-
-    return {
-      create: 'false',
-      read: 'false',
-      update: 'false',
-      delete: 'false'
+    if (venueUser.isAdmin) {
+      // No filters == allow everything
+      return {}
     }
+
+    return anonymousFilterExpressions
   }
 
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
