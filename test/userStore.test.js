@@ -49,7 +49,7 @@ describe('query', () => {
 
     const {globalUser, venueUser} = await userStore.fetchUsersForIdentity(ident._id)
     expect(globalUser).toMatchObject(claimed)
-    expect(venueUser).toBe(undefined)
+    expect(venueUser).toBe(null)
   })
 
   test('can claim venue user and fetch user for identity', async () => {
@@ -69,6 +69,6 @@ describe('query', () => {
 
     const {globalUser, venueUser} = await userStore.fetchUsersForIdentity(ident._id, 'lyra-test')
     expect(venueUser).toMatchObject(claimed)
-    expect(globalUser).toBe(undefined)
+    expect(globalUser).toBe(null)
   })
 })

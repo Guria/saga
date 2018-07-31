@@ -88,7 +88,10 @@ module.exports = class UserStore {
 
     const globalUser = this.connect().then(getUserForIdentity)
     if (!venueId) {
-      return {globalUser: await globalUser}
+      return {
+        globalUser: await globalUser,
+        venueUser: null
+      }
     }
 
     const venueUser = this.dataStore.forDataset(venueId).then(getUserForIdentity)
