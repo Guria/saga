@@ -47,9 +47,9 @@ describe('query', () => {
     expect(claimed).toMatchObject({isAdmin: true, identity: ident._id, name: 'Espen'})
     expect(claimed).not.toHaveProperty('arb')
 
-    const users = await userStore.fetchUsersForIdentity(ident._id)
-    expect(users).toHaveLength(1)
-    expect(users[0]).toMatchObject(claimed)
+    const {globalUser, venueUser} = await userStore.fetchUsersForIdentity(ident._id)
+    expect(globalUser).toMatchObject(claimed)
+    expect(venueUser).toBe(undefined)
   })
 
   test('can claim venue user and fetch user for identity', async () => {
@@ -67,8 +67,8 @@ describe('query', () => {
     expect(claimed).toMatchObject({isAdmin: true, identity: ident._id, name: 'Espen'})
     expect(claimed).not.toHaveProperty('arb')
 
-    const users = await userStore.fetchUsersForIdentity(ident._id, 'lyra-test')
-    expect(users).toHaveLength(1)
-    expect(users[0]).toMatchObject(claimed)
+    const {globalUser, venueUser} = await userStore.fetchUsersForIdentity(ident._id, 'lyra-test')
+    expect(venueUser).toMatchObject(claimed)
+    expect(globalUser).toBe(undefined)
   })
 })

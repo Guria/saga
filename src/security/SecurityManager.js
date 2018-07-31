@@ -31,17 +31,16 @@ class SecurityManager {
       return anonymousFilterExpressions
     }
 
-    const users = await this.userStore.fetchUsersForIdentity(identityId, venueId)
-    if (users.length === 0) {
+    const {globalUser, venueUser} = await this.userStore.fetchUsersForIdentity(identityId, venueId)
+    if ([globalUser, venueUser].filter(Boolean).length === 0) {
       return anonymousFilterExpressions
     }
 
-    const [globalUser, venueUser] = users
-    if (globalUser.isAdmin) {
+    if (globalUser && globalUser.isAdmin) {
       // No filters == allow everything
       return {}
     }
-    if (venueUser.isAdmin) {
+    if (venueUser && venueUser.isAdmin) {
       // No filters == allow everything
       return {}
     }

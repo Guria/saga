@@ -14,7 +14,9 @@ module.exports = function applyStrategies(app, config) {
     log.trace(`Fetching users for identity ${id}`)
     const [identity, users] = await Promise.all([
       userStore.fetchIdentityById(id),
-      userStore.fetchUsersForIdentity(id)
+      userStore
+        .fetchUsersForIdentity(id)
+        .then(result => [result.globalUser, result.venueUser].filter(Boolean))
     ])
 
     log.trace(`Found %d users`, users ? users.length : 0)
