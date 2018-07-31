@@ -88,11 +88,16 @@ module.exports = class UserStore {
 
     const globalUser = this.connect().then(getUserForIdentity)
     if (!venueId) {
-      return [await globalUser].filter(Boolean)
+      return {globalUser: await globalUser}
     }
 
     const venueUser = this.dataStore.forDataset(venueId).then(getUserForIdentity)
-    return Promise.all([globalUser, venueUser]).then(users => users.filter(Boolean))
+    return Promise.all([globalUser, venueUser]).then(results => {
+      return {
+        globalUser: results[0],
+        venueUser: results[1]
+      }
+    })
   }
 
   hasRootUser() {
