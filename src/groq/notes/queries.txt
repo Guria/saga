@@ -1,0 +1,470 @@
+Some important queries performed by Vega
+
+-----
+*[_id == $id][0]{...,profileImage{...,asset->{...}}}
+-----
+*[_id == "venue"]{...}
+-----
+*[_id == $id]
+-----
+*[!(_id in path("_.**"))]
+-----
+[*[_id in ["article_0821ef4e78fa62cf5646ebba29822e8d","article_3424db35752b6669db23129ea2c76b48","b5cb24d9-0eca-4c00-99f0-e2574b3478da","08eb0814-0d6e-460f-a797-055cdd80174c","999b7698-82d6-4efa-a2f5-c88cde402385","article_f358e9ec492771253916ea1247c52d17","article_22dad3d8a0927a4fe4783f777aa474fc","article_22e110660e67be26f1897248844f7e47","article_194e52cc9dbfa8b008dec399058a9642","article_fcbe8ef995f9f9d5258ae9bf699ef835","article_c9faae4b095a51c2b08787aa7aa25978","article_75b9b78d5ba6177276ccd79c04b1b83e","article_f97339d8ebbc173665769a450a2ddc57","article_113ff33a57fbb2f534a2daba25e7a22f","article_70ca02bfa531ae9cf9e622282e6a947f","article_cf983c663049ca25f1c5321894cb4f29","article_af576031346b9d315cc5e71264a50b3e","article_d763bc2593eabe36811fcd140add067c","article_4c285242f8c6692602f16f42b95559ba","article_e506ab4c0c87b26864fd75e403ca5598","article_579e026bb57eae0dcfa41366c9ac5a01","article_6828da8df3c5523062bd14817a54d1ca","article_623ea957644544bafb56b95c83d455e0","article_7f42e21a7c2fad1e1dac2cf71c44a13b","article_100971ea8fa12b3ce01b96fb61489821","article_2c86b3575a7a49296c7d9a7254ca847b","article_9e0f20e9d064873e455281b43df1555d","article_6a20645d99b6e52fc7d25b80f6178b23","article_a56b52c588de9f2d73291710b7c06413","article_8cac4fb901911d30238e413de80a195f","article_8cb3ab8aa8363cda92ed89a1763811a3","article_8f66cd7c17f80aaf75728269603685fc","article_92380441fabc08fb9dca0b17df952369","article_1d1267721fb4436dc7f269ae84922bf1","article_4e6d190badda610fd29c6ac95af6f164","article_0ac37779a61cc1183e94c331c8d486fd","article_0c9b1e1eeff10f63a89b56fe65bf2bfa","article_173c12318b78540b31e837f6dffe8ccd","article_46d64d8421217b8fb8427f394919f55a","article_9df33f43d8668c442f02118da1d39314","article_bc6133d683537951d555f67664a42d32","article_b64feb86f854313fa27b63b880ca158e","article_f9cbd2709356db0d5766910c3e2f9f11","article_e542074988f80450aced2088418bfee4","article_6167d5fb97057c87eeb8320c4675c502","article_77c56c8b9f7eb30d8273d4783b1c1ee9","article_082a44da2a1d319efdc6aa5d2f040aa4","article_2fe99f7e222d49d0849e724fe6521b84","article_2888ec7f2d48dc7956b0b69fd669732f","article_aae648f4f804014438e610996441396c","article_247c38fd0d1975c3991398d2ee8ccfe2","article_15fc418762796d0fe5f87edcb0aded30","article_9d14f6c5d21fea7c2d374c2a50f83173","article_9241c69e9e7fcab44593aed6ada5550d","article_91562559719a42d58654fe7be296907d","article_474803ae68dbc6b2ef5998ff5680dd17","article_2ef3e251fb3148386acc4b17b2614a2d","article_4a97c17cc13e2ec1a278826f9e759ef1","article_53fcbccd37d618d3246e03d3283f28bd","article_e210829f2964d7ac7e20a0f767dd511e","article_78871aa17f76642a0856628187376f7f","article_06d90f0e0745d3cf3d2a88858695068b","article_65b103f64f8d9ad875a84f961e848b2b","article_f51a9a245f6b6cfb01ced67c6ef8f744","article_333321265ddb777e1c56f420f2e8486b","article_3a144bb32a7e4f85a5ddeff6b611c1a7","article_0563aeb6adebe5cadd105c4ff0dc56fe","article_77cad6cb39031a3c0133124c08d230b5","article_e83e65bd767cf2b63ef014a501152278","article_df6d15c695863ce9a22bc0c1c03b5509","article_b8a92650fea74a39fab5fd26bd92be80","article_182cf309391e0400c638435adab24a74","article_a94cac6686c94446afeaecef55934001","article_8bf17313992a50c6f289eaf06f7cca56","article_4a514ff374ed5f0cd9e86e9ffe18bbc6","article_51fbc077f9288957da91eb9707d3bbfb","article_44de7f9814093346a192d49ef4c41357","article_58832351c0603a7090f3d8e000e47fb9","article_81e5c39ab8c7453f5e8fd04dc67994c0","article_8fdc8a67d3286cb83e24dd7f189cc01b","article_f58f8093d026b64a55a04b017dcc2f08","article_144f7fc31b8c3fbc1504658a5c044914","article_45fbe838bc4b65b84cbf2693e6f234f4","article_c96f1f7be941cdd1cfc5808c05ada2f7","article_6be053e8e2d3faa5d5a2066f0e776e59","article_1d5d1c23503482c087ea01a2fca10cb5","article_bc8c335086f71557368f771e2338c839","article_f7c65518fe1f963e7b6432d6ec634246","article_378ea8e32fc6bd106fdfda207ada3056","article_41ec0b4154c1d773afee1fcf5454cae4","article_f445c212e9509ff8971aa814a0cc0b47","article_1b01b9fadfb81332b946f1bf4502f04a","article_5a79109d41c12fe97e685a8bd6bf5806","article_e088ad282e42d03042ee8a3b9bfbb8eb","article_81266e60f4919ab2a51506ca2c3da83a","article_4118fb6bc01ba4c1cef1ab9f6a224c01","article_dbc897391123465f07ffa61b6eaf185b","article_1ed13dd40853c7432b5d5f0e6897808e","article_7a3e97fc246f2049cbd37e7de04d2db2","article_ad9984014af2ce97628f09db3629fc1d","article_f2aefece8127a966477d58618479da7f","article_9fd66ee93045ac329e3ee3f025452c09","article_bf77d0eb946baa5babc19012a492efeb","article_02429587fd962c13ec597e5aab37508a","article_20e606e3a5c9694984653863db5a1754","article_88019e229e9f6d5584b028b49d15c87b","article_1dfff3a8b934230ffb4a9b8b404639e3","article_8a18e919c79b3346093a58ce8e0284df","article_7011e91fbc7180e693a08b98a60b7db1","article_4e1de13a01a664f1bfdaf6d222473420","article_27668e65cc771d9a4ec28dedb8ecf906","article_2b0354d7ef4a92ca2c9d234a2bf0db86","article_c0dcbe0576cc5e0207d75987cad1ab8c","article_26c3f2b5e90a2f34fc6987c4fe6fdf33"]][0...114]{_id,_rev,_type,title,stage}][0...1]
+-----
+[*[_id in ["image-oC71CdDASIWn_ndnFaxKDsTaRFpaAeMpqcsV5-1200x756-jpg"]][0...1]{_id,_rev,_type,originalFilename,url,metadata}][0...1]
+-----
+*[references("user_pNux1iopj") && _type in ["venue", "issue", "article", "track"] && !(_id in path('drafts.**'))] | order(_updatedAt desc) [0..1000]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0,
+      "submitter": defined(submitters) && submitters[_ref=="user_pNux1iopj"],
+      "referee": defined(referees) && length(referees[_ref=="user_pNux1iopj"])>0
+    }
+-----
+*[_type == "article" && isReadyToAdvance == true] | order(_updatedAt desc) [0..10]
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_7bd26a331477275ef21c11d649bd48b3"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+*[_type == "issue" && !(_id in path("drafts.**"))]
+      |order(coalesce(publishAt,'A') desc)
+      |[0...1000] {
+        _id,
+        volume,
+        number,
+        content,
+        title,
+        publishAt,
+        coverImage {
+          asset -> {url}
+        }
+      }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "52f78a0e-7c8c-489b-8b1c-cc709a217831"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "afb21533-7a9b-4cfc-abcc-a0ba2f47a92b"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_99217ad7755dbefb8bc0beabaa87d777"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_087bd12cf4d1ef0b4b88714ad49cf0f4"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_e089fb7991576666ee1e328c26a41601"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_36ab6f1df21f3c9a169c8942e981959a"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_629ffff971d10f275a79a70fae527fbc"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_9ee2a0f409662e4664217b7e3b808428"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_dd10b03a406a44cb52e7d41971c2b941"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_b63003b792fb0099f3c299464a2cb4bd"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_11f6d5bda2e7706aab0bbb44524ca189"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_1842e03d0bd71cf85d6e893379433dfb"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_794bd9c7a5f588bd5e1cbad002ea72a2"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_1869bba44f396b6d2f52d01e02e72a14"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "issues":
+        *[_id == "issue_ea58b957574aa5b136278914aa8b1113"]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    }
+-----
+[*[_id in ["stage_completed","stage_establishing","stage_review","stage_copyEditing","stage_proofing"]][0...5]{_id,_rev,_type,displayColor,title}][0...1]
+-----
+*[_type == "comment"&&_id in path("*")&&subject._ref in ["52f78a0e-7c8c-489b-8b1c-cc709a217831"]]{
+      "i": _id, "t": thread, "c": _createdAt
+    }[0..10000]
+-----
+*[_type == "comment"&&_id in path("*")&&subject._ref in ["undefined"]]{
+      "i": _id, "t": thread, "c": _createdAt
+    }[0..10000]
+-----
+*[_type == "comment"&&_id in path("*")&&subject._ref in ["undefined"]]
+-----
+*[_type == "article"][0...1000]{
+          ...,
+          mainImage{
+            asset->{url}
+          },
+          track->{...},
+          stage->{...},
+          submitters[]->{
+            ...,
+            profileImage{
+              asset->{url}
+            }
+          },
+          "issues":
+            *[_type == "issue" && references(^._id)]{
+              _id,
+              number,
+              volume,
+              title
+            }
+        }
+-----
+*[_type == "issue"][0...200]{
+          ...,
+          content[]{
+            ...,
+            articles[] -> {
+              ...,
+              mainImage{
+                asset->{url}
+              },
+              authors[]{
+                ...,
+                profileImage{
+                  asset->{url}
+                }
+              }
+            }
+          }
+        }
+-----
+*[_type == "track"][0...20]{
+          ...,
+          trackStages[]{
+            ...,
+            stage -> {...}
+          },
+          editors[] -> {...}
+        }
+-----
+[*[_id in ["article_144f7fc31b8c3fbc1504658a5c044914","article_15fc418762796d0fe5f87edcb0aded30","article_2ef3e251fb3148386acc4b17b2614a2d","article_51fbc077f9288957da91eb9707d3bbfb","article_77c56c8b9f7eb30d8273d4783b1c1ee9","article_bf77d0eb946baa5babc19012a492efeb","article_e506ab4c0c87b26864fd75e403ca5598"]][0...7]{_id,_rev,_type,displayColor,mainImage},*[_id in ["article_46d64d8421217b8fb8427f394919f55a","article_bc6133d683537951d555f67664a42d32"]][0...2]{_id,_rev,_type,abstract,displayColor,mainImage}][0...2]
+-----
+*[_type=="issue" && references("article_15fc418762796d0fe5f87edcb0aded30")]{_id,title, volume}
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "tracks": *[_id == "article_15fc418762796d0fe5f87edcb0aded30"]{
+        track->{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref=="user_pNux1iopj"])>0,
+          "copyEditor": defined(copyEditors) && length(copyEditors[_ref=="user_pNux1iopj"])>0
+        }
+      }.track
+    ,
+      "issues":
+        *[_type=="issue" && references("article_15fc418762796d0fe5f87edcb0aded30") && !(_id in path('drafts.**'))]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    ,
+      "articles": *[_id=="article_15fc418762796d0fe5f87edcb0aded30"]{
+          _id,
+          _type,
+          "stageName": stage->{name}.name,
+          track->{trackStages[]{
+            accessibleByReviewers,
+            editableBySubmitters,
+            "stageName": stage->{name}.name
+          }},
+          "submitter": defined(submitters) && length(submitters[_ref=="user_pNux1iopj"])>0
+        }
+    }
+-----
+[*[_id in ["article_144f7fc31b8c3fbc1504658a5c044914","article_15fc418762796d0fe5f87edcb0aded30","article_2ef3e251fb3148386acc4b17b2614a2d","article_51fbc077f9288957da91eb9707d3bbfb","article_77c56c8b9f7eb30d8273d4783b1c1ee9","article_bf77d0eb946baa5babc19012a492efeb","article_e506ab4c0c87b26864fd75e403ca5598"]][0...7]{_id,_rev,_type,displayColor,mainImage},*[_id in ["article_15fc418762796d0fe5f87edcb0aded30"]][0...1]{_id,_rev,_type,isReadyToAdvance},*[_id in ["article_46d64d8421217b8fb8427f394919f55a","article_bc6133d683537951d555f67664a42d32"]][0...2]{_id,_rev,_type,abstract,displayColor,mainImage}][0...3]
+-----
+[*[_id in ["stage_establishing","stage_review","stage_copyEditing","stage_completed"]][0...4]{_id,_rev,_type,name}][0...1]
+-----
+*[_id in []]
+-----
+[*[_id in ["stage_review"]][0...1]{_id,_rev,_type,displayColor,title}][0...1]
+-----
+[*[_id in ["article_15fc418762796d0fe5f87edcb0aded30"]][0...1]{_id,_rev,_type,displayColor,mainImage},*[_id in ["article_15fc418762796d0fe5f87edcb0aded30"]][0...1]{_id,_rev,_type,isReadyToAdvance}][0...2]
+-----
+*[_type=="issue" && references("article_2ef3e251fb3148386acc4b17b2614a2d")]{_id,title, volume}
+-----
+{"venues":
+    *[_type=="venue" && references("user_pNux1iopj") && !(_id in path('drafts.**'))]{
+      _id,
+      _type,
+      "administrator": defined(administrators) && length(administrators[_ref == "user_pNux1iopj"])>0,
+      "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0,
+      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == "user_pNux1iopj"])>0
+    }
+  ,
+      "tracks": *[_id == "article_2ef3e251fb3148386acc4b17b2614a2d"]{
+        track->{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref=="user_pNux1iopj"])>0,
+          "copyEditor": defined(copyEditors) && length(copyEditors[_ref=="user_pNux1iopj"])>0
+        }
+      }.track
+    ,
+      "issues":
+        *[_type=="issue" && references("article_2ef3e251fb3148386acc4b17b2614a2d") && !(_id in path('drafts.**'))]{
+          _id,
+          _type,
+          "editor": defined(editors) && length(editors[_ref == "user_pNux1iopj"])>0
+        }
+    ,
+      "articles": *[_id=="article_2ef3e251fb3148386acc4b17b2614a2d"]{
+          _id,
+          _type,
+          "stageName": stage->{name}.name,
+          track->{trackStages[]{
+            accessibleByReviewers,
+            editableBySubmitters,
+            "stageName": stage->{name}.name
+          }},
+          "submitter": defined(submitters) && length(submitters[_ref=="user_pNux1iopj"])>0
+        }
+    }
+-----
+[*[_id in ["article_144f7fc31b8c3fbc1504658a5c044914","article_15fc418762796d0fe5f87edcb0aded30","article_2ef3e251fb3148386acc4b17b2614a2d","article_51fbc077f9288957da91eb9707d3bbfb","article_77c56c8b9f7eb30d8273d4783b1c1ee9","article_bf77d0eb946baa5babc19012a492efeb","article_e506ab4c0c87b26864fd75e403ca5598"]][0...7]{_id,_rev,_type,displayColor,mainImage},*[_id in ["article_2ef3e251fb3148386acc4b17b2614a2d"]][0...1]{_id,_rev,_type,isReadyToAdvance},*[_id in ["article_46d64d8421217b8fb8427f394919f55a","article_bc6133d683537951d555f67664a42d32"]][0...2]{_id,_rev,_type,abstract,displayColor,mainImage}][0...3]
+-----
+[*[_id in ["article_144f7fc31b8c3fbc1504658a5c044914","article_15fc418762796d0fe5f87edcb0aded30","article_2ef3e251fb3148386acc4b17b2614a2d","article_51fbc077f9288957da91eb9707d3bbfb","article_77c56c8b9f7eb30d8273d4783b1c1ee9","article_bf77d0eb946baa5babc19012a492efeb","article_e506ab4c0c87b26864fd75e403ca5598"]][0...7]{_id,_rev,_type,displayColor,mainImage},*[_id in ["article_2ef3e251fb3148386acc4b17b2614a2d"]][0...1]{_id,_rev,_type,isReadyToAdvance},*[_id in ["stage_review"]][0...1]{_id,_rev,_type,displayColor,title},*[_id in ["article_46d64d8421217b8fb8427f394919f55a","article_bc6133d683537951d555f67664a42d32"]][0...2]{_id,_rev,_type,abstract,displayColor,mainImage}][0...4]

@@ -1,5 +1,5 @@
 const {omit} = require('lodash')
-const {query: execQuery} = require('groq')
+const {query: execQuery} = require('../../groq')
 const WebSocket = require('ws')
 const formatRpcMessage = require('../../util/formatRpcMessage')
 
@@ -24,7 +24,14 @@ async function listen(msg, ws, req) {
     dataset
   }
 
-  const emitOptions = {ws, id, params, query, omitProps, filterOptions}
+  const emitOptions = {
+    ws,
+    id,
+    params,
+    query,
+    omitProps,
+    filterOptions
+  }
   const onMutation = mut => emitOnMutationMatch(mut, emitOptions)
   const cancel = () => {
     log.info('Cancelling listener with ID %s', id)
@@ -33,16 +40,26 @@ async function listen(msg, ws, req) {
     return ws
   }
 
-  listeners.set(id, {cancel})
-  send(ws, formatRpcMessage({listenerName: id, type: 'welcome'}, id, {stream: true}))
+  listeners.set(id, {
+    cancel
+  })
+  send(ws, formatRpcMessage({
+    listenerName: id,
+    type: 'welcome'
+  }, id, {
+    stream: true
+  }))
   store.on('mutation', onMutation)
   ws.on('close', cancel)
 }
 
-listen.cancel = (msg, ws, req) =>
-  listeners.has(msg.id) &&
+listen.cancel = (msg, ws, req) => listeners.has(msg.id) &&
   listeners.get(msg.id).cancel() &&
-  send(ws, formatRpcMessage({type: 'complete'}, msg.id, {complete: true}))
+  send(ws, formatRpcMessage({
+    type: 'complete'
+  }, msg.id, {
+    complete: true
+  }))
 
 function send(ws, data) {
   if (ws.readyState === WebSocket.OPEN) {
@@ -58,7 +75,10 @@ async function queryMatchesDocument(query, doc, params, filterOptions) {
     source: query,
     globalFilter: globalFilter,
     params,
-    fetcher: spec => ({results: [doc], start: 0})
+    fetcher: spec => ({
+      results: [doc],
+      start: 0
+    })
   })
 
   return Array.isArray(results && results.value) && results.value.length > 0
@@ -67,11 +87,9 @@ async function queryMatchesDocument(query, doc, params, filterOptions) {
 async function emitOnMutationMatch(mut, options) {
   const {id, query, params, ws, omitProps, filterOptions} = options
 
-  const matchesPrev =
-    mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
+  const matchesPrev = mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
 
-  const matchesNext =
-    mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
+  const matchesNext = mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
 
   let transition
   if (matchesPrev && matchesNext) {
@@ -86,5 +104,9 @@ async function emitOnMutationMatch(mut, options) {
 
   const data = omitProps.length > 0 ? omit(mut, omitProps) : mut
 
-  send(ws, formatRpcMessage({...data, type: 'mutation', transition}, id))
+  send(ws, formatRpcMessage({
+    ...data,
+    type: 'mutation',
+    transition
+  }, id))
 }

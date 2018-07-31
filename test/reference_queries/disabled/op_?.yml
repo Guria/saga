@@ -1,0 +1,102 @@
+# FIXME Should be removed, see: https://github.com/sanity-io/gradient/issues/581
+title: "? operator"
+documents:
+- _id: "id"
+  _type: "test"
+  v_array: [1, 3.14, "string", true, [1, 2, 3], {"key": "value"}]
+  v_array_empty: []
+  v_decimal: 3.14
+  v_decimal_zero: 0.0
+  v_false: false
+  v_integer: 1
+  v_integer_zero: 0
+  v_null: null
+  v_object: {
+    "v_array": ["a", "b", "c"],
+    "v_boolean": true,
+    "v_decimal": 2.718,
+    "v_integer": 2,
+    "v_null": null,
+    "v_object": {"k": "v"},
+    "v_string": "abc"
+  }
+  v_object_empty: {}
+  v_string: "string"
+  v_string_empty: ""
+  v_true: true
+
+tests:
+- title: "? attributes"
+  query: |
+    [
+      *[_id=="id"][0].v_array?,
+      *[_id=="id"][0].v_array_empty?,
+      *[_id=="id"][0].v_decimal?,
+      *[_id=="id"][0].v_decimal_zero?,
+      *[_id=="id"][0].v_false?,
+      *[_id=="id"][0].v_integer?,
+      *[_id=="id"][0].v_integer_zero?,
+      *[_id=="id"][0].v_null?,
+      *[_id=="id"][0].v_object?,
+      *[_id=="id"][0].v_object_empty?,
+      *[_id=="id"][0].v_string?,
+      *[_id=="id"][0].v_string_empty?,
+      *[_id=="id"][0].v_true?,
+    ]
+  result: [
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+  ]
+- title: "? everything"
+  query: |
+    [
+      *?,
+      *[false]?
+    ]
+  result: [
+    true,
+    false,
+  ]
+- title: "? literals"
+  query: |
+    [
+      [1, 2, 3]?,
+      []?,
+      3.14?,
+      0.0?,
+      false?,
+      1?,
+      0?,
+      null?,
+      {"a": 1}?,
+      {}?,
+      "string"?,
+      ""?,
+      *[_id=="id"][0].v_true?,
+    ]
+  result: [
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+  ]

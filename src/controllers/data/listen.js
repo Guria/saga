@@ -1,7 +1,7 @@
 const Boom = require('boom')
 const uuid = require('uuid/v4')
 const {omit} = require('lodash')
-const {query: execQuery} = require('groq')
+const {query: execQuery} = require('../../groq')
 const endOfStream = require('end-of-stream')
 const SseChannel = require('sse-channel')
 const extendBoom = require('../../util/extendBoom')
@@ -39,10 +39,22 @@ module.exports = async (req, res, next) => {
     dataset
   }
 
-  const emitOptions = {channel, params, query, omitProps, filterOptions}
+  const emitOptions = {
+    channel,
+    params,
+    query,
+    omitProps,
+    filterOptions
+  }
   const onMutation = mut => emitOnMutationMatch(mut, getMessageId(), emitOptions)
 
-  channel.send({id: getMessageId(), data: {listenerName: uuid()}, event: 'welcome'})
+  channel.send({
+    id: getMessageId(),
+    data: {
+      listenerName: uuid()
+    },
+    event: 'welcome'
+  })
 
   store.on('mutation', onMutation)
   endOfStream(res, () => {
@@ -54,11 +66,9 @@ module.exports = async (req, res, next) => {
 async function emitOnMutationMatch(mut, messageId, options) {
   const {query, params, channel, omitProps, filterOptions} = options
 
-  const matchesPrev =
-    mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
+  const matchesPrev = mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
 
-  const matchesNext =
-    mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
+  const matchesNext = mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
 
   let transition
   if (matchesPrev && matchesNext) {
@@ -76,7 +86,10 @@ async function emitOnMutationMatch(mut, messageId, options) {
   channel.send({
     id: messageId,
     event: 'mutation',
-    data: {...data, transition}
+    data: {
+      ...data,
+      transition
+    }
   })
 }
 
@@ -88,7 +101,10 @@ async function queryMatchesDocument(query, doc, params, filterOptions) {
     source: query,
     globalFilter: globalFilter,
     params,
-    fetcher: spec => ({results: [doc], start: 0})
+    fetcher: spec => ({
+      results: [doc],
+      start: 0
+    })
   })
 
   return Array.isArray(results && results.value) && results.value.length > 0

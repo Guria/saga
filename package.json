@@ -5,6 +5,11 @@
   "description": "Backend for Vega",
   "main": "src/app.js",
   "scripts": {
+    "clean": "rimraf lib",
+    "build": "npm run clean && npm run compile",
+    "compile": "babel --source-maps --copy-files -d lib/ src/",
+    "prepublishOnly": "npm run compile",
+    "postpublish": "npm run clean",
     "coverage": "NODE_ENV=test jest --coverage --runInBand",
     "start": "node src/server.js",
     "test": "NODE_ENV=test jest --runInBand"
@@ -39,7 +44,6 @@
     "express-session": "^1.15.6",
     "file-type": "^8.0.0",
     "fs-extra": "^6.0.1",
-    "groq": "^0.0.9",
     "hard-rejection": "^1.0.0",
     "joi": "^12.0.0",
     "lodash": "^4.17.10",
@@ -60,6 +64,9 @@
     "ws": "^5.2.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "cookie-signature": "^1.0.6",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
@@ -67,12 +74,12 @@
     "jest": "^23.2.0",
     "passport-mocked": "^1.2.0",
     "prettier": "^1.13.6",
+    "rimraf": "^2.6.2",
     "supertest": "^3.1.0"
   },
   "jest": {
     "verbose": true,
     "testEnvironment": "node",
-    "transform": {},
     "globalSetup": "./test/helpers/globalSetup.js",
     "setupFiles": [
       "./test/helpers/setup.js"

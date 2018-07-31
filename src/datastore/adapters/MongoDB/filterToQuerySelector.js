@@ -1,10 +1,13 @@
 const util = require('util')
 const {merge, omit} = require('lodash')
-const {query: execQuery} = require('groq')
+const {query: execQuery} = require('../../../groq')
 
 const log = (prefix, ast) =>
-  // eslint-disable-next-line no-console
-  console.log('%s: ', prefix, util.inspect(ast, {colors: true, depth: 15}))
+// eslint-disable-next-line no-console
+console.log('%s: ', prefix, util.inspect(ast, {
+  colors: true,
+  depth: 15
+}))
 
 module.exports = {
   toMongo,
@@ -51,7 +54,11 @@ async function fetchForSpec(collection, spec) {
       acc.refs[doc._id] = doc['@refs'] || []
       return acc
     },
-    {results: [], refs: {}, start}
+    {
+      results: [],
+      refs: {},
+      start
+    }
   )
 }
 
@@ -114,12 +121,20 @@ function fromNode(node) {
 }
 
 function fromSource(node) {
-  return {query: {}}
+  return {
+    query: {}
+  }
 }
 
 function fromPipe(pipe) {
   // Use for loop instead of reduce to be able to bail early in case of short-circuiting
-  let acc = {query: {}, limit: 100, offset: 0, returnFirst: false, sort: []}
+  let acc = {
+    query: {},
+    limit: 100,
+    offset: 0,
+    returnFirst: false,
+    sort: []
+  }
   for (let i = 0; i < pipe.operations.length; i++) {
     const node = pipe.operations[i]
     const result = fromNode(node)
@@ -127,7 +142,9 @@ function fromPipe(pipe) {
     if (isShortCircuit && result.query === true) {
       continue
     } else if (isShortCircuit) {
-      return {query: false}
+      return {
+        query: false
+      }
     }
 
     acc = merge(acc, result)
@@ -151,7 +168,9 @@ function fromAndOperator(node) {
     return lhs === true ? rhs : lhs
   }
 
-  return {$and: [lhs, rhs]}
+  return {
+    $and: [lhs, rhs]
+  }
 }
 
 function fromOrOperator(node) {
@@ -162,7 +181,9 @@ function fromOrOperator(node) {
   }
 
   // Remove any falsey parts
-  return {$or: [lhs, rhs].filter(Boolean)}
+  return {
+    $or: [lhs, rhs].filter(Boolean)
+  }
 }
 
 function asFilter(node) {
@@ -171,7 +192,11 @@ function asFilter(node) {
     return fromEqualityFilter({
       op: 'eq',
       lhs: node,
-      rhs: {op: 'literal', type: 'bool', value: true}
+      rhs: {
+        op: 'literal',
+        type: 'bool',
+        value: true
+      }
     })
   }
 
@@ -193,7 +218,9 @@ function fromNotOperator(node) {
     return !rhs
   }
 
-  return {$nor: [fromNode(node.rhs)]}
+  return {
+    $nor: [fromNode(node.rhs)]
+  }
 }
 
 function fromEqualityFilter(node) {
@@ -203,10 +230,16 @@ function fromEqualityFilter(node) {
   }
 
   if (type === 'fieldComparison') {
-    return {$expr: {$eq: [`$${lhs}`, `$${rhs}`]}}
+    return {
+      $expr: {
+        $eq: [`$${lhs}`, `$${rhs}`]
+      }
+    }
   }
 
-  return {[lhs]: rhs}
+  return {
+    [lhs]: rhs
+  }
 }
 
 function fromInequalityFilter(node) {
@@ -216,10 +249,18 @@ function fromInequalityFilter(node) {
   }
 
   if (type === 'fieldComparison') {
-    return {$expr: {$ne: [`$${lhs}`, `$${rhs}`]}}
+    return {
+      $expr: {
+        $ne: [`$${lhs}`, `$${rhs}`]
+      }
+    }
   }
 
-  return {[lhs]: {$ne: rhs}}
+  return {
+    [lhs]: {
+      $ne: rhs
+    }
+  }
 }
 
 function fromGreaterThanFilter(node) {
@@ -229,10 +270,18 @@ function fromGreaterThanFilter(node) {
   }
 
   if (type === 'fieldComparison') {
-    return {$expr: {$gt: [`$${lhs}`, `$${rhs}`]}}
+    return {
+      $expr: {
+        $gt: [`$${lhs}`, `$${rhs}`]
+      }
+    }
   }
 
-  return {[lhs]: {$gt: rhs}}
+  return {
+    [lhs]: {
+      $gt: rhs
+    }
+  }
 }
 
 function fromGreaterThanOrEqualFilter(node) {
@@ -242,10 +291,18 @@ function fromGreaterThanOrEqualFilter(node) {
   }
 
   if (type === 'fieldComparison') {
-    return {$expr: {$gte: [`$${lhs}`, `$${rhs}`]}}
+    return {
+      $expr: {
+        $gte: [`$${lhs}`, `$${rhs}`]
+      }
+    }
   }
 
-  return {[lhs]: {$gte: rhs}}
+  return {
+    [lhs]: {
+      $gte: rhs
+    }
+  }
 }
 
 function fromLessThanFilter(node) {
@@ -255,10 +312,18 @@ function fromLessThanFilter(node) {
   }
 
   if (type === 'fieldComparison') {
-    return {$expr: {$lt: [`$${lhs}`, `$${rhs}`]}}
+    return {
+      $expr: {
+        $lt: [`$${lhs}`, `$${rhs}`]
+      }
+    }
   }
 
-  return {[lhs]: {$lt: rhs}}
+  return {
+    [lhs]: {
+      $lt: rhs
+    }
+  }
 }
 
 function fromLessThanOrEqualFilter(node) {
@@ -268,10 +333,18 @@ function fromLessThanOrEqualFilter(node) {
   }
 
   if (type === 'fieldComparison') {
-    return {$expr: {$lte: [`$${lhs}`, `$${rhs}`]}}
+    return {
+      $expr: {
+        $lte: [`$${lhs}`, `$${rhs}`]
+      }
+    }
   }
 
-  return {[lhs]: {$lte: rhs}}
+  return {
+    [lhs]: {
+      $lte: rhs
+    }
+  }
 }
 
 function fromInFilter(node) {
@@ -279,7 +352,9 @@ function fromInFilter(node) {
 
   // 'stringVal' in fieldName
   if (!rhs.$op && !Array.isArray(rhs) && type !== 'fieldComparison') {
-    return {[lhs]: rhs}
+    return {
+      [lhs]: rhs
+    }
   }
 
   // _id in path('drafts.*')
@@ -299,13 +374,23 @@ function fromInFilter(node) {
   // mainTagField in arrayOfTagsField
   if (type === 'fieldComparison') {
     return {
-      [lhs]: {$exists: true},
-      [rhsValue]: {$type: 'array'},
-      $expr: {[op]: [`$${lhs}`, `$${rhsValue}`]}
+      [lhs]: {
+        $exists: true
+      },
+      [rhsValue]: {
+        $type: 'array'
+      },
+      $expr: {
+        [op]: [`$${lhs}`, `$${rhsValue}`]
+      }
     }
   }
 
-  return {[lhs]: {[op]: rhsValue}}
+  return {
+    [lhs]: {
+      [op]: rhsValue
+    }
+  }
 }
 
 function fromInPathFilter(node) {
@@ -314,17 +399,33 @@ function fromInPathFilter(node) {
     .replace(/\*\*$/, '')
     .replace(/\*$/, '[^\\.]+$')
 
-  return {$op: '$regex', value: `^${pattern}`}
+  return {
+    $op: '$regex',
+    value: `^${pattern}`
+  }
 }
 
 function fromDefinedFilter(node) {
   const [field] = node.arguments.map(fromNode)
-  return {[field]: {$exists: true, $not: {$size: 0}}}
+  return {
+    [field]: {
+      $exists: true,
+      $not: {
+        $size: 0
+      }
+    }
+  }
 }
 
 function fromReferencesFilter(node) {
   const [id] = node.arguments.map(fromNode)
-  return {'@refs': {$elemMatch: {id}}}
+  return {
+    '@refs': {
+      $elemMatch: {
+        id
+      }
+    }
+  }
 }
 
 function fromMatchFilter(node) {
@@ -335,12 +436,16 @@ function fromMatchFilter(node) {
     // Multiple occurences -> Single occurence (*** -> .*?)
     .replace(/(\.\*\?)+/g, '.*?')
 
-  const $regex = new RegExp(`\\b${pattern}\\b`, 'i')
+  const $regex = new RegExp(`${pattern}`, 'i')
   if (type === 'literalComparison') {
     return $regex.test(lhs)
   }
 
-  return {[lhs]: {$regex}}
+  return {
+    [lhs]: {
+      $regex
+    }
+  }
 }
 
 function fromAccessor(node) {
@@ -377,7 +482,11 @@ function fromFunctionCall(node) {
 }
 
 function fromSubscript(node) {
-  return {limit: node.end - node.start, offset: node.start, returnFirst: node.first}
+  return {
+    limit: node.end - node.start,
+    offset: node.start,
+    returnFirst: node.first
+  }
 }
 
 function fromSortDirection(node) {
@@ -388,7 +497,9 @@ function fromSortDirection(node) {
 }
 
 function fromOrdering(node) {
-  return {sort: node.terms.map(fromNode).filter(Boolean)}
+  return {
+    sort: node.terms.map(fromNode).filter(Boolean)
+  }
 }
 
 // eslint-disable-next-line complexity
@@ -404,28 +515,54 @@ function filterParts(node) {
 
   if (lhsIsAccessor && rhsIsAccessor) {
     // some.field == other.field
-    return {type: 'fieldComparison', lhs, rhs}
+    return {
+      type: 'fieldComparison',
+      lhs,
+      rhs
+    }
   } else if (lhsIsAccessor && rhsIsLiteral) {
     // some.field == 'some value'
-    return {type: 'fieldLiteralComparison', lhs, rhs}
+    return {
+      type: 'fieldLiteralComparison',
+      lhs,
+      rhs
+    }
   } else if (rhsIsAccessor && lhsIsLiteral) {
     // 'some value' == some.field (-> some.field == 'some value')
-    return {type: 'fieldLiteralComparison', lhs: rhs, rhs: lhs}
+    return {
+      type: 'fieldLiteralComparison',
+      lhs: rhs,
+      rhs: lhs
+    }
   } else if (lhsIsLiteral && rhsIsLiteral) {
     // 'some value' == 'other value'
-    return {type: 'literalComparison', lhs, rhs}
+    return {
+      type: 'literalComparison',
+      lhs,
+      rhs
+    }
   } else if (lhsIsAccessor && rhs.$op) {
     // 'some.field' $mongo-operator
-    return {type: 'mongoComparison', lhs, rhs}
+    return {
+      type: 'mongoComparison',
+      lhs,
+      rhs
+    }
   }
 
-  log('ehm', {lhs, rhs: node.rhs, node})
+  log('ehm', {
+    lhs,
+    rhs: node.rhs,
+    node
+  })
 
   throw new Error('Unable to determine filter type')
 }
 
 function wrapQuery(queryVal) {
-  return {query: queryVal}
+  return {
+    query: queryVal
+  }
 }
 
 function isAccessor(node) {
