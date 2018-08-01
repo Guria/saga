@@ -61,7 +61,7 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async createAdminUser(identity = {}, venueId = null, isRootUser = false) {
+  async createUser(identity, venueId = null, options = {}) {
     const {_id, name, email, profileImage} = identity
     const externalProfileImageUrl = profileImage
 
@@ -71,14 +71,19 @@ module.exports = class UserStore {
       .create({
         _type: 'user',
         identity: _id,
-        isAdmin: true,
-        isRootUser,
+        isAdmin: options.isAdmin,
+        isRootUser: options.isRootUser,
         name,
         email,
         externalProfileImageUrl
       })
       .commit()
       .then(getFirstDocument)
+  }
+
+  // eslint-disable-next-line require-await
+  async createAdminUser(identity = {}, venueId = null, isRootUser = false) {
+    return this.createUser(identity, venueId, {isRootUser, isAdmin: true})
   }
 
   async fetchUsersForIdentity(identityId, venueId = null) {
