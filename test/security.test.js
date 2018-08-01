@@ -69,7 +69,7 @@ describe('security', () => {
     expect(filters).toEqual(fullAccessFilter)
   })
 
-  test('denies access to venue user with any implied access', async () => {
+  test('denies access to venue user without implicit access', async () => {
     const userStore = app.services.userStore
     const identity = await userStore.createIdentity(identityTemplate)
     const user = await userStore.createUser(identity, 'lyra-test')
