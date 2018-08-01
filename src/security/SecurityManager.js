@@ -1,11 +1,13 @@
 const LruCache = require('lru-cache')
 
-const anonymousFilterExpressions = {
+const noAccessFilterExpressions = {
   create: 'false',
   read: 'false',
   update: 'false',
   delete: 'false'
 }
+
+const fullAccessFilterExpressions = {}
 
 class SecurityManager {
   constructor(options = {}) {
@@ -20,7 +22,7 @@ class SecurityManager {
 
   async getFilterExpressionsForUser(venueId, identityId) {
     if (identityId === SecurityManager.SYSTEM_IDENTITY) {
-      return {} // Allow all
+      return fullAccessFilterExpressions
     }
 
     if (!this.userStore) {
@@ -28,24 +30,22 @@ class SecurityManager {
     }
 
     if (!identityId) {
-      return anonymousFilterExpressions
+      return noAccessFilterExpressions
     }
 
     const {globalUser, venueUser} = await this.userStore.fetchUsersForIdentity(identityId, venueId)
     if ([globalUser, venueUser].filter(Boolean).length === 0) {
-      return anonymousFilterExpressions
+      return noAccessFilterExpressions
     }
 
     if (globalUser && globalUser.isAdmin) {
-      // No filters == allow everything
-      return {}
+      return fullAccessFilterExpressions
     }
     if (venueUser && venueUser.isAdmin) {
-      // No filters == allow everything
-      return {}
+      return fullAccessFilterExpressions
     }
 
-    return anonymousFilterExpressions
+    return noAccessFilterExpressions
   }
 
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
