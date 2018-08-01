@@ -1,21 +1,16 @@
 const {close, getApp} = require('./helpers')
+const {
+  noAccessFilterExpressions,
+  fullAccessFilterExpressions
+} = require('../src/security/defaultFilters')
 
-describe('security', () => {
+describe('securityManager', () => {
   const identityTemplate = {
     provider: 'google',
     providerId: 'xyzzy',
     name: 'Profeten Thomax',
     email: 'thomas@sanity.io'
   }
-
-  const noAccessFilter = {
-    create: 'false',
-    read: 'false',
-    update: 'false',
-    delete: 'false'
-  }
-
-  const fullAccessFilter = {}
 
   let app
   let securityManager
@@ -40,17 +35,17 @@ describe('security', () => {
 
   test('denies access to unknown user', async () => {
     const filters = await securityManager.getFilterExpressionsForUser('lyra-test', 'unknownUser')
-    expect(filters).toEqual(noAccessFilter)
+    expect(filters).toEqual(noAccessFilterExpressions)
   })
 
   test('denies access if no user is given', async () => {
     const filters = await securityManager.getFilterExpressionsForUser('lyra-test')
-    expect(filters).toEqual(noAccessFilter)
+    expect(filters).toEqual(noAccessFilterExpressions)
   })
 
   test('grants full access to system user', async () => {
     const filters = await securityManager.getFilterExpressionsForUser('lyra-test', '_system_')
-    expect(filters).toEqual(fullAccessFilter)
+    expect(filters).toEqual(fullAccessFilterExpressions)
   })
 
   test('grants full access to global admin user', async () => {
@@ -58,7 +53,7 @@ describe('security', () => {
     const identity = await userStore.createIdentity(identityTemplate)
     const user = await userStore.createAdminUser(identity)
     const filters = await securityManager.getFilterExpressionsForUser(null, user.identity)
-    expect(filters).toEqual(fullAccessFilter)
+    expect(filters).toEqual(fullAccessFilterExpressions)
   })
 
   test('grants full access to venue admin user', async () => {
@@ -66,7 +61,7 @@ describe('security', () => {
     const identity = await userStore.createIdentity(identityTemplate)
     const user = await userStore.createAdminUser(identity, 'lyra-test')
     const filters = await securityManager.getFilterExpressionsForUser('lyra-test', user.identity)
-    expect(filters).toEqual(fullAccessFilter)
+    expect(filters).toEqual(fullAccessFilterExpressions)
   })
 
   test('denies access to venue user without implicit access', async () => {
@@ -74,6 +69,6 @@ describe('security', () => {
     const identity = await userStore.createIdentity(identityTemplate)
     const user = await userStore.createUser(identity, 'lyra-test')
     const filters = await securityManager.getFilterExpressionsForUser('lyra-test', user.identity)
-    expect(filters).toEqual(noAccessFilter)
+    expect(filters).toEqual(noAccessFilterExpressions)
   })
 })

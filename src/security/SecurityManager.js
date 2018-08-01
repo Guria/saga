@@ -1,14 +1,6 @@
 const LruCache = require('lru-cache')
 const determineAccessFilters = require('./determineAccessFilters')
-
-const noAccessFilterExpressions = {
-  create: 'false',
-  read: 'false',
-  update: 'false',
-  delete: 'false'
-}
-
-const fullAccessFilterExpressions = {}
+const {noAccessFilterExpressions, fullAccessFilterExpressions} = require('./defaultFilters')
 
 class SecurityManager {
   constructor(options = {}) {
@@ -49,13 +41,10 @@ class SecurityManager {
       return globalUser.isAdmin ? fullAccessFilterExpressions : noAccessFilterExpressions
     }
     if (venueUser) {
-      const dataStore = await this.dataStore.forDataset(venueId)
+      const scopedDataStore = await this.dataStore.forDataset(venueId)
       return venueUser.isAdmin
         ? fullAccessFilterExpressions
-        : determineAccessFilters(venueUser._id, {
-            defaultFilters: noAccessFilterExpressions,
-            dataStore: dataStore
-          })
+        : determineAccessFilters(venueUser._id, scopedDataStore)
     }
 
     return noAccessFilterExpressions

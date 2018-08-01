@@ -1,3 +1,5 @@
+const {noAccessFilterExpressions, fullAccessFilterExpressions} = require('./defaultFilters')
+
 async function performQuery(dataStore, query, params = {}) {
   try {
     const results = await dataStore.fetch(query, params)
@@ -8,16 +10,18 @@ async function performQuery(dataStore, query, params = {}) {
   }
 }
 
-async function lookup(userId, dataStore) {
-  const venueAccessQuery = '*[_type=="venue" && references($userId)]'
+async function determineFilters(userId, dataStore) {
+  const venueAccessQuery = `*[_type=="venue" && references($userId)][0]{
+    _id, _type,
+    "administrator": defined(administrators) && length(administrators[_ref == $userId])>0,
+  }`
   const params = {userId}
   const result = await performQuery(dataStore, venueAccessQuery, params)
-  console.log('Got result', result)
-  return null
+  console.log('Got result', JSON.stringify(result, null, 2))
+  return result.administrator ? fullAccessFilterExpressions : noAccessFilterExpressions
 }
 
-module.exports = async (userId, options = {}) => {
-  await lookup(userId, options.dataStore)
-  const accessFilters = Object.assign({}, options.defaultFilters)
+module.exports = async (userId, dataStore) => {
+  const accessFilters = await determineFilters(userId, dataStore)
   return accessFilters
 }
