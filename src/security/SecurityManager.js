@@ -43,18 +43,22 @@ class SecurityManager {
     this.confirmStoresArePresent()
 
     const {globalUser, venueUser} = await this.userStore.fetchUsersForIdentity(identityId, venueId)
-    if ([globalUser, venueUser].filter(Boolean).length === 0) {
-      return noAccessFilterExpressions
+
+    if (globalUser) {
+      // Will there ever be a globalUser who is not admin?
+      return globalUser.isAdmin ? fullAccessFilterExpressions : noAccessFilterExpressions
+    }
+    if (venueUser) {
+      const dataStore = await this.dataStore.forDataset(venueId)
+      return venueUser.isAdmin
+        ? fullAccessFilterExpressions
+        : determineAccessFilters(venueUser._id, {
+            defaultFilters: noAccessFilterExpressions,
+            dataStore: dataStore
+          })
     }
 
-    if ((globalUser && globalUser.isAdmin) || (venueUser && venueUser.isAdmin)) {
-      return fullAccessFilterExpressions
-    }
-
-    return determineAccessFilters(identityId, venueId, {
-      defaultFilters: noAccessFilterExpressions,
-      dataStore: this.dataStore
-    })
+    return noAccessFilterExpressions
   }
 
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
