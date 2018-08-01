@@ -13,6 +13,7 @@ const fullAccessFilterExpressions = {}
 class SecurityManager {
   constructor(options = {}) {
     this.userStore = options.userStore
+    this.dataStore = options.dataStore
     this.cache = new LruCache({max: 500})
     this.onMutation = this.onMutation.bind(this)
   }
@@ -21,32 +22,39 @@ class SecurityManager {
     this.userStore = userStore
   }
 
+  confirmStoresArePresent() {
+    if (!this.userStore) {
+      throw new Error('User store must be set before fetching filter expressions')
+    }
+    if (!this.dataStore) {
+      throw new Error('Data store must be set before fetching filter expressions')
+    }
+  }
+
   async getFilterExpressionsForUser(venueId, identityId) {
+    if (!identityId) {
+      return noAccessFilterExpressions
+    }
+
     if (identityId === SecurityManager.SYSTEM_IDENTITY) {
       return fullAccessFilterExpressions
     }
 
-    if (!this.userStore) {
-      throw new Error('User store must be set before fetching filter expressions')
-    }
-
-    if (!identityId) {
-      return noAccessFilterExpressions
-    }
+    this.confirmStoresArePresent()
 
     const {globalUser, venueUser} = await this.userStore.fetchUsersForIdentity(identityId, venueId)
     if ([globalUser, venueUser].filter(Boolean).length === 0) {
       return noAccessFilterExpressions
     }
 
-    if (globalUser && globalUser.isAdmin) {
-      return fullAccessFilterExpressions
-    }
-    if (venueUser && venueUser.isAdmin) {
+    if ((globalUser && globalUser.isAdmin) || (venueUser && venueUser.isAdmin)) {
       return fullAccessFilterExpressions
     }
 
-    return determineAccessFilters(identityId, venueId, {default: noAccessFilterExpressions})
+    return determineAccessFilters(identityId, venueId, {
+      defaultFilters: noAccessFilterExpressions,
+      dataStore: this.dataStore
+    })
   }
 
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {

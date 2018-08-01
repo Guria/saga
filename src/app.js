@@ -23,7 +23,7 @@ module.exports = config => {
   const fileStore = getFileStore(config.assets)
   const dataStore = new StoreManager(config.datastore)
   const userStore = new UserStore({dataStore, db: config.datastore.options.systemDb})
-  const securityManager = new SecurityManager({userStore})
+  const securityManager = new SecurityManager({userStore, dataStore})
   const sessionStore = new MongoStore({
     ...config.sessionStore,
     dbPromise: dataStore.connect().then(client => client.db(config.datastore.options.systemDb))
