@@ -1,3 +1,5 @@
+/* eslint-disable max-depth */
+
 import { Assignment } from './operations'
 import debug from '../debug'
 
@@ -35,11 +37,12 @@ export function determineUnambiguousAlias(operation) {
     default:
       return null
   }
+  return null
 }
 
 
 export function toObjectOperations(expressions) {
-  // TODO: Convert a list of expressions to object operations
+  // T0D0: Convert a list of expressions to object operations
 
   return expressions.map(expr => {
     const alias = determineUnambiguousAlias(expr)

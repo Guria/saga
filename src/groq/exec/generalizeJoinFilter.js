@@ -1,3 +1,5 @@
+/* eslint-disable require-await */
+
 import rewrite from '../plan/rewrite'
 import debug from '../debug'
 

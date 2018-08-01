@@ -1,3 +1,5 @@
+/* eslint-disable id-length */
+
 import * as types from './types'
 import { asPlainValue } from './scopeTools'
 

@@ -1,16 +1,17 @@
-import Scope from './Scope'
+/* eslint-disable id-length */
+
 import debug from '../debug'
 
 // Coerce a value to be on the comparable form. E.g. rewrites path("a.b.c") => "a.b.c"
-function coerce(value) {
-  if (value === null || value === undefined) {
-    return null
-  }
-  if (value.toJSON) {
-    return value.toJSON()
-  }
-  return value
-}
+// function coerce(value) {
+//   if (value === null || value === undefined) {
+//     return null
+//   }
+//   if (value.toJSON) {
+//     return value.toJSON()
+//   }
+//   return value
+// }
 
 const TYPE_ORDER = {
   'number': 1,
@@ -36,9 +37,9 @@ function compare(a, b, ascending) {
 }
 
 
-async function sortScopes(scopes, terms, executor) {
-  debug("sortScopes()", scopes, terms, executor)
-  terms = terms.slice()
+async function sortScopes(scopes, searchTerms, executor) {
+  debug("sortScopes()", scopes, searchTerms, executor)
+  const terms = searchTerms.slice()
   // Map each object into terms sorted by cardinality
   // so [{a: 1, b: "a"}, {a: 2, b: "b"}]|order(a, b)
   // becomes [[1, "a"], [2, "b"]]
@@ -46,9 +47,9 @@ async function sortScopes(scopes, terms, executor) {
   debug('scopes to be sorted', scopes)
   for (let i = 0; i < scopes.length; i++) {
     const scope = scopes[i]
-    const termValues = await (Promise.all(terms.map(term => {
+    const termValues = await (Promise.all(terms.map(term => { // eslint-disable-line no-await-in-loop
       return executor.exec(term.expression, scope)
-    }))).then(scopes => scopes.map(scope => scope.value))
+    }))).then(theScopes => theScopes.map(theScope => theScope.value))
     itemWithTerms.push({
       scope,
       terms: termValues
@@ -80,7 +81,7 @@ async function sortScopes(scopes, terms, executor) {
   return sorted.map(item => item.scope)
 }
 
-export default async function sort(input, terms, executor) {
+export default async function sort(input, terms, executor) { // eslint-disable-line require-await
   debug("sort()", input, terms, executor)
   if (Array.isArray(input)) {
     // Input is array of scopes

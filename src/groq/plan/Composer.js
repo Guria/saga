@@ -1,3 +1,5 @@
+/* eslint-disable complexity, class-methods-use-this */
+
 import { toObjectOperations } from './objectExpressionOps';
 import { newFunctionCall } from './functions'
 import debug from '../debug'
@@ -114,7 +116,7 @@ export default class Composer {
     })
   }
 
-  // TODO: Check that subscript indicies are literal constants
+  // T0D0: Check that subscript indicies are literal constants
   nodeSubscript(node) {
     switch (node.value.node) {
       case 'range':
@@ -125,13 +127,14 @@ export default class Composer {
             : this.compose(node.value.end).value,
           first: false
         })
-      default:
+      default: {
         const index = this.compose(node.value).value
         return new ops.Subscript({
           start: index,
           end: index + 1,
           first: true
         })
+      }
     }
   }
 
@@ -141,7 +144,6 @@ export default class Composer {
     return new ops.ObjectExpr({
       operations
     })
-    return
   }
 
   nodeArray(node) {
@@ -149,7 +151,6 @@ export default class Composer {
     return new ops.ArrayExpr({
       operations
     })
-    return
   }
 
   nodePipeOperator(node) {

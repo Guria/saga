@@ -3,7 +3,6 @@ import Scope from './Scope'
 import debug from '../debug'
 import generalizeJoinFilter from './generalizeJoinFilter'
 import { asPlainValue } from './scopeTools'
-import { join } from 'path';
 
 // Given a pipeline, fetch will make sure the source value for that pipeline
 // gets cached in the parentScope. It does not actually return the retrieved
@@ -61,8 +60,8 @@ class FetchSpec {
     this.filter = new BinaryOperator('and', this.filter, constraint)
   }
 
-  project(objectOperations) {
-    // TODO: Remap the values of the filter and orderings collected so far
+  project(objectOperations) { // eslint-disable-line class-methods-use-this
+    // T0D0: Remap the values of the filter and orderings collected so far
     // by substituting expressions according to the projection
   }
 
@@ -106,7 +105,7 @@ function extractSourceId(pipeline) {
 }
 
 // Given a pipeline, collapses it to a filter, a window and an ordering
-async function compile(scope, pipeline, executor) {
+async function compile(scope, pipeline, executor) { // eslint-disable-line complexity
   const operations = pipeline.operations
   if (operations.length == 0) {
     throw new Error("Empty pipelines can't be collapsed")
@@ -126,9 +125,11 @@ async function compile(scope, pipeline, executor) {
       case 'filter':
         fetchSpec.applyFilter(operation.filter)
         break
-      case 'mapJoin':
-        const filter = await generalizeMapJoin(operation, scope, executor)
+      case 'mapJoin': {
+        const filter = await generalizeMapJoin(operation, scope, executor) // eslint-disable-line no-await-in-loop
         fetchSpec.applyFilter(filter)
+        break
+      }
       case 'object':
         fetchSpec.project(operation.operations)
         break
@@ -137,6 +138,7 @@ async function compile(scope, pipeline, executor) {
         break
       case 'ordering':
         fetchSpec.applyOrdering(operation.terms)
+        break
       case 'accessor':
         fetchSpec.project(operation.operations)
         break
@@ -155,7 +157,7 @@ async function compile(scope, pipeline, executor) {
     return joinFetch
   }
 
-  // TODO: Now the filter needs to be expanded in case it requires anything
+  // T0D0: Now the filter needs to be expanded in case it requires anything
   // to be fetched in order to be executed.
   debug('fetchSpec => ', fetchSpec)
   return fetchSpec
@@ -166,24 +168,25 @@ async function compile(scope, pipeline, executor) {
 async function generalizeMapJoin(operation, scope, executor) {
   if (!scope) {
     debug("mapJoin over null short circuited")
-    fetchSpec.applyFilter(new Literal({
+    return new Literal({
       type: 'boolean',
       value: false
-    }))
+    })
   }
   let ids
   if (scope.sourceId) {
     const source = await scope.dataForSource(scope.sourceId)
     debug('expanding mapJoin', scope, scope.sourceId)
     const idPromises = source.documents.map(async document => {
-      const scope = new Scope({
+      const scopedDocument = new Scope({
         value: document
       })
-      const resolved = asPlainValue(await executor.exec(operation.pipeline, scope)).filter(Boolean)
+      const resolved = asPlainValue(await executor.exec(operation.pipeline, scopedDocument)).filter(Boolean)
       debug('resolved', resolved)
       if (resolved) {
         return resolved
       }
+      return null
     })
     const idMap = {}
     ids = (await Promise.all(idPromises))
@@ -195,7 +198,6 @@ async function generalizeMapJoin(operation, scope, executor) {
     return (new Literal({
       value: false
     }))
-    throw new Error(`mapJoin not supported in this context`)
   }
   debug('expanded mapJoin', ids)
   return new BinaryOperator('in',

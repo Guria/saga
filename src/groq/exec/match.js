@@ -1,9 +1,10 @@
+/* eslint-disable max-depth */
 
 function tokenizer(text) {
-  const tokenizer = /(?:\s*)([^\s]+)(?:\s*)/y
+  const regexp = /(?:\s*)([^\s]+)(?:\s*)/y
   return {
     next() {
-      const matches = text.match(tokenizer)
+      const matches = text.match(regexp)
       if (!matches) {
         return null
       }
@@ -13,6 +14,7 @@ function tokenizer(text) {
 }
 
 
+/* eslint-disable no-param-reassign */
 function matcherForTerm(term) {
   term = term.replace(/^\s+/g, '').replace(/\s+$/, '').toLowerCase()
   if (term[term.length - 1] == '*') {
@@ -26,6 +28,7 @@ function matcherForTerm(term) {
   }
   return (word) => word == term
 }
+/* eslint-enable no-param-reassign */
 
 function matchString(source, terms) {
   if (typeof source !== 'string') {

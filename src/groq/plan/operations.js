@@ -1,4 +1,4 @@
-import { toObjectOperations, determineUnambiguousAlias } from './objectExpressionOps'
+import { determineUnambiguousAlias } from './objectExpressionOps'
 import debug from '../debug'
 
 let nextSourceId = 1
@@ -14,6 +14,32 @@ class Filter {
   constructor(filter) {
     this.op = 'filter'
     this.filter = filter
+  }
+}
+
+class Pipeline {
+  constructor(options) {
+    const {operations, alias} = options
+    this.op = 'pipe'
+    this.operations = operations
+    // The alias will be used to auto-assign this pipeline if it appears
+    // without an explicit assignment in an object expression
+    this.alias = alias
+    debug("new pipeline:", this, options)
+  }
+
+  pipeOp(operation) {
+    return new Pipeline({
+      operations: this.operations.concat(operation),
+      alias: this.alias
+    })
+  }
+
+  dotOp(operation) {
+    return new Pipeline({
+      operations: this.operations.concat(operation),
+      alias: this.alias
+    })
   }
 }
 
@@ -36,6 +62,38 @@ class ArrayExpr {
     const {operations} = options
     this.op = 'array'
     this.operations = operations
+  }
+}
+
+class Accessor {
+  constructor(path) {
+    this.op = 'accessor'
+    this.path = path
+  }
+
+  dotOp(rhs) {
+    switch (rhs.op) {
+      case 'attribute':
+        return new Accessor(this.path.concat([rhs]))
+      case 'accessor':
+        return new Accessor(this.path.concat(rhs.path))
+      default:
+        return null
+    }
+  }
+}
+
+class Attribute {
+  constructor(name) {
+    this.op = 'attribute'
+    this.name = name
+  }
+
+  dotOp(rhs) {
+    if (rhs.op == 'attribute') {
+      return new Accessor([this, rhs])
+    }
+    return null
   }
 }
 
@@ -77,7 +135,7 @@ class Range {
     const {start, end, inclusive} = options
     this.op = 'range'
     this.start = start
-    this.inclusive = this.inclusive
+    this.inclusive = inclusive
     this.end = end
   }
 }
@@ -130,65 +188,11 @@ class PrefixOperator {
 class Assignment {
   constructor(name, value) {
     this.op = 'assignment'
-    this.name = name,
+    this.name = name
     this.value = value
   }
 }
 
-class Pipeline {
-  constructor(options) {
-    const {operations, alias} = options
-    this.op = 'pipe'
-    this.operations = operations
-    // The alias will be used to auto-assign this pipeline if it appears
-    // without an explicit assignment in an object expression
-    this.alias = alias
-    debug("new pipeline:", this, options)
-  }
-
-  pipeOp(operation) {
-    return new Pipeline({
-      operations: this.operations.concat(operation),
-      alias: this.alias
-    })
-  }
-
-  dotOp(operation) {
-    return new Pipeline({
-      operations: this.operations.concat(operation),
-      alias: this.alias
-    })
-  }
-}
-
-class Accessor {
-  constructor(path) {
-    this.op = 'accessor'
-    this.path = path
-  }
-
-  dotOp(rhs) {
-    switch (rhs.op) {
-      case 'attribute':
-        return new Accessor(this.path.concat([rhs]))
-      case 'accessor':
-        return new Accessor(this.path.concat(rhs.path))
-    }
-  }
-}
-
-class Attribute {
-  constructor(name) {
-    this.op = 'attribute'
-    this.name = name
-  }
-
-  dotOp(rhs) {
-    if (rhs.op == 'attribute') {
-      return new Accessor([this, rhs])
-    }
-  }
-}
 
 // A map join takes a pipeline that resolves to an array of id's and fetches those documents returning them in the same order
 // as they resolve in the pipeline.
@@ -284,7 +288,7 @@ function applyPostfixOperator(lhs, name) {
       })
     case 'arrow':
       // Rewrite foo-> to *[^.foo._ref == _id]
-      // TODO: Assert lhs is accessor
+      // T0D0: Assert lhs is accessor
       debug('arrow operator lhs', lhs)
       if (lhs.op == 'accessor') {
         return new Pipeline({
@@ -320,14 +324,12 @@ function applyPostfixOperator(lhs, name) {
             }))
           ]
         })
-      } else {
-        return new Pipeline({
-          operations: [new Literal({
-            value: null
-          })]
-        })
-      // throw new Error(`Unable to apply arrow operator in this context`)
       }
+      return new Pipeline({
+        operations: [new Literal({
+          value: null
+        })]
+      })
     default:
       throw new Error(`Unknown postfix operator ${name}`)
   }

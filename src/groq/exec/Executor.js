@@ -7,8 +7,6 @@ import sort from './sort'
 import match from './match'
 import { asPlainValue } from './scopeTools'
 
-const DEFAULT_LIMIT = 100
-
 // Implementation of equals that do not respect object equality and eschews deep compare
 function equals(lhs, rhs) {
   if (typeof lhs === 'object' || typeof rhs === 'object') {
@@ -71,20 +69,20 @@ function first(input, offset) {
   return input.first(offset)
 }
 
-function shallowFlatten(value) {
-  if (!Array.isArray(value)) {
-    return value
-  }
-  const result = []
-  value.forEach(item => {
-    if (Array.isArray(item)) {
-      result.push(...item)
-    } else {
-      result.push(item)
-    }
-  })
-  return result
-}
+// function shallowFlatten(value) {
+//   if (!Array.isArray(value)) {
+//     return value
+//   }
+//   const result = []
+//   value.forEach(item => {
+//     if (Array.isArray(item)) {
+//       result.push(...item)
+//     } else {
+//       result.push(item)
+//     }
+//   })
+//   return result
+// }
 
 module.exports = class Executor {
 
@@ -98,10 +96,11 @@ module.exports = class Executor {
     this.operations = operations
   }
 
-  async run() {
+  async run() { // eslint-disable-line require-await
     return this.exec(this.operations, this.scope)
   }
 
+  /* eslint-disable complexity */
   async exec(operation, scope) {
     debug('exec() op:', operation, 'scope:', scope)
     if (scope instanceof Promise) {
@@ -110,7 +109,7 @@ module.exports = class Executor {
     switch (operation.op) {
       case 'pipe':
         return this.execPipeline(operation, scope)
-      case 'source':
+      case 'source': {
         const data = await scope.dataForSource(operation.id)
         debug("sourceId will be", operation.id)
         return scope.child({
@@ -118,6 +117,7 @@ module.exports = class Executor {
           value: data.documents,
           start: data.start
         })
+      }
       case 'filter':
         return this.execFilter(operation, scope)
       case 'and':
@@ -158,6 +158,7 @@ module.exports = class Executor {
         throw new Error(`(exec) Unknown operation ${operation.op}`)
     }
   }
+  /* eslint-enable complexity */
 
   async execFunctionCall(operation, scope) {
     const fn = functions[operation.name]
@@ -174,9 +175,9 @@ module.exports = class Executor {
   }
 
   // Exec an array of operations and return their plain values as an array
-  async execEval(operations, scope) {
+  async execEval(operations, scope) { // eslint-disable-line require-await
     return Promise.all(operations.map(op => this.exec(op, scope))).then(scopes => {
-      return scopes.map(s => s.value)
+      return scopes.map(scopedValue => scopedValue.value)
     })
   }
 
@@ -192,6 +193,7 @@ module.exports = class Executor {
 
   }
 
+  /* eslint-disable complexity, max-depth */
   async execIn(operation, scope) {
     const [lhs, rhs] = await Promise.all([
       this.exec(operation.lhs, scope),
@@ -232,9 +234,10 @@ module.exports = class Executor {
     }
     throw new Error(`in-operator does not apply to rhs value ${rhs.value}`)
   }
+  /* eslint-enable complexity, max-depth */
 
 
-  async execArray(operation, scope) {
+  async execArray(operation, scope) { // eslint-disable-line require-await
     return Promise.all(operation.operations.map(op => this.exec(op, scope))).then(elements => {
       return scope.clone({
         value: elements.map(element => asPlainValue(element))
@@ -242,9 +245,9 @@ module.exports = class Executor {
     })
   }
 
-  async execObjectExpr(operation, scope) {
+  async execObjectExpr(operation, scope) { // eslint-disable-line require-await
     debug('execObjectExpr()', operation, scope)
-    const evalObjOp = async (objOp) => {
+    const evalObjOp = async (objOp) => { // eslint-disable-line require-await
       debug('objOp:', objOp)
       switch (objOp.op) {
         case 'assignment':
@@ -252,7 +255,7 @@ module.exports = class Executor {
             const value = asPlainValue(resultScope)
             debug(`objOp assignment [${objOp.name}] = ${value}`, value)
             // Don't assign null values to the object
-            if (value == null || value == undefined) {
+            if (value === null || value == undefined) {
               return {}
             }
             return {
@@ -278,14 +281,14 @@ module.exports = class Executor {
     })
   }
 
-  async pipeMap(operation, lhs) {
-    let input = Array.isArray(lhs) ? lhs : [lhs]
+  async pipeMap(operation, lhs) { // eslint-disable-line require-await
+    const input = Array.isArray(lhs) ? lhs : [lhs]
     return Promise.all(input.map(item => {
       return this.exec(operation, item)
     }))
   }
 
-  async pipeFilter(operation, lhs) {
+  async pipeFilter(operation, lhs) { // eslint-disable-line require-await
     let input
     if (Array.isArray(lhs)) {
       debug("LHS is array")
@@ -303,7 +306,7 @@ module.exports = class Executor {
       debug('flattened to', input)
     } else {
       // If lhs is a single array value, explode it to an array of scopes
-      if (Array.isArray(lhs.value)) {
+      if (Array.isArray(lhs.value)) { // eslint-disable-line no-lonely-if
         debug("LHS is single array value (explode)")
         input = lhs.value.map(item => lhs.clone({
           value: item
@@ -328,7 +331,6 @@ module.exports = class Executor {
 
   async pipe(operation, lhs) {
     const inputIsArray = Array.isArray(lhs)
-    let input = inputIsArray ? lhs : [lhs]
     let result
     switch (operation.op) {
       case 'subscript':
@@ -336,18 +338,14 @@ module.exports = class Executor {
           debug('first()', lhs, operation.start)
           debug('=>', first(lhs, operation.start))
           return first(lhs, operation.start)
-        } else {
-          debug('slice()', lhs, operation.start, operation.end)
-          debug('=>', slice(lhs, operation.start, operation.end))
-          return slice(lhs, operation.start, operation.end)
         }
-        break
+        debug('slice()', lhs, operation.start, operation.end)
+        debug('=>', slice(lhs, operation.start, operation.end))
+        return slice(lhs, operation.start, operation.end)
       case 'ordering':
         return sort(lhs, operation.terms, this)
-        break
       case 'filter':
         return this.pipeFilter(operation, lhs)
-        break
       default:
         debug('mapping:', lhs)
         result = await this.pipeMap(operation, lhs)
@@ -371,17 +369,17 @@ module.exports = class Executor {
   // containing an array. Have a feeling each value in the mapping chain needs
   // the ability to keep track of it's own parents etc.
   async execPipeline(operation, scope) {
-    scope = await fetch(scope, operation, this.fetcher, this)
+    scope = await fetch(scope, operation, this.fetcher, this) // eslint-disable-line no-param-reassign
     const ops = operation.operations.slice()
-    const first = ops.shift()
-    debug('first op', first)
-    let current = await this.exec(first, scope)
+    const firstOp = ops.shift()
+    debug('first op', firstOp)
+    let current = await this.exec(firstOp, scope)
     debug('first op result:', current)
     while (ops.length > 0) {
       debug('current:', current)
-      let nextOp = ops.shift()
+      const nextOp = ops.shift()
       debug('nextOp:', nextOp)
-      current = await this.pipe(nextOp, current)
+      current = await this.pipe(nextOp, current) // eslint-disable-line no-await-in-loop
     }
     debug('current:', current)
     return current
@@ -404,7 +402,7 @@ module.exports = class Executor {
     })
   }
 
-  async execAnd(operation, scope) {
+  async execAnd(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => {
       if (lhs === false || rhs === false) {
         return false
@@ -416,7 +414,7 @@ module.exports = class Executor {
     })
   }
 
-  async execOr(operation, scope) {
+  async execOr(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => {
       if (lhs === true || rhs === true) {
         return true
@@ -428,31 +426,31 @@ module.exports = class Executor {
     })
   }
 
-  async execEq(operation, scope) {
+  async execEq(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => equals(lhs, rhs))
   }
 
-  async execNEq(operation, scope) {
+  async execNEq(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => !equals(lhs, rhs))
   }
 
-  async execLT(operation, scope) {
+  async execLT(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => lt(lhs, rhs))
   }
 
-  async execLTE(operation, scope) {
+  async execLTE(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => lt(lhs, rhs) || equals(lhs, rhs))
   }
 
-  async execGT(operation, scope) {
+  async execGT(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => gt(lhs, rhs))
   }
 
-  async execGTE(operation, scope) {
+  async execGTE(operation, scope) { // eslint-disable-line require-await
     return this.execBinaryOp(operation, scope, (lhs, rhs) => gt(lhs, rhs) || equals(lhs, rhs))
   }
 
-  async execNOT(operation, scope) {
+  async execNOT(operation, scope) { // eslint-disable-line require-await
     return this.execPrefixOp(operation, scope, rhs => {
       if (typeof rhs !== 'boolean') {
         return null
@@ -477,7 +475,7 @@ module.exports = class Executor {
     return mapOverArray ? joinResult : joinResult[0]
   }
 
-  async execAccessor(operation, scope) {
+  async execAccessor(operation, scope) { // eslint-disable-line require-await, class-methods-use-this
     debug('execAccessor()', operation.path, scope)
     if (!scope) {
       return new Scope({
@@ -487,14 +485,14 @@ module.exports = class Executor {
     return scope.resolveAccessor(operation.path)
   }
 
-  async execLiteral(operation, scope) {
+  async execLiteral(operation, scope) { // eslint-disable-line require-await, class-methods-use-this
     return new Scope({
       parent: null,
       value: operation.value
     })
   }
 
-  async execFilter(operation, scope) {
+  async execFilter(operation, scope) { // eslint-disable-line require-await
     return this.exec(operation.filter, scope)
   }
 }

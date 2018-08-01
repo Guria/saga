@@ -1,3 +1,5 @@
+/* eslint-disable max-depth */
+
 import debug from '../debug'
 
 export default class Scope {
@@ -79,8 +81,8 @@ export default class Scope {
   }
 
   // Returns true if the provided document references any of the ids
-  doesReference(ids) {
-    ids = Array.isArray(ids) ? ids : [ids]
+  doesReference(idsParam) {
+    const ids = Array.isArray(idsParam) ? idsParam : [idsParam]
 
     const document = this.value
 
@@ -133,7 +135,7 @@ export default class Scope {
 
   resolveAccessor(path) {
     debug('resolve accessor:', this.value, path)
-    let scope = this
+    let scope = this // eslint-disable-line consistent-this
     if (scope.value) {
       for (let i = 0; i < path.length; i++) {
         const operation = path[i]
@@ -191,7 +193,7 @@ export default class Scope {
   // foo._refs of the parent expression. Always returns an array of scopes
   async resolveAccessorForAll(path) {
     debug('resolve accessor (all):', this.value, path)
-    let scope = this
+    let scope = this // eslint-disable-line consistent-this
     for (let i = 0; i < path.length; i++) {
       const operation = path[i]
       switch (operation.op) {
@@ -201,10 +203,10 @@ export default class Scope {
           break
         case 'attribute':
           if (scope.sourceId) {
-            const source = (await scope.dataForSource(scope.sourceId)).documents
+            const source = (await scope.dataForSource(scope.sourceId)).documents // eslint-disable-line no-await-in-loop
             const subPath = path.slice(i)
             const result = []
-            source.forEach(item => {
+            source.forEach(item => { // eslint-disable-line no-loop-func, no-await-in-loop
               const itemScope = scope.clone({
                 value: item
               })
