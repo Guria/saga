@@ -61,31 +61,6 @@ module.exports = class UserStore {
       .then(getFirstDocument)
   }
 
-  async createUser(identity, venueId = null, options = {}) {
-    const {_id, name, email, profileImage} = identity
-    const externalProfileImageUrl = profileImage
-
-    const store = await (venueId ? this.dataStore.forDataset(venueId) : this.connect())
-    return store
-      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
-      .create({
-        _type: 'user',
-        identity: _id,
-        isAdmin: options.isAdmin,
-        isRootUser: options.isRootUser,
-        name,
-        email,
-        externalProfileImageUrl
-      })
-      .commit()
-      .then(getFirstDocument)
-  }
-
-  // eslint-disable-next-line require-await
-  async createAdminUser(identity = {}, venueId = null, isRootUser = false) {
-    return this.createUser(identity, venueId, {isRootUser, isAdmin: true})
-  }
-
   async fetchUsersForIdentity(identityId, venueId = null) {
     const getUserForIdentity = store => {
       return store.fetch('*[_type == "user" && identity == $identityId][0]', {identityId})
@@ -116,6 +91,31 @@ module.exports = class UserStore {
     return this.connect().then(store =>
       store.fetch('*[_type == "invite" && isRootUser == true && isAccepted == false][0]')
     )
+  }
+
+  async createUser(identity, venueId = null, options = {}) {
+    const {_id, name, email, profileImage} = identity
+    const externalProfileImageUrl = profileImage
+
+    const store = await (venueId ? this.dataStore.forDataset(venueId) : this.connect())
+    return store
+      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
+      .create({
+        _type: 'user',
+        identity: _id,
+        isAdmin: options.isAdmin,
+        isRootUser: options.isRootUser,
+        name,
+        email,
+        externalProfileImageUrl
+      })
+      .commit()
+      .then(getFirstDocument)
+  }
+
+  // eslint-disable-next-line require-await
+  async createAdminUser(identity = {}, venueId = null, isRootUser = false) {
+    return this.createUser(identity, venueId, {isRootUser, isAdmin: true})
   }
 
   async createRootUser() {
