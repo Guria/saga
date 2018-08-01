@@ -1,4 +1,5 @@
 const LruCache = require('lru-cache')
+const determineAccessFilters = require('./determineAccessFilters')
 
 const noAccessFilterExpressions = {
   create: 'false',
@@ -45,7 +46,7 @@ class SecurityManager {
       return fullAccessFilterExpressions
     }
 
-    return noAccessFilterExpressions
+    return determineAccessFilters(identityId, venueId, {default: noAccessFilterExpressions})
   }
 
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
