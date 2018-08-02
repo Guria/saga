@@ -56,14 +56,18 @@ describe('securityAccessFilters', () => {
       )
     ))
 
-  test('grants full access to venue administrator', async () => {
-    const user = await createUser()
+  test('grants full access only to venue administrator', async () => {
+    const venueAdminUser = await createUser()
     await createDocument({
       name: 'journal-of-snah',
       _type: 'venue',
-      administrators: [{_type: 'reference', _ref: user._id}]
+      administrators: [{_type: 'reference', _ref: venueAdminUser._id}]
     })
-    const filters = await determineAccessFilters(user._id, await getScopedDataStore())
+    const filters = await determineAccessFilters(venueAdminUser._id, await getScopedDataStore())
     expect(filters).toEqual(fullAccessFilterExpressions)
+
+    const unprivilegedUser = await createUser()
+    const filters2 = await determineAccessFilters(unprivilegedUser._id, await getScopedDataStore())
+    expect(filters2).toEqual(noAccessFilterExpressions)
   })
 })
