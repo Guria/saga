@@ -50,10 +50,12 @@ class SecurityManager {
     return noAccessFilterExpressions
   }
 
+  // Figure out which users must have there cached filters purged
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
     return []
   }
 
+  // Point of callback when a document changes
   onMutation(mutation) {
     const venueId = mutation.annotations.venueId
     const changedFor = this.accessFilterChangesForUserIds(
