@@ -11,7 +11,7 @@
     "prepublishOnly": "npm run compile",
     "postpublish": "npm run clean",
     "coverage": "NODE_ENV=test jest --coverage --runInBand",
-    "start": "node src/server.js",
+    "start": "babel-node src/server.js",
     "test": "NODE_ENV=test jest --runInBand"
   },
   "repository": {
