@@ -1,0 +1,33 @@
+title: "Regression tests for specific Vega-related bugs"
+documents:
+- _id: r1
+  _type: reviewProcess
+  article:
+    _ref: a1
+- _id: a1
+  _type: article
+  title: An article
+- _id: ri1
+  _type: reviewItem
+  review:
+    _ref: r1
+
+tests:
+- title: Review overview query
+  query: |
+    *[_type == "reviewProcess" && !(_id in path('drafts.**'))]|order(_createdAt desc)[0..1000]{
+      ...,
+      article->{_id,title},
+      "reviewItems": *[_type=="reviewItem" && !(_id in path('drafts.**')) && references(^._id)]
+    }
+  result:
+  - _id: "r1"
+    _type: reviewProcess
+    article:
+      _id: a1
+      title: An article
+    reviewItems:
+    - _id: ri1
+      _type: reviewItem
+      review:
+        _ref: r1
