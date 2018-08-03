@@ -63,12 +63,4 @@ describe('securityManager', () => {
     const filters = await securityManager.getFilterExpressionsForUser('lyra-test', user.identity)
     expect(filters).toEqual(fullAccessFilterExpressions)
   })
-
-  test('denies access to venue user without implicit access', async () => {
-    const userStore = app.services.userStore
-    const identity = await userStore.createIdentity(identityTemplate)
-    const user = await userStore.createUser(identity, 'lyra-test')
-    const filters = await securityManager.getFilterExpressionsForUser('lyra-test', user.identity)
-    expect(filters).toEqual(noAccessFilterExpressions)
-  })
 })
