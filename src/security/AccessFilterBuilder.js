@@ -31,7 +31,7 @@ class AccessFilterBuilder {
 
   canRead(type) {
     const queries = this.queries
-    console.log('GOT queries', queries)
+    //console.log('GOT queries', queries)
     switch (type) {
       case 'venue':
         return '_type == "venue"'
@@ -46,16 +46,14 @@ class AccessFilterBuilder {
       case 'article':
         return `_type == "article" && (${queries.isVenueAdministrator} || ${
           queries.isVenueEditor
-        } || ${queries.isVenueCopyEditor})`
+        } || ${queries.isVenueCopyEditor} || ${queries.isEditorInArticleTrack})`
       default:
         return 'false'
     }
   }
-  // ${this.queries.isVenueEditor} ||
-  // ${this.queries.isVenueCopyEditor} ||
-  // ${this.queries.isArticleSubmitter} ||
-  // ${this.queries.isEditorInArticlTrack} ||
-  // ${this.queries.isIssueEditor}
+  // ${queries.isArticleSubmitter} ||
+  // ${queries.isIssueEditor}
+
   canCreate(type) {
     return 'false'
   }

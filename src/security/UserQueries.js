@@ -61,13 +61,12 @@ class UserQueries {
     )
   }
 
+  // find all tracks user is editor
   trackIdsWhereUserIsEditor() {
-    // find all tracks user is editor for
     const query = `*[_type == "track" && references($userId)]{
         _id,
         _type,
-        "editor": defined(editors) && length(editors[_ref == $userId])>0,
-        "copyEditor": defined(copyEditors) && length(copyEditors[_ref == $userId])>0
+        "editor": defined(editors) && length(editors[_ref == $userId])>0
       }
     `
     return this.performQuery(query, {userId: this.userId}).then(tracks => {
@@ -75,22 +74,31 @@ class UserQueries {
     })
   }
 
+  stringy(items) {
+    return `["${items.join('","')}"]`
+  }
+
   // does article.track reference any of those tracks
-  // isEditorInArticleTrack() {
-  //   const trackIds = await trackIdsWhereUserIsEditor()
-  //   return `track._ref in ${trackIds}`
-  // }
+  isEditorInArticleTrack() {
+    return this.trackIdsWhereUserIsEditor().then(trackIds => {
+      return `track._ref in ${this.stringy(trackIds)}`
+    })
+  }
 
   async runAll() {
-    return Promise.all([this.isVenueAdministrator()]).then(
-      ([isVenueAdministrator, isVenueEditor, isVenueCopyEditor]) => {
-        return {
-          isVenueAdministrator: !!isVenueAdministrator,
-          isVenueEditor: !!isVenueEditor,
-          isVenueCopyEditor: !!isVenueCopyEditor
-        }
+    return Promise.all([
+      this.isVenueAdministrator(),
+      this.isVenueEditor(),
+      this.isVenueCopyEditor(),
+      this.isEditorInArticleTrack()
+    ]).then(([isVenueAdministrator, isVenueEditor, isVenueCopyEditor, isEditorInArticleTrack]) => {
+      return {
+        isVenueAdministrator: !!isVenueAdministrator,
+        isVenueEditor: !!isVenueEditor,
+        isVenueCopyEditor: !!isVenueCopyEditor,
+        isEditorInArticleTrack: isEditorInArticleTrack
       }
-    )
+    })
   }
 }
 
