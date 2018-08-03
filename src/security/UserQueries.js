@@ -42,17 +42,23 @@ class UserQueries {
   }
 
   isVenueEditor() {
-    return `*[_type=="venue" && references($userId)][0]{
+    return this.performQuery(
+      `*[_type=="venue" && references($userId)][0]{
       _id, _type,
       "editor": defined(editors) && length(editors[_ref == $userId])>0,
-    }.editor`
+    }.editor`,
+      {userId: this.userId}
+    )
   }
 
   isVenueCopyEditor() {
-    return `*[_type=="venue" && references($userId)][0]{
+    return this.performQuery(
+      `*[_type=="venue" && references($userId)][0]{
       _id, _type,
       "copyEditor": defined(copyEditors) && length(copyEditors[_ref == $userId])>0,
-    }.copyEditor`
+    }.copyEditor`,
+      {userId: this.userId}
+    )
   }
 
   trackIdsWhereUserIsEditor() {
@@ -76,12 +82,15 @@ class UserQueries {
   // }
 
   async runAll() {
-    return Promise.all([this.isVenueAdministrator()]).then(result => {
-      const queries = {}
-      queries.isVenueAdministrator = result[0]
-      console.log('queries', queries)
-      return queries
-    })
+    return Promise.all([this.isVenueAdministrator()]).then(
+      ([isVenueAdministrator, isVenueEditor, isVenueCopyEditor]) => {
+        return {
+          isVenueAdministrator: !!isVenueAdministrator,
+          isVenueEditor: !!isVenueEditor,
+          isVenueCopyEditor: !!isVenueCopyEditor
+        }
+      }
+    )
   }
 }
 

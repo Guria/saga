@@ -1,5 +1,5 @@
+import {uniq} from 'lodash'
 const UserQueries = require('./UserQueries')
-
 const documentTypes = [
   'venue',
   'issue',
@@ -21,7 +21,7 @@ class AccessFilterBuilder {
     this.dataStore = dataStore
   }
 
-  async getQueries() {
+  async prefetchAllQueries() {
     if (!this.queries) {
       const userQueries = new UserQueries(this.userId, this.dataStore, this.venueId)
       this.queries = await userQueries.runAll()
@@ -44,7 +44,9 @@ class AccessFilterBuilder {
       case 'user':
         return '_type == "user"'
       case 'article':
-        return `_type == "article" && ${queries.isVenueAdministrator}`
+        return `_type == "article" && (${queries.isVenueAdministrator} || ${
+          queries.isVenueEditor
+        } || ${queries.isVenueCopyEditor})`
       default:
         return 'false'
     }
@@ -67,13 +69,13 @@ class AccessFilterBuilder {
   }
 
   async determineFilters() {
-    await this.getQueries()
+    await this.prefetchAllQueries()
 
     return {
-      read: documentTypes.map(type => this.canRead(type)).join(' || '),
-      create: documentTypes.map(type => this.canCreate(type)).join(' || '),
-      update: documentTypes.map(type => this.canUpdate(type)).join(' || '),
-      delete: documentTypes.map(type => this.canDelete(type)).join(' || ')
+      read: uniq(documentTypes.map(type => this.canRead(type))).join(' || '),
+      create: uniq(documentTypes.map(type => this.canCreate(type))).join(' || '),
+      update: uniq(documentTypes.map(type => this.canUpdate(type))).join(' || '),
+      delete: uniq(documentTypes.map(type => this.canDelete(type))).join(' || ')
     }
   }
 }

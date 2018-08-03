@@ -63,18 +63,28 @@ describe('accessFilterBuilder', () => {
       )
     ))
 
-  xtest('grants full access only to venue administrator', async () => {
+  test('grants full read access only to venue bigwigs', async () => {
     const venueAdminUser = await createUser()
+    const venueEditorUser = await createUser()
+    const venueCopyEditorUser = await createUser()
+    const unprivilegedUser = await createUser()
     await createDocument({
       name: 'journal-of-snah',
       _type: 'venue',
-      administrators: [{_type: 'reference', _ref: venueAdminUser._id}]
+      administrators: [{_type: 'reference', _ref: venueAdminUser._id}],
+      editors: [{_type: 'reference', _ref: venueEditorUser._id}],
+      copyEditors: [{_type: 'reference', _ref: venueCopyEditorUser._id}]
     })
     const filters = await filtersForUser(venueAdminUser._id)
-    expect(filters).toEqual(fullAccessFilterExpressions)
+    expect(filters.read).toMatch(/_type == "article" && \(true \|\| false \|\| false\)/)
 
-    const unprivilegedUser = await createUser()
-    const filters2 = await filtersForUser(unprivilegedUser._id)
-    expect(filters2).toEqual(noAccessFilterExpressions)
+    const filters2 = await filtersForUser(venueEditorUser._id)
+    expect(filters2.read).toMatch(/_type == "article" && \(false \|\| true \|\| false\)/)
+
+    const filters3 = await filtersForUser(venueCopyEditorUser._id)
+    expect(filters3.read).toMatch(/_type == "article" && \(false \|\| false \|\| true\)/)
+
+    const filters4 = await filtersForUser(unprivilegedUser._id)
+    expect(filters4.read).toMatch(/_type == "article" && \(false \|\| false \|\| false\)/)
   })
 })
