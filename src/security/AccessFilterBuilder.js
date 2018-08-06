@@ -1,5 +1,5 @@
 import {uniq} from 'lodash'
-const UserQueries = require('./UserQueries')
+const UserCapabilityDiviner = require('./UserCapabilityDiviner')
 const documentTypes = [
   'venue',
   'issue',
@@ -21,17 +21,17 @@ class AccessFilterBuilder {
     this.dataStore = dataStore
   }
 
-  async prefetchAllQueries() {
-    if (!this.queries) {
-      const userQueries = new UserQueries(this.userId, this.dataStore, this.venueId)
-      this.queries = await userQueries.runAll()
+  async prefetchAllCapabilities() {
+    if (!this.userCapabilities) {
+      const userCapabilities = new UserCapabilityDiviner(this.userId, this.dataStore, this.venueId)
+      this.userCapabilities = await userCapabilities.runAll()
     }
-    return this.queries
+    return this.userCapabilities
   }
 
   canRead(type) {
-    const queries = this.queries
-    //console.log('GOT queries', queries)
+    const capabilities = this.userCapabilities
+    //console.log('GOT capabilities', capabilities)
     switch (type) {
       case 'venue':
         return '_type == "venue"'
@@ -44,15 +44,15 @@ class AccessFilterBuilder {
       case 'user':
         return '_type == "user"'
       case 'article':
-        return `_type == "article" && (${queries.isVenueAdministrator} || ${
-          queries.isVenueEditor
-        } || ${queries.isVenueCopyEditor} || ${queries.isEditorInArticleTrack})`
+        return `_type == "article" && (${capabilities.isVenueAdministrator} || ${
+          capabilities.isVenueEditor
+        } || ${capabilities.isVenueCopyEditor} || ${capabilities.isEditorInArticleTrack})`
       default:
         return 'false'
     }
   }
-  // ${queries.isArticleSubmitter} ||
-  // ${queries.isIssueEditor}
+  // ${capabilities.isArticleSubmitter} ||
+  // ${capabilities.isIssueEditor}
 
   canCreate(type) {
     return 'false'
@@ -67,7 +67,7 @@ class AccessFilterBuilder {
   }
 
   async determineFilters() {
-    await this.prefetchAllQueries()
+    await this.prefetchAllCapabilities()
 
     return {
       read: uniq(documentTypes.map(type => this.canRead(type))).join(' || '),

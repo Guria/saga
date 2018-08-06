@@ -1,6 +1,14 @@
+function quote(item) {
+  return `"${item}"`
+}
+
+function quoteItems(items) {
+  return `[${items.map(quote).join(',')}]`
+}
+
 // A collection of queries used by AccessFilterBuilder
 // They all assume that query params will include {userId: userId}
-class UserQueries {
+class UserCapabilityDiviner {
   constructor(userId, dataStore, venueId) {
     this.userId = userId
     this.venueId = venueId
@@ -74,14 +82,10 @@ class UserQueries {
     })
   }
 
-  stringy(items) {
-    return `["${items.join('","')}"]`
-  }
-
   // does article.track reference any of those tracks
   isEditorInArticleTrack() {
     return this.trackIdsWhereUserIsEditor().then(trackIds => {
-      return `track._ref in ${this.stringy(trackIds)}`
+      return `track._ref in ${quoteItems(trackIds)}`
     })
   }
 
@@ -102,4 +106,4 @@ class UserQueries {
   }
 }
 
-module.exports = UserQueries
+module.exports = UserCapabilityDiviner
