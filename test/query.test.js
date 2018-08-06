@@ -36,17 +36,21 @@ describe('query', () => {
       .post('/v1/data/mutate/lyra-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
-        mutations: [{
-          create: doc
-        }],
+        mutations: [
+          {
+            create: doc
+          }
+        ],
         transactionId
       })
       .expect(200, {
         transactionId,
-        results: [{
-          id: doc._id,
-          operation: 'create'
-        }]
+        results: [
+          {
+            id: doc._id,
+            operation: 'create'
+          }
+        ]
       })
 
     await request(app)
@@ -78,22 +82,28 @@ describe('query', () => {
       .post('/v1/data/mutate/lyra-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
-        mutations: [{
-          create: bar
-        }, {
-          create: foo
-        }],
+        mutations: [
+          {
+            create: bar
+          },
+          {
+            create: foo
+          }
+        ],
         transactionId
       })
       .expect(200, {
         transactionId,
-        results: [{
-          id: bar._id,
-          operation: 'create'
-        }, {
-          id: foo._id,
-          operation: 'create'
-        }]
+        results: [
+          {
+            id: bar._id,
+            operation: 'create'
+          },
+          {
+            id: foo._id,
+            operation: 'create'
+          }
+        ]
       })
 
     await request(app)
@@ -101,7 +111,7 @@ describe('query', () => {
         `/v1/data/query/lyra-test/?query=${encodeURIComponent(
           `*[_id == "foo"]{isBar, "bar": bar->{isBar}}`
         )}`
-    )
+      )
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
@@ -141,11 +151,14 @@ describe('query', () => {
       _id: 'bar1',
       _type: 'test',
       isBar: true,
-      bazs: [{
-        _ref: 'baz1'
-      }, {
-        _ref: 'baz2'
-      }]
+      bazs: [
+        {
+          _ref: 'baz1'
+        },
+        {
+          _ref: 'baz2'
+        }
+      ]
     }
     const bar2 = {
       _id: 'bar2',
@@ -156,11 +169,14 @@ describe('query', () => {
       _id: 'foo',
       _type: 'test',
       isBar: false,
-      refs: [{
-        _ref: 'bar1'
-      }, {
-        _ref: 'bar2'
-      }]
+      refs: [
+        {
+          _ref: 'bar1'
+        },
+        {
+          _ref: 'bar2'
+        }
+      ]
     }
     await request(app)
       .post('/v1/data/mutate/lyra-test?returnIds=true')
@@ -179,7 +195,7 @@ describe('query', () => {
             _id, isBar, "bazs": bazs[]->{_id, isBaz}
           }}`
         )}`
-    )
+      )
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
@@ -190,13 +206,16 @@ describe('query', () => {
             {
               _id: 'bar1',
               isBar: true,
-              bazs: [{
-                _id: 'baz1',
-                isBaz: true
-              }, {
-                _id: 'baz2',
-                isBaz: true
-              }]
+              bazs: [
+                {
+                  _id: 'baz1',
+                  isBaz: true
+                },
+                {
+                  _id: 'baz2',
+                  isBaz: true
+                }
+              ]
             },
             {
               _id: 'bar2',
@@ -273,7 +292,7 @@ describe('query', () => {
         `/v1/data/query/lyra-test/?query=${encodeURIComponent(
           `*[_type == "test"] | order (i asc) [1...6]`
         )}`
-    )
+      )
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
@@ -320,9 +339,17 @@ describe('query', () => {
       }
     ]
 
-    const sorted = sortBy(documents.map(doc => Object.assign({
-      i: 100
-    }, doc)), 'i')
+    const sorted = sortBy(
+      documents.map(doc =>
+        Object.assign(
+          {
+            i: 100
+          },
+          doc
+        )
+      ),
+      'i'
+    )
       .slice(1, 6)
       .map(doc => doc.i)
 
@@ -341,12 +368,64 @@ describe('query', () => {
         `/v1/data/query/lyra-test/?query=${encodeURIComponent(
           `*[_type == "test"] | order(coalesce(i,100) asc) [1...6]`
         )}`
-    )
+      )
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
         expect(res.body.result).toHaveLength(sorted.length)
         expect(res.body.result.map(doc => doc.i)).toEqual([0.66, 17, 88, undefined, 105])
+      })
+  })
+
+  test('can use array membership clause', async () => {
+    const documents = [
+      {
+        _id: 'a1',
+        _type: 'author',
+        name: 'Espen'
+      },
+      {
+        _id: 'a2',
+        _type: 'author',
+        name: 'Thomas'
+      },
+      {
+        _id: 'a3',
+        _type: 'author',
+        name: 'Bjørge'
+      },
+      {
+        _id: 'd1',
+        _type: 'doc',
+        authors: [
+          {
+            _ref: 'a1'
+          },
+          {
+            _ref: 'a2'
+          }
+        ]
+      },
+      {
+        _id: 'd2',
+        _type: 'doc',
+        authors: []
+      }
+    ]
+
+    await request(app)
+      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .send({mutations: documents.map(create => ({create}))})
+      .expect(200)
+
+    await request(app)
+      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent(`*["a1" in authors[]._ref]`)}`)
+      .set('Cookie', getSessionCookie(app, adminUser))
+      .expect(200)
+      .expect(res => {
+        expect(res.body.result).toHaveLength(1)
+        expect(res.body.result[0]).toMatchObject(documents[3])
       })
   })
 })

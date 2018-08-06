@@ -3,11 +3,15 @@ const {merge, omit} = require('lodash')
 const {query: execQuery} = require('../../../groq')
 
 const log = (prefix, ast) =>
-// eslint-disable-next-line no-console
-console.log('%s: ', prefix, util.inspect(ast, {
-  colors: true,
-  depth: 15
-}))
+  // eslint-disable-next-line no-console
+  console.log(
+    '%s: ',
+    prefix,
+    util.inspect(ast, {
+      colors: true,
+      depth: 15
+    })
+  )
 
 module.exports = {
   toMongo,
@@ -135,6 +139,7 @@ function fromPipe(pipe) {
     returnFirst: false,
     sort: []
   }
+
   for (let i = 0; i < pipe.operations.length; i++) {
     const node = pipe.operations[i]
     const result = fromNode(node)
@@ -350,6 +355,11 @@ function fromLessThanOrEqualFilter(node) {
 function fromInFilter(node) {
   const {type, lhs, rhs} = filterParts(node)
 
+  if (type === 'pipeComparison') {
+    // Could potentially be optimized
+    return {}
+  }
+
   // 'stringVal' in fieldName
   if (!rhs.$op && !Array.isArray(rhs) && type !== 'fieldComparison') {
     return {
@@ -547,6 +557,12 @@ function filterParts(node) {
       type: 'mongoComparison',
       lhs,
       rhs
+    }
+  } else if (lhsIsLiteral && node.rhs.op === 'pipe') {
+    return {
+      type: 'pipeComparison',
+      lhs,
+      rhs: node.rhs
     }
   }
 
