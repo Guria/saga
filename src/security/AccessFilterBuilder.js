@@ -31,7 +31,6 @@ class AccessFilterBuilder {
 
   canRead(type) {
     const capabilities = this.userCapabilities
-    //console.log('GOT capabilities', capabilities)
     switch (type) {
       case 'venue':
         return '_type == "venue"'
@@ -51,7 +50,6 @@ class AccessFilterBuilder {
         return 'false'
     }
   }
-  // ${capabilities.isArticleSubmitter} ||
 
   canCreate(type) {
     return 'false'

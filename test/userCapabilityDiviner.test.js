@@ -90,13 +90,12 @@ describe('userCapabilityDiviner', () => {
     const track = await createDocument({
       _id: 'TRACKID1234',
       _type: 'track',
-      name: 'Bubblegum',
       editors: [{_type: 'reference', _ref: articleTrackEditorUser._id}]
     })
 
     await createDocument({
       _type: 'article',
-      name: 'Bubblegum etc',
+      title: 'Bubblegum',
       track: [{_type: 'reference', _ref: track._id}]
     })
 
@@ -110,13 +109,13 @@ describe('userCapabilityDiviner', () => {
     await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article',
-      name: 'Bubblegum etc'
+      title: 'Bubblegum'
     })
 
     await createDocument({
       _id: 'ISSUEID1234',
       _type: 'issue',
-      name: 'Bubblegum',
+      title: 'Bubblegum etc',
       content: [
         {
           _type: 'section',
@@ -137,7 +136,7 @@ describe('userCapabilityDiviner', () => {
     await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article',
-      name: 'Bubblegum etc',
+      title: 'Bubblegum',
       submitters: [{_type: 'reference', _ref: submitterUser._id}]
     })
 
