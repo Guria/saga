@@ -143,4 +143,17 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(submitterUser._id)
     expect(capabilities).toMatchObject({isSubmitterInArticle: '_id in ["ARTICLEID1234"]'})
   })
+
+  test('recognizes comment owner', async () => {
+    const creator = await createUser()
+
+    await createDocument({
+      _id: 'COMMENTID1234',
+      _type: 'comment',
+      _createdBy: creator._id
+    })
+
+    const capabilities = await capabilitiesForUser(creator._id)
+    expect(capabilities).toMatchObject({isCreator: `_createdBy == "${creator._id}"`})
+  })
 })

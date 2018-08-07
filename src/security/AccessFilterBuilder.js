@@ -46,6 +46,9 @@ class AccessFilterBuilder {
         return `_type == "article" && (${capabilities.isVenueEditor} || ${
           capabilities.isEditorInArticleTrack
         } || ${capabilities.isEditorInArticleIssues}) || ${capabilities.isSubmitterInArticle})`
+      case 'comment':
+        // TODO: editor in article.track or any issues to which the article belong
+        return `_type == "comment" && (${capabilities.isCreator} || ${capabilities.isVenueEditor})`
       default:
         return 'false'
     }

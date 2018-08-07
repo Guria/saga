@@ -37,18 +37,12 @@ class UserCapabilityDiviner {
     }
   }
 
-  isArticleSubmitter() {
-    return '$userId in submitters[]._ref'
-  }
-
   isVenueEditor() {
-    return this.performQuery(
-      `*[_type=="venue" && references($userId)][0]{
+    const query = `*[_type=="venue" && references($userId)][0]{
       _id, _type,
       "editor": defined(editors) && length(editors[_ref == $userId])>0,
-    }.editor`,
-      {userId: this.userId}
-    )
+    }.editor`
+    return this.performQuery(query, {userId: this.userId})
   }
 
   // Find all tracks where user is editor
@@ -113,19 +107,31 @@ class UserCapabilityDiviner {
     })
   }
 
-  async runAll() {
+  isCreator() {
+    return `_createdBy == "${this.userId}"`
+  }
+
+  runAll() {
     return Promise.all([
       this.isVenueEditor(),
       this.isEditorInArticleTrack(),
       this.isEditorInArticleIssues(),
-      this.isSubmitterInArticle()
+      this.isSubmitterInArticle(),
+      this.isCreator()
     ]).then(
-      ([isVenueEditor, isEditorInArticleTrack, isEditorInArticleIssues, isSubmitterInArticle]) => {
+      ([
+        isVenueEditor,
+        isEditorInArticleTrack,
+        isEditorInArticleIssues,
+        isSubmitterInArticle,
+        isCreator
+      ]) => {
         return {
           isVenueEditor: !!isVenueEditor,
-          isEditorInArticleTrack: isEditorInArticleTrack,
-          isEditorInArticleIssues: isEditorInArticleIssues,
-          isSubmitterInArticle: isSubmitterInArticle
+          isEditorInArticleTrack,
+          isEditorInArticleIssues,
+          isSubmitterInArticle,
+          isCreator
         }
       }
     )
