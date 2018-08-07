@@ -103,4 +103,45 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
     expect(capabilities).toMatchObject({isEditorInArticleTrack: 'track._ref in ["TRACKID1234"]'})
   })
+
+  test('recognizes issue editor', async () => {
+    const issueEditorUser = await createUser()
+
+    await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      name: 'Bubblegum etc'
+    })
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      name: 'Bubblegum',
+      content: [
+        {
+          _type: 'section',
+          title: 'A Section',
+          articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
+        }
+      ],
+      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+    })
+
+    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    expect(capabilities).toMatchObject({isEditorInArticleIssues: '_id in ["ARTICLEID1234"]'})
+  })
+
+  test('recognizes article submitter', async () => {
+    const submitterUser = await createUser()
+
+    await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      name: 'Bubblegum etc',
+      submitters: [{_type: 'reference', _ref: submitterUser._id}]
+    })
+
+    const capabilities = await capabilitiesForUser(submitterUser._id)
+    expect(capabilities).toMatchObject({isSubmitterInArticle: '_id in ["ARTICLEID1234"]'})
+  })
 })

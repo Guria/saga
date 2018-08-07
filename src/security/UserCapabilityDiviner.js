@@ -1,3 +1,5 @@
+import {flatten} from 'lodash'
+
 function quote(item) {
   return `"${item}"`
 }
@@ -49,8 +51,8 @@ class UserCapabilityDiviner {
     )
   }
 
-  // find all tracks user is editor
-  trackIdsWhereUserIsEditor() {
+  // Find all tracks where user is editor
+  tracksWhereUserIsEditor() {
     const query = `*[_type == "track" && references($userId)]{
         _id,
         _type,
@@ -58,23 +60,72 @@ class UserCapabilityDiviner {
       }
     `
     return this.performQuery(query, {userId: this.userId}).then(tracks => {
-      return tracks.filter(track => !!track.editor).map(track => track._id)
+      return tracks.filter(track => !!track.editor)
     })
   }
 
-  // does article.track reference any of those tracks
+  articlesWhereUserIsSubmitter() {
+    const query = `*[_type == "article" && references($userId)]{
+        _id,
+        _type,
+        "submitter": defined(submitters) && length(submitters[_ref == $userId])>0
+      }
+    `
+    return this.performQuery(query, {userId: this.userId}).then(articles => {
+      return articles.filter(article => !!article.submitter)
+    })
+  }
+
+  // Find all issues where user is editor. Bring along articleIds
+  issuesWhereUserIsEditor() {
+    const query = `*[_type == "issue" && references($userId)]{
+        _id,
+        _type,
+        "editor": defined(editors) && length(editors[_ref == $userId])>0,
+        "articleIds": content[].articles[]._ref
+      }
+    `
+    return this.performQuery(query, {userId: this.userId}).then(issues => {
+      return issues.filter(issue => !!issue.editor)
+    })
+  }
+
+  // does article.track reference any of these tracks
   isEditorInArticleTrack() {
-    return this.trackIdsWhereUserIsEditor().then(trackIds => {
-      return `track._ref in ${quoteItems(trackIds)}`
+    return this.tracksWhereUserIsEditor().then(tracks => {
+      return `track._ref in ${quoteItems(tracks.map(track => track._id))}`
+    })
+  }
+
+  // Do any of these issues also reference article
+  isEditorInArticleIssues() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue.articleIds))
+      .then(articleIds => {
+        const flattenedArticleIds = flatten(articleIds)
+        return `_id in ${quoteItems(flattenedArticleIds)}`
+      })
+  }
+
+  isSubmitterInArticle() {
+    return this.articlesWhereUserIsSubmitter().then(articles => {
+      return `_id in ${quoteItems(articles.map(article => article._id))}`
     })
   }
 
   async runAll() {
-    return Promise.all([this.isVenueEditor(), this.isEditorInArticleTrack()]).then(
-      ([isVenueEditor, isEditorInArticleTrack]) => {
+    return Promise.all([
+      this.isVenueEditor(),
+      this.isEditorInArticleTrack(),
+      this.isEditorInArticleIssues(),
+      this.isSubmitterInArticle()
+    ]).then(
+      ([isVenueEditor, isEditorInArticleTrack, isEditorInArticleIssues, isSubmitterInArticle]) => {
         return {
           isVenueEditor: !!isVenueEditor,
-          isEditorInArticleTrack: isEditorInArticleTrack
+          isEditorInArticleTrack: isEditorInArticleTrack,
+          isEditorInArticleIssues: isEditorInArticleIssues,
+          isSubmitterInArticle: isSubmitterInArticle
         }
       }
     )

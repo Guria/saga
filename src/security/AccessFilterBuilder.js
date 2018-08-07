@@ -46,13 +46,12 @@ class AccessFilterBuilder {
       case 'article':
         return `_type == "article" && (${capabilities.isVenueEditor} || ${
           capabilities.isEditorInArticleTrack
-        })`
+        } || ${capabilities.isEditorInArticleIssues}) || ${capabilities.isSubmitterInArticle})`
       default:
         return 'false'
     }
   }
   // ${capabilities.isArticleSubmitter} ||
-  // ${capabilities.isIssueEditor}
 
   canCreate(type) {
     return 'false'
