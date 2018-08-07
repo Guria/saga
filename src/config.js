@@ -59,7 +59,10 @@ module.exports = {
       'http://0.0.0.0:3333',
       'http://localhost:1234',
       'http://127.0.0.1:1234',
-      'http://0.0.0.0:1234'
+      'http://0.0.0.0:1234',
+      'http://localhost:1235',
+      'http://127.0.0.1:1235',
+      'http://0.0.0.0:1235',
     ],
     exposedHeaders: ['Content-Type', 'Content-Length', 'ETag']
       .concat(split(process.env.LYRA_CORS_EXPOSED_HEADERS))
