@@ -67,42 +67,20 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(unprivilegedUser._id)
 
     expect(capabilities).toMatchObject({
-      isVenueAdministrator: false,
-      isVenueCopyEditor: false,
       isVenueEditor: false
     })
   })
 
-  test('recognizes venue bigwigs', async () => {
-    const venueAdminUser = await createUser()
+  test('recognizes a venue editor', async () => {
     const venueEditorUser = await createUser()
-    const venueCopyEditorUser = await createUser()
     await createDocument({
       _type: 'venue',
       name: 'journal-of-snah',
-      administrators: [{_type: 'reference', _ref: venueAdminUser._id}],
-      editors: [{_type: 'reference', _ref: venueEditorUser._id}],
-      copyEditors: [{_type: 'reference', _ref: venueCopyEditorUser._id}]
+      editors: [{_type: 'reference', _ref: venueEditorUser._id}]
     })
-    const caps = await capabilitiesForUser(venueAdminUser._id)
-    expect(caps).toMatchObject({
-      isVenueAdministrator: true,
-      isVenueCopyEditor: false,
-      isVenueEditor: false
-    })
-
-    const caps2 = await capabilitiesForUser(venueEditorUser._id)
-    expect(caps2).toMatchObject({
-      isVenueAdministrator: false,
-      isVenueCopyEditor: false,
+    const capabilities = await capabilitiesForUser(venueEditorUser._id)
+    expect(capabilities).toMatchObject({
       isVenueEditor: true
-    })
-
-    const caps3 = await capabilitiesForUser(venueCopyEditorUser._id)
-    expect(caps3).toMatchObject({
-      isVenueAdministrator: false,
-      isVenueCopyEditor: true,
-      isVenueEditor: false
     })
   })
 
@@ -122,7 +100,7 @@ describe('userCapabilityDiviner', () => {
       track: [{_type: 'reference', _ref: track._id}]
     })
 
-    const caps = await capabilitiesForUser(articleTrackEditorUser._id)
-    expect(caps).toMatchObject({isEditorInArticleTrack: 'track._ref in ["TRACKID1234"]'})
+    const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
+    expect(capabilities).toMatchObject({isEditorInArticleTrack: 'track._ref in ["TRACKID1234"]'})
   })
 })

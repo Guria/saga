@@ -44,9 +44,9 @@ class AccessFilterBuilder {
       case 'user':
         return '_type == "user"'
       case 'article':
-        return `_type == "article" && (${capabilities.isVenueAdministrator} || ${
-          capabilities.isVenueEditor
-        } || ${capabilities.isVenueCopyEditor} || ${capabilities.isEditorInArticleTrack})`
+        return `_type == "article" && (${capabilities.isVenueEditor} || ${
+          capabilities.isEditorInArticleTrack
+        })`
       default:
         return 'false'
     }

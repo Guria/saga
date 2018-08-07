@@ -39,32 +39,12 @@ class UserCapabilityDiviner {
     return '$userId in submitters[]._ref'
   }
 
-  isVenueAdministrator() {
-    return this.performQuery(
-      `*[_type=="venue" && references($userId)][0]{
-      _id, _type,
-      "administrator": defined(administrators) && length(administrators[_ref == $userId])>0,
-    }.administrator`,
-      {userId: this.userId}
-    )
-  }
-
   isVenueEditor() {
     return this.performQuery(
       `*[_type=="venue" && references($userId)][0]{
       _id, _type,
       "editor": defined(editors) && length(editors[_ref == $userId])>0,
     }.editor`,
-      {userId: this.userId}
-    )
-  }
-
-  isVenueCopyEditor() {
-    return this.performQuery(
-      `*[_type=="venue" && references($userId)][0]{
-      _id, _type,
-      "copyEditor": defined(copyEditors) && length(copyEditors[_ref == $userId])>0,
-    }.copyEditor`,
       {userId: this.userId}
     )
   }
@@ -90,19 +70,14 @@ class UserCapabilityDiviner {
   }
 
   async runAll() {
-    return Promise.all([
-      this.isVenueAdministrator(),
-      this.isVenueEditor(),
-      this.isVenueCopyEditor(),
-      this.isEditorInArticleTrack()
-    ]).then(([isVenueAdministrator, isVenueEditor, isVenueCopyEditor, isEditorInArticleTrack]) => {
-      return {
-        isVenueAdministrator: !!isVenueAdministrator,
-        isVenueEditor: !!isVenueEditor,
-        isVenueCopyEditor: !!isVenueCopyEditor,
-        isEditorInArticleTrack: isEditorInArticleTrack
+    return Promise.all([this.isVenueEditor(), this.isEditorInArticleTrack()]).then(
+      ([isVenueEditor, isEditorInArticleTrack]) => {
+        return {
+          isVenueEditor: !!isVenueEditor,
+          isEditorInArticleTrack: isEditorInArticleTrack
+        }
       }
-    })
+    )
   }
 }
 
