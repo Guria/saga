@@ -147,11 +147,11 @@ describe('userCapabilityDiviner', () => {
     await createDocument({
       _id: 'COMMENTID1234',
       _type: 'comment',
-      _createdBy: creator._id
+      author: {_type: 'reference', _ref: creator._id}
     })
 
     const capabilities = await capabilitiesForUser(creator._id)
-    expect(capabilities).toMatchObject({isCreator: `_createdBy == "${creator._id}"`})
+    expect(capabilities).toMatchObject({isCommentAuthor: `author._ref == "${creator._id}"`})
   })
 
   test('recognizes track editors in comment', async () => {

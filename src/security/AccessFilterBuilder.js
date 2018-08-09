@@ -49,7 +49,7 @@ class AccessFilterBuilder {
           capabilities.isEditorInArticleTrack
         } || ${capabilities.isEditorInArticleIssues}) || ${capabilities.isSubmitterInArticle})`
       case 'comment':
-        return `_type == "comment" && (${capabilities.isCreator} || ${
+        return `_type == "comment" && (${capabilities.isCommentAuthor} || ${
           capabilities.isVenueEditor
         } || ${capabilities.isEditorInTrackWithArticleInComment} || ${
           capabilities.isEditorInIssueWithArticleInComment
@@ -59,9 +59,17 @@ class AccessFilterBuilder {
           capabilities.isEditorInIssueWithArticleInReviewProcess
         } || ${capabilities.isEditorInTrackWithArticleInReviewProcess})`
       case 'reviewItem':
+        // TODO: track and issue editors for the article being reviewed
         return `_type == "reviewItem" && (${capabilities.isVenueEditor} || ${
           capabilities.isReviewer
         })`
+      case 'reviewPolicy':
+        return '_type == "reviewPolicy"'
+      case 'featureConfig':
+        return '_type == "featureConfig"'
+      case 'featureState':
+        // submitters, track and issue editors for the article
+        return '_type == "featureState"'
       default:
         return 'false'
     }

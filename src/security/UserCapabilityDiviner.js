@@ -118,8 +118,8 @@ class UserCapabilityDiviner {
     })
   }
 
-  isCreator() {
-    return `_createdBy == "${this.userId}"`
+  isCommentAuthor() {
+    return `author._ref == "${this.userId}"`
   }
 
   isEditorInIssueWithArticleInReviewProcess() {
@@ -172,7 +172,7 @@ class UserCapabilityDiviner {
       this.isEditorInArticleTrack(),
       this.isEditorInArticleIssues(),
       this.isSubmitterInArticle(),
-      this.isCreator(),
+      this.isCommentAuthor(),
       this.isEditorInIssueWithArticleInComment(),
       this.isEditorInTrackWithArticleInComment(),
       this.isEditorInIssueWithArticleInReviewProcess(),
@@ -184,7 +184,7 @@ class UserCapabilityDiviner {
         isEditorInArticleTrack,
         isEditorInArticleIssues,
         isSubmitterInArticle,
-        isCreator,
+        isCommentAuthor,
         isEditorInIssueWithArticleInComment,
         isEditorInTrackWithArticleInComment,
         isEditorInIssueWithArticleInReviewProcess,
@@ -196,7 +196,7 @@ class UserCapabilityDiviner {
           isEditorInArticleTrack,
           isEditorInArticleIssues,
           isSubmitterInArticle,
-          isCreator,
+          isCommentAuthor,
           isEditorInIssueWithArticleInComment,
           isEditorInTrackWithArticleInComment,
           isEditorInIssueWithArticleInReviewProcess,
