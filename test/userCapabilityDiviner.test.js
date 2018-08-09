@@ -129,15 +129,15 @@ describe('userCapabilityDiviner', () => {
   })
 
   test('recognizes article submitter', async () => {
-    const submitterUser = await createUser()
+    const submitter = await createUser()
 
     await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article',
-      submitters: [{_type: 'reference', _ref: submitterUser._id}]
+      submitters: [{_type: 'reference', _ref: submitter._id}]
     })
 
-    const capabilities = await capabilitiesForUser(submitterUser._id)
+    const capabilities = await capabilitiesForUser(submitter._id)
     expect(capabilities).toMatchObject({isSubmitterInArticle: '_id in ["ARTICLEID1234"]'})
   })
 
@@ -299,6 +299,27 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(reviewerUser._id)
     expect(capabilities).toMatchObject({
       isReviewer: `reviewer._ref == "${reviewerUser._id}"`
+    })
+  })
+
+  test('recognizes article submitter in featureState', async () => {
+    const submitter = await createUser()
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      submitters: [{_type: 'reference', _ref: submitter._id}]
+    })
+
+    await createDocument({
+      _id: 'FEATURESTATEID1234',
+      _type: 'featureState',
+      article: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(submitter._id)
+    expect(capabilities).toMatchObject({
+      isSubmitterInArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
     })
   })
 })

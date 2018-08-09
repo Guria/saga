@@ -118,6 +118,12 @@ class UserCapabilityDiviner {
     })
   }
 
+  isSubmitterInArticleInFeatureState() {
+    return this.articlesWhereUserIsSubmitter().then(articles => {
+      return `article._ref in ${quoteItems(articles.map(article => article._id))}`
+    })
+  }
+
   isCommentAuthor() {
     return `author._ref == "${this.userId}"`
   }
@@ -177,7 +183,8 @@ class UserCapabilityDiviner {
       this.isEditorInTrackWithArticleInComment(),
       this.isEditorInIssueWithArticleInReviewProcess(),
       this.isEditorInTrackWithArticleInReviewProcess(),
-      this.isReviewer()
+      this.isReviewer(),
+      this.isSubmitterInArticleInFeatureState()
     ]).then(
       ([
         isVenueEditor,
@@ -189,7 +196,8 @@ class UserCapabilityDiviner {
         isEditorInTrackWithArticleInComment,
         isEditorInIssueWithArticleInReviewProcess,
         isEditorInTrackWithArticleInReviewProcess,
-        isReviewer
+        isReviewer,
+        isSubmitterInArticleInFeatureState
       ]) => {
         return {
           isVenueEditor: !!isVenueEditor,
@@ -201,7 +209,8 @@ class UserCapabilityDiviner {
           isEditorInTrackWithArticleInComment,
           isEditorInIssueWithArticleInReviewProcess,
           isEditorInTrackWithArticleInReviewProcess,
-          isReviewer
+          isReviewer,
+          isSubmitterInArticleInFeatureState
         }
       }
     )
