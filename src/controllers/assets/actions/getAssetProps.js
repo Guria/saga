@@ -4,14 +4,13 @@ const getAssetProps = options => {
   const {type, sha1hash, imageData, extension, req, mimeType, size} = options
   const {width, height} = imageData ? imageData.dimensions : {}
   const datasetName = req.params.dataset
-  const projectId = 'vega'
   const dstFilename =
     type === 'file'
       ? `${sha1hash}.${extension || 'bin'}`
       : `${sha1hash}-${width}x${height}.${extension || 'bin'}`
 
   const originalFilename = req.query.filename || dstFilename
-  const dstPath = `${type}s/${projectId}/${datasetName}/${dstFilename}`
+  const dstPath = `${type}s/${datasetName}/${dstFilename}`
   const baseProps = {
     assetId: sha1hash,
     sha1hash,
