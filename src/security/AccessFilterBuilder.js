@@ -10,6 +10,7 @@ const documentTypes = [
   'comment',
   'reviewProcess',
   'reviewItem',
+  'reviewPolicy',
   'featureConfig',
   'featureState'
 ]
@@ -47,8 +48,12 @@ class AccessFilterBuilder {
           capabilities.isEditorInArticleTrack
         } || ${capabilities.isEditorInArticleIssues}) || ${capabilities.isSubmitterInArticle})`
       case 'comment':
-        // TODO: editor in article.track or any issues to which the article belong
+        // TODO: editor in article.track, editor in any issues to which the commented article belongs
         return `_type == "comment" && (${capabilities.isCreator} || ${capabilities.isVenueEditor})`
+      case 'reviewProcess':
+        return `_type == "reviewProcess" && (${capabilities.isVenueEditor} || ${
+          capabilities.isEditorInIssueWithArticleInReviewProcess
+        } || ${capabilities.isEditorInTrackWithArticleInReviewProcess})`
       default:
         return 'false'
     }

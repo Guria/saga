@@ -32,7 +32,7 @@ describe('userCapabilityDiviner', () => {
       .newTransaction({identity: '_system_'})
       .create(doc)
       .commit()
-    return createdDocument
+    return createdDocument.results[0].document
   }
 
   async function capabilitiesForUser(userId) {
@@ -155,5 +155,67 @@ describe('userCapabilityDiviner', () => {
 
     const capabilities = await capabilitiesForUser(creator._id)
     expect(capabilities).toMatchObject({isCreator: `_createdBy == "${creator._id}"`})
+  })
+
+  test('recognizes issue editors in reviewProcess', async () => {
+    const issueEditorUser = await createUser()
+
+    await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      title: 'Bubblegum'
+    })
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      title: 'Bubblegum etc',
+      content: [
+        {
+          _type: 'section',
+          title: 'A Section',
+          articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
+        }
+      ],
+      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+    })
+
+    await createDocument({
+      _id: 'REVIEWPROCESSID1234',
+      _type: 'reviewProcess',
+      article: {_type: 'reference', _ref: 'ARTICLEID1234'}
+    })
+
+    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    expect(capabilities).toMatchObject({
+      isEditorInIssueWithArticleInReviewProcess: 'article._ref in ["ARTICLEID1234"]'
+    })
+  })
+
+  test('recognizes track editors in reviewProcess', async () => {
+    const articleTrackEditorUser = await createUser()
+
+    const track = await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: articleTrackEditorUser._id}]
+    })
+
+    await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      track: {_type: 'reference', _ref: track._id}
+    })
+
+    await createDocument({
+      _id: 'REVIEWPROCESSID1234',
+      _type: 'reviewProcess',
+      article: {_type: 'reference', _ref: 'ARTICLEID1234'}
+    })
+
+    const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
+    expect(capabilities).toMatchObject({
+      isEditorInTrackWithArticleInReviewProcess: 'article._ref in ["ARTICLEID1234"]'
+    })
   })
 })

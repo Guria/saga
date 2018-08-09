@@ -37,6 +37,13 @@ class UserCapabilityDiviner {
     }
   }
 
+  articlesInTracks(trackIds) {
+    const query = `*[_type=="article" && track._ref in ${quoteItems(trackIds)}]{
+      _id, _type
+    }`
+    return this.performQuery(query)
+  }
+
   isVenueEditor() {
     const query = `*[_type=="venue" && references($userId)][0]{
       _id, _type,
@@ -111,27 +118,55 @@ class UserCapabilityDiviner {
     return `_createdBy == "${this.userId}"`
   }
 
+  isEditorInIssueWithArticleInReviewProcess() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue.articleIds))
+      .then(articleIds => {
+        const flattenedArticleIds = flatten(articleIds)
+        return `article._ref in ${quoteItems(flattenedArticleIds)}`
+      })
+  }
+
+  isEditorInTrackWithArticleInReviewProcess() {
+    return this.tracksWhereUserIsEditor().then(tracks => {
+      // user is editor in these tracks
+      const trackIds = tracks.map(track => track._id)
+      return this.articlesInTracks(trackIds).then(articles => {
+        // articles in aforementioned tracks
+        const articleIds = articles.map(article => article._id)
+        // reviewProcess reffing those articles
+        return `article._ref in ${quoteItems(articleIds)}`
+      })
+    })
+  }
+
   runAll() {
     return Promise.all([
       this.isVenueEditor(),
       this.isEditorInArticleTrack(),
       this.isEditorInArticleIssues(),
       this.isSubmitterInArticle(),
-      this.isCreator()
+      this.isCreator(),
+      this.isEditorInIssueWithArticleInReviewProcess(),
+      this.isEditorInTrackWithArticleInReviewProcess()
     ]).then(
       ([
         isVenueEditor,
         isEditorInArticleTrack,
         isEditorInArticleIssues,
         isSubmitterInArticle,
-        isCreator
+        isCreator,
+        isEditorInIssueWithArticleInReviewProcess,
+        isEditorInTrackWithArticleInReviewProcess
       ]) => {
         return {
           isVenueEditor: !!isVenueEditor,
           isEditorInArticleTrack,
           isEditorInArticleIssues,
           isSubmitterInArticle,
-          isCreator
+          isCreator,
+          isEditorInIssueWithArticleInReviewProcess,
+          isEditorInTrackWithArticleInReviewProcess
         }
       }
     )
