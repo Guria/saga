@@ -286,4 +286,19 @@ describe('userCapabilityDiviner', () => {
       isEditorInTrackWithArticleInReviewProcess: 'article._ref in ["ARTICLEID1234"]'
     })
   })
+
+  test('recognizes a reviewer', async () => {
+    const reviewerUser = await createUser()
+
+    await createDocument({
+      _id: 'REVIEWITEMID1234',
+      _type: 'reviewItem',
+      reviewer: {_type: 'reference', _ref: reviewerUser._id}
+    })
+
+    const capabilities = await capabilitiesForUser(reviewerUser._id)
+    expect(capabilities).toMatchObject({
+      isReviewer: `reviewer._ref == "${reviewerUser._id}"`
+    })
+  })
 })

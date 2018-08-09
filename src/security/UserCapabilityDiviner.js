@@ -52,6 +52,10 @@ class UserCapabilityDiviner {
     return this.performQuery(query, {userId: this.userId})
   }
 
+  isReviewer() {
+    return `reviewer._ref == "${this.userId}"`
+  }
+
   // Find all tracks where user is editor
   tracksWhereUserIsEditor() {
     const query = `*[_type == "track" && references($userId)]{
@@ -172,7 +176,8 @@ class UserCapabilityDiviner {
       this.isEditorInIssueWithArticleInComment(),
       this.isEditorInTrackWithArticleInComment(),
       this.isEditorInIssueWithArticleInReviewProcess(),
-      this.isEditorInTrackWithArticleInReviewProcess()
+      this.isEditorInTrackWithArticleInReviewProcess(),
+      this.isReviewer()
     ]).then(
       ([
         isVenueEditor,
@@ -183,7 +188,8 @@ class UserCapabilityDiviner {
         isEditorInIssueWithArticleInComment,
         isEditorInTrackWithArticleInComment,
         isEditorInIssueWithArticleInReviewProcess,
-        isEditorInTrackWithArticleInReviewProcess
+        isEditorInTrackWithArticleInReviewProcess,
+        isReviewer
       ]) => {
         return {
           isVenueEditor: !!isVenueEditor,
@@ -194,7 +200,8 @@ class UserCapabilityDiviner {
           isEditorInIssueWithArticleInComment,
           isEditorInTrackWithArticleInComment,
           isEditorInIssueWithArticleInReviewProcess,
-          isEditorInTrackWithArticleInReviewProcess
+          isEditorInTrackWithArticleInReviewProcess,
+          isReviewer
         }
       }
     )

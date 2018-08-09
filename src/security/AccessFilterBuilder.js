@@ -30,6 +30,7 @@ class AccessFilterBuilder {
     return this.userCapabilities
   }
 
+  // eslint-disable-next-line complexity
   canRead(type) {
     const capabilities = this.userCapabilities
     switch (type) {
@@ -57,6 +58,10 @@ class AccessFilterBuilder {
         return `_type == "reviewProcess" && (${capabilities.isVenueEditor} || ${
           capabilities.isEditorInIssueWithArticleInReviewProcess
         } || ${capabilities.isEditorInTrackWithArticleInReviewProcess})`
+      case 'reviewItem':
+        return `_type == "reviewItem" && (${capabilities.isVenueEditor} || ${
+          capabilities.isReviewer
+        })`
       default:
         return 'false'
     }
