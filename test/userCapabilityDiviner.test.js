@@ -154,6 +154,79 @@ describe('userCapabilityDiviner', () => {
     expect(capabilities).toMatchObject({isCreator: `_createdBy == "${creator._id}"`})
   })
 
+  test('recognizes track editors in comment', async () => {
+    const articleTrackEditorUser = await createUser()
+
+    const track = await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: articleTrackEditorUser._id}]
+    })
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      track: {_type: 'reference', _ref: track._id}
+    })
+
+    await createDocument({
+      _id: 'COMMENTID1234',
+      _type: 'comment',
+      subject: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
+    expect(capabilities).toMatchObject({
+      isEditorInTrackWithArticleInComment: 'subject._ref in ["ARTICLEID1234"]'
+    })
+  })
+
+  test('recognizes issue editors in comment', async () => {
+    const issueEditorUser = await createUser()
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article'
+    })
+
+    const anotherArticle = await createDocument({
+      _id: 'ARTICLEID12345',
+      _type: 'article'
+    })
+
+    await createDocument({
+      _id: 'ARTICLEID123456',
+      _type: 'article'
+    })
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      content: [
+        {
+          _type: 'section',
+          title: 'A Section',
+          articles: [
+            {_type: 'reference', _ref: article._id},
+            {_type: 'reference', _ref: anotherArticle._id}
+          ]
+        }
+      ],
+      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+    })
+
+    await createDocument({
+      _id: 'COMMENTID1234',
+      _type: 'comment',
+      subject: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    expect(capabilities).toMatchObject({
+      isEditorInIssueWithArticleInComment: 'subject._ref in ["ARTICLEID1234","ARTICLEID12345"]'
+    })
+  })
+
   test('recognizes issue editors in reviewProcess', async () => {
     const issueEditorUser = await createUser()
 

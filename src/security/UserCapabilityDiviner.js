@@ -140,6 +140,28 @@ class UserCapabilityDiviner {
     })
   }
 
+  isEditorInIssueWithArticleInComment() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue.articleIds))
+      .then(articleIds => {
+        const flattenedArticleIds = flatten(articleIds)
+        return `subject._ref in ${quoteItems(flattenedArticleIds)}`
+      })
+  }
+
+  isEditorInTrackWithArticleInComment() {
+    return this.tracksWhereUserIsEditor().then(tracks => {
+      // user is editor in these tracks
+      const trackIds = tracks.map(track => track._id)
+      return this.articlesInTracks(trackIds).then(articles => {
+        // articles in aforementioned tracks
+        const articleIds = articles.map(article => article._id)
+        // comment reffing any of those articles
+        return `subject._ref in ${quoteItems(articleIds)}`
+      })
+    })
+  }
+
   runAll() {
     return Promise.all([
       this.isVenueEditor(),
@@ -147,6 +169,8 @@ class UserCapabilityDiviner {
       this.isEditorInArticleIssues(),
       this.isSubmitterInArticle(),
       this.isCreator(),
+      this.isEditorInIssueWithArticleInComment(),
+      this.isEditorInTrackWithArticleInComment(),
       this.isEditorInIssueWithArticleInReviewProcess(),
       this.isEditorInTrackWithArticleInReviewProcess()
     ]).then(
@@ -156,6 +180,8 @@ class UserCapabilityDiviner {
         isEditorInArticleIssues,
         isSubmitterInArticle,
         isCreator,
+        isEditorInIssueWithArticleInComment,
+        isEditorInTrackWithArticleInComment,
         isEditorInIssueWithArticleInReviewProcess,
         isEditorInTrackWithArticleInReviewProcess
       ]) => {
@@ -165,6 +191,8 @@ class UserCapabilityDiviner {
           isEditorInArticleIssues,
           isSubmitterInArticle,
           isCreator,
+          isEditorInIssueWithArticleInComment,
+          isEditorInTrackWithArticleInComment,
           isEditorInIssueWithArticleInReviewProcess,
           isEditorInTrackWithArticleInReviewProcess
         }

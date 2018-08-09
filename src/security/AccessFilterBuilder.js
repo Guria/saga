@@ -48,8 +48,11 @@ class AccessFilterBuilder {
           capabilities.isEditorInArticleTrack
         } || ${capabilities.isEditorInArticleIssues}) || ${capabilities.isSubmitterInArticle})`
       case 'comment':
-        // TODO: editor in article.track, editor in any issues to which the commented article belongs
-        return `_type == "comment" && (${capabilities.isCreator} || ${capabilities.isVenueEditor})`
+        return `_type == "comment" && (${capabilities.isCreator} || ${
+          capabilities.isVenueEditor
+        } || ${capabilities.isEditorInTrackWithArticleInComment} || ${
+          capabilities.isEditorInIssueWithArticleInComment
+        })`
       case 'reviewProcess':
         return `_type == "reviewProcess" && (${capabilities.isVenueEditor} || ${
           capabilities.isEditorInIssueWithArticleInReviewProcess
