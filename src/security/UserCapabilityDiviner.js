@@ -137,6 +137,16 @@ class UserCapabilityDiviner {
       })
   }
 
+  isEditorInIssueWithArticleInReviewItem() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue.articleIds))
+      .then(articleIds => {
+        const flattenedArticleIds = flatten(articleIds)
+        // PICKUP HERE reviewprocessess for article ids
+        return `article._ref in ${quoteItems(flattenedArticleIds)}`
+      })
+  }
+
   isEditorInTrackWithArticleInReviewProcess() {
     return this.tracksWhereUserIsEditor().then(tracks => {
       // user is editor in these tracks
@@ -184,6 +194,7 @@ class UserCapabilityDiviner {
       this.isEditorInIssueWithArticleInReviewProcess(),
       this.isEditorInTrackWithArticleInReviewProcess(),
       this.isReviewer(),
+      this.isEditorInIssueWithArticleInReviewItem(),
       this.isSubmitterInArticleInFeatureState()
     ]).then(
       ([
@@ -197,6 +208,7 @@ class UserCapabilityDiviner {
         isEditorInIssueWithArticleInReviewProcess,
         isEditorInTrackWithArticleInReviewProcess,
         isReviewer,
+        isEditorInIssueWithArticleInReviewItem,
         isSubmitterInArticleInFeatureState
       ]) => {
         return {
@@ -210,6 +222,7 @@ class UserCapabilityDiviner {
           isEditorInIssueWithArticleInReviewProcess,
           isEditorInTrackWithArticleInReviewProcess,
           isReviewer,
+          isEditorInIssueWithArticleInReviewItem,
           isSubmitterInArticleInFeatureState
         }
       }

@@ -1,11 +1,6 @@
 const {close, getApp} = require('./helpers')
 const AccessFilterBuilder = require('../src/security/AccessFilterBuilder')
 
-const {
-  noAccessFilterExpressions,
-  fullAccessFilterExpressions
-} = require('../src/security/defaultFilters')
-
 describe('accessFilterBuilder', () => {
   const identityTemplate = {
     provider: 'google',
@@ -72,8 +67,12 @@ describe('accessFilterBuilder', () => {
     })
     const filters = await filtersForUser(unprivilegedUser._id)
     expect(filters).toBeTruthy()
-    // expect(filters.read).toMatch(
-    //   /_type == "article" && \(false \|\| false \|\| false \|\| track\._ref in \[""\]\)/
-    // )
+    expect(filters.read).toEqual(
+      `_type == "venue" || _type == "issue" || _type == "track" || _type == "stage" || _type == "user" || _type == "article" && (false || track._ref in [] || _id in []) || _id in []) || _type == "comment" && (author._ref == "${
+        unprivilegedUser._id
+      }" || false || subject._ref in [] || subject._ref in []) || _type == "reviewProcess" && (false || article._ref in [] || article._ref in []) || _type == "reviewItem" && (false || reviewer._ref == "${
+        unprivilegedUser._id
+      }" || article._ref in []) || _type == "reviewPolicy" || _type == "featureConfig" || _type == "featureState" && (false || article._ref in [])`
+    )
   })
 })

@@ -302,6 +302,45 @@ describe('userCapabilityDiviner', () => {
     })
   })
 
+  test('recognizes issue editors in reviewItem', async () => {
+    const issueEditorUser = await createUser()
+
+    await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article'
+    })
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      content: [
+        {
+          _type: 'section',
+          title: 'A Section',
+          articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
+        }
+      ],
+      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+    })
+
+    const reviewProcess = await createDocument({
+      _id: 'REVIEWPROCESSID1234',
+      _type: 'reviewProcess',
+      article: {_type: 'reference', _ref: 'ARTICLEID1234'}
+    })
+
+    await createDocument({
+      _id: 'REVIEWITEMID1234',
+      _type: 'reviewItem',
+      reviewProcess: {_type: 'reference', _ref: reviewProcess._id}
+    })
+
+    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    expect(capabilities).toMatchObject({
+      isEditorInIssueWithArticleInReviewItem: 'article._ref in ["ARTICLEID1234"]'
+    })
+  })
+
   test('recognizes article submitter in featureState', async () => {
     const submitter = await createUser()
 

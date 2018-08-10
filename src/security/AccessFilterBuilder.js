@@ -62,7 +62,7 @@ class AccessFilterBuilder {
         // TODO: track and issue editors for the article being reviewed
         return `_type == "reviewItem" && (${capabilities.isVenueEditor} || ${
           capabilities.isReviewer
-        })`
+        } || ${capabilities.isEditorInIssueWithArticleInReviewItem})`
       case 'reviewPolicy':
         return '_type == "reviewPolicy"'
       case 'featureConfig':
@@ -91,6 +91,7 @@ class AccessFilterBuilder {
 
   async determineFilters() {
     await this.prefetchAllCapabilities()
+    console.log('----->', this.userCapabilities.read)
 
     return {
       read: uniq(documentTypes.map(type => this.canRead(type))).join(' || '),
