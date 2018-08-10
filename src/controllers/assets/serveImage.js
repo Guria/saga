@@ -12,7 +12,7 @@ module.exports = mead(
   getMeadConfig({
     sources: [
       {
-        name: 'lyra',
+        name: 'images',
         adapter: {
           type: adapter,
           config: meadOptions

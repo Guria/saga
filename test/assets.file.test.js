@@ -151,12 +151,12 @@ describe('asset file uploads', () => {
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
           _id: 'file-47ba17d63618b876d5002b0f110671211ea0214c-txt',
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           assetId: '47ba17d63618b876d5002b0f110671211ea0214c',
           sha1hash: '47ba17d63618b876d5002b0f110671211ea0214c',
-          path: 'files/vega/lyra-test/47ba17d63618b876d5002b0f110671211ea0214c.txt',
+          path: 'files/lyra-test/47ba17d63618b876d5002b0f110671211ea0214c.txt',
           url:
-            'http://localhost:4000/files/vega/lyra-test/47ba17d63618b876d5002b0f110671211ea0214c.txt',
+            'http://localhost:4000/files/lyra-test/47ba17d63618b876d5002b0f110671211ea0214c.txt',
           originalFilename: '47ba17d63618b876d5002b0f110671211ea0214c.txt',
           extension: 'txt',
           mimeType: 'text/plain',
@@ -174,16 +174,16 @@ describe('asset file uploads', () => {
       .send('2017-06-03,5,30\n')
       .expect(200)
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
           _id: 'file-e5145b41219ffc51dffc9f2de8b522c51c3d38d3-csv',
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           assetId: 'e5145b41219ffc51dffc9f2de8b522c51c3d38d3',
           extension: 'csv',
           mimeType: 'text/csv',
           originalFilename: 'blåbærsyltetøy på skiva.csv',
-          path: 'files/vega/lyra-test/e5145b41219ffc51dffc9f2de8b522c51c3d38d3.csv',
+          path: 'files/lyra-test/e5145b41219ffc51dffc9f2de8b522c51c3d38d3.csv',
           sha1hash: 'e5145b41219ffc51dffc9f2de8b522c51c3d38d3',
           size: 16
         })
@@ -205,10 +205,10 @@ describe('asset file uploads', () => {
       .send('2017-06-03,5,30\n')
       .expect(200)
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'csv',
           mimeType: 'text/csv',
           originalFilename: meta.filename,
@@ -224,10 +224,10 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(Buffer.from('mix'))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'bin',
           size: 3,
           mimeType: 'application/octet-stream'
@@ -242,10 +242,10 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(Buffer.from('mix'))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'txt',
           size: 3,
           mimeType: 'text/plain'
@@ -260,10 +260,10 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(Buffer.from('console.log("foo")'))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'js',
           size: 18,
           mimeType: 'application/javascript'
@@ -278,10 +278,10 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(fs.readFileSync(path.join(__dirname, 'fixtures', 'some.zip')))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'zip',
           size: 168,
           mimeType: 'application/zip'
@@ -295,10 +295,10 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(fs.readFileSync(path.join(__dirname, 'fixtures', 'some.zip')))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'zip',
           size: 168,
           mimeType: 'application/zip'
@@ -314,10 +314,10 @@ describe('asset file uploads', () => {
       .set('Content-Type', 'text/plain; charset=utf-8')
       .send(data)
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           size: 8 * 655360,
           mimeType: 'text/plain'
         })
@@ -331,11 +331,11 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(fs.readFileSync(path.join(__dirname, 'fixtures', 'some.zip')))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
 
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'sanity.fileAsset',
+          _type: 'lyra.fileAsset',
           extension: 'zip',
           size: 168,
           mimeType: 'application/zip'
@@ -349,10 +349,9 @@ describe('asset file uploads', () => {
       .set('Cookie', getSessionCookie(app, adminUser))
       .send(fs.readFileSync(path.join(__dirname, 'fixtures', 'some.zip')))
       .then(async res => {
-        expect(res.body.document).toMatchObject({_type: 'sanity.fileAsset'})
-
+        expect(res.body.document).toMatchObject({_type: 'lyra.fileAsset'})
         await request(app)
-          .get(`/files/vega/lyra-test/${path.basename(res.body.document.path)}`)
+          .get(`/files/lyra-test/${path.basename(res.body.document.path)}`)
           .expect(200)
 
         await request(app)
@@ -362,7 +361,7 @@ describe('asset file uploads', () => {
           .expect(200)
 
         await request(app)
-          .get(`/files/vega/lyra-test/${path.basename(res.body.document.path)}`)
+          .get(`/files/lyra-test/${path.basename(res.body.document.path)}`)
           .expect(404)
       }))
 })

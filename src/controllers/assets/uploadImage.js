@@ -19,7 +19,7 @@ module.exports = async (req, res, next) => {
   }
 
   const doc = removeUndefined({
-    _type: `sanity.imageAsset`,
+    _type: `lyra.imageAsset`,
     label,
     title,
     description,

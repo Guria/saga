@@ -1,4 +1,4 @@
-const assetTypes = ['sanity.imageAsset', 'sanity.fileAsset']
+const assetTypes = ['lyra.imageAsset', 'lyra.fileAsset']
 
 module.exports = async (app, evt) => {
   if (!evt.previous || !assetTypes.includes(evt.previous._type)) {

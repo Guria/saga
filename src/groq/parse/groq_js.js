@@ -27534,7 +27534,7 @@ $packages["encoding/hex"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/sanity-io/gradient/pkg/utils/sliceutils"] = (function() {
+$packages["github.com/VegaPublish/lyra/pkg/utils/sliceutils"] = (function() {
 	var $pkg = {}, $init, reflect, sliceType, intfSliceType, IntoInterfaceSlice;
 	reflect = $packages["reflect"];
 	sliceType = $sliceType($emptyInterface);
@@ -27577,17 +27577,17 @@ $packages["github.com/sanity-io/gradient/pkg/utils/sliceutils"] = (function() {
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function() {
+$packages["github.com/VegaPublish/lyra/pkg/search/gradientql/ast"] = (function() {
 	var $pkg = {}, $init, bufio, bytes, json, fmt, sliceutils, io, strconv, strings, Position, Expression, Everything, Parent, Constraint, Object, Array, Tuple, Subscript, Range, FunctionCall, BinaryOperator, DotOperator, PipeOperator, PrefixOperator, PostfixOperator, Attribute, StringLiteral, IntegerLiteral, FloatLiteral, BooleanLiteral, Ellipsis, Param, Token, sliceType$1, sliceType$2, structType, sliceType$3, structType$1, structType$2, structType$3, structType$4, structType$5, structType$6, structType$7, structType$8, structType$9, structType$10, structType$11, structType$12, structType$13, structType$14, ptrType$2, ptrType$3, ptrType$5, ptrType$6, ptrType$7, ptrType$8, ptrType$9, ptrType$10, ptrType$11, ptrType$12, ptrType$13, ptrType$14, ptrType$15, ptrType$16, ptrType$17, ptrType$18, ptrType$19, ptrType$20, ptrType$21, ptrType$22, ptrType$23, LiteralFromInterface;
 	bufio = $packages["bufio"];
 	bytes = $packages["bytes"];
 	json = $packages["encoding/json"];
 	fmt = $packages["fmt"];
-	sliceutils = $packages["github.com/sanity-io/gradient/pkg/utils/sliceutils"];
+	sliceutils = $packages["github.com/VegaPublish/lyra/pkg/utils/sliceutils"];
 	io = $packages["io"];
 	strconv = $packages["strconv"];
 	strings = $packages["strings"];
-	Position = $pkg.Position = $newType(0, $kindStruct, "ast.Position", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Start_, End_, Source_) {
+	Position = $pkg.Position = $newType(0, $kindStruct, "ast.Position", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Start_, End_, Source_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Start = 0;
@@ -27599,8 +27599,8 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.End = End_;
 		this.Source = Source_;
 	});
-	Expression = $pkg.Expression = $newType(8, $kindInterface, "ast.Expression", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, null);
-	Everything = $pkg.Everything = $newType(0, $kindStruct, "ast.Everything", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_) {
+	Expression = $pkg.Expression = $newType(8, $kindInterface, "ast.Expression", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, null);
+	Everything = $pkg.Everything = $newType(0, $kindStruct, "ast.Everything", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27608,7 +27608,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		}
 		this.Pos = Pos_;
 	});
-	Parent = $pkg.Parent = $newType(0, $kindStruct, "ast.Parent", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_) {
+	Parent = $pkg.Parent = $newType(0, $kindStruct, "ast.Parent", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27616,7 +27616,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		}
 		this.Pos = Pos_;
 	});
-	Constraint = $pkg.Constraint = $newType(0, $kindStruct, "ast.Constraint", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Expression_) {
+	Constraint = $pkg.Constraint = $newType(0, $kindStruct, "ast.Constraint", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Expression_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27626,7 +27626,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Expression = Expression_;
 	});
-	Object = $pkg.Object = $newType(0, $kindStruct, "ast.Object", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Expressions_) {
+	Object = $pkg.Object = $newType(0, $kindStruct, "ast.Object", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Expressions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27636,7 +27636,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Expressions = Expressions_;
 	});
-	Array = $pkg.Array = $newType(0, $kindStruct, "ast.Array", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Expressions_) {
+	Array = $pkg.Array = $newType(0, $kindStruct, "ast.Array", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Expressions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27646,7 +27646,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Expressions = Expressions_;
 	});
-	Tuple = $pkg.Tuple = $newType(0, $kindStruct, "ast.Tuple", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Expressions_) {
+	Tuple = $pkg.Tuple = $newType(0, $kindStruct, "ast.Tuple", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Expressions_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27656,7 +27656,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Expressions = Expressions_;
 	});
-	Subscript = $pkg.Subscript = $newType(0, $kindStruct, "ast.Subscript", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
+	Subscript = $pkg.Subscript = $newType(0, $kindStruct, "ast.Subscript", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27666,7 +27666,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Value = Value_;
 	});
-	Range = $pkg.Range = $newType(0, $kindStruct, "ast.Range", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Start_, End_, Inclusive_) {
+	Range = $pkg.Range = $newType(0, $kindStruct, "ast.Range", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Start_, End_, Inclusive_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27680,7 +27680,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.End = End_;
 		this.Inclusive = Inclusive_;
 	});
-	FunctionCall = $pkg.FunctionCall = $newType(0, $kindStruct, "ast.FunctionCall", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Name_, Arguments_) {
+	FunctionCall = $pkg.FunctionCall = $newType(0, $kindStruct, "ast.FunctionCall", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Name_, Arguments_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27692,7 +27692,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Name = Name_;
 		this.Arguments = Arguments_;
 	});
-	BinaryOperator = $pkg.BinaryOperator = $newType(0, $kindStruct, "ast.BinaryOperator", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, LHS_, RHS_, Operator_) {
+	BinaryOperator = $pkg.BinaryOperator = $newType(0, $kindStruct, "ast.BinaryOperator", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, LHS_, RHS_, Operator_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27706,7 +27706,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.RHS = RHS_;
 		this.Operator = Operator_;
 	});
-	DotOperator = $pkg.DotOperator = $newType(0, $kindStruct, "ast.DotOperator", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, LHS_, RHS_) {
+	DotOperator = $pkg.DotOperator = $newType(0, $kindStruct, "ast.DotOperator", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, LHS_, RHS_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27718,7 +27718,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.LHS = LHS_;
 		this.RHS = RHS_;
 	});
-	PipeOperator = $pkg.PipeOperator = $newType(0, $kindStruct, "ast.PipeOperator", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, LHS_, RHS_) {
+	PipeOperator = $pkg.PipeOperator = $newType(0, $kindStruct, "ast.PipeOperator", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, LHS_, RHS_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27730,7 +27730,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.LHS = LHS_;
 		this.RHS = RHS_;
 	});
-	PrefixOperator = $pkg.PrefixOperator = $newType(0, $kindStruct, "ast.PrefixOperator", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, RHS_, Operator_) {
+	PrefixOperator = $pkg.PrefixOperator = $newType(0, $kindStruct, "ast.PrefixOperator", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, RHS_, Operator_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27742,7 +27742,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.RHS = RHS_;
 		this.Operator = Operator_;
 	});
-	PostfixOperator = $pkg.PostfixOperator = $newType(0, $kindStruct, "ast.PostfixOperator", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, LHS_, Operator_) {
+	PostfixOperator = $pkg.PostfixOperator = $newType(0, $kindStruct, "ast.PostfixOperator", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, LHS_, Operator_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27754,7 +27754,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.LHS = LHS_;
 		this.Operator = Operator_;
 	});
-	Attribute = $pkg.Attribute = $newType(0, $kindStruct, "ast.Attribute", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Name_) {
+	Attribute = $pkg.Attribute = $newType(0, $kindStruct, "ast.Attribute", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Name_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27764,7 +27764,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Name = Name_;
 	});
-	StringLiteral = $pkg.StringLiteral = $newType(0, $kindStruct, "ast.StringLiteral", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
+	StringLiteral = $pkg.StringLiteral = $newType(0, $kindStruct, "ast.StringLiteral", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27774,7 +27774,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Value = Value_;
 	});
-	IntegerLiteral = $pkg.IntegerLiteral = $newType(0, $kindStruct, "ast.IntegerLiteral", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
+	IntegerLiteral = $pkg.IntegerLiteral = $newType(0, $kindStruct, "ast.IntegerLiteral", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27784,7 +27784,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Value = Value_;
 	});
-	FloatLiteral = $pkg.FloatLiteral = $newType(0, $kindStruct, "ast.FloatLiteral", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
+	FloatLiteral = $pkg.FloatLiteral = $newType(0, $kindStruct, "ast.FloatLiteral", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27794,7 +27794,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Value = Value_;
 	});
-	BooleanLiteral = $pkg.BooleanLiteral = $newType(0, $kindStruct, "ast.BooleanLiteral", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
+	BooleanLiteral = $pkg.BooleanLiteral = $newType(0, $kindStruct, "ast.BooleanLiteral", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Value_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27804,7 +27804,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Value = Value_;
 	});
-	Ellipsis = $pkg.Ellipsis = $newType(0, $kindStruct, "ast.Ellipsis", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_) {
+	Ellipsis = $pkg.Ellipsis = $newType(0, $kindStruct, "ast.Ellipsis", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27812,7 +27812,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		}
 		this.Pos = Pos_;
 	});
-	Param = $pkg.Param = $newType(0, $kindStruct, "ast.Param", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, function(Pos_, Name_) {
+	Param = $pkg.Param = $newType(0, $kindStruct, "ast.Param", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, function(Pos_, Name_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Pos = new Position.ptr(0, 0, "");
@@ -27822,7 +27822,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		this.Pos = Pos_;
 		this.Name = Name_;
 	});
-	Token = $pkg.Token = $newType(4, $kindInt, "ast.Token", true, "github.com/sanity-io/gradient/pkg/search/gradientql/ast", true, null);
+	Token = $pkg.Token = $newType(4, $kindInt, "ast.Token", true, "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", true, null);
 	sliceType$1 = $sliceType($Uint8);
 	sliceType$2 = $sliceType($emptyInterface);
 	structType = $structType("", [{prop: "Node", name: "Node", anonymous: false, exported: true, typ: $String, tag: "json:\"node,omitempty\""}, {prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: $Int, tag: "json:\"pos\""}, {prop: "Expression", name: "Expression", anonymous: false, exported: true, typ: Expression, tag: "json:\"expression,omitempty\""}]);
@@ -28420,30 +28420,30 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 		/* */ } return; } if ($f === undefined) { $f = { $blk: LiteralFromInterface }; } $f._i = _i; $f._r = _r; $f._r$1 = _r$1; $f._r$2 = _r$2; $f._ref = _ref; $f._ref$1 = _ref$1; $f._tuple = _tuple; $f._tuple$1 = _tuple$1; $f.err = err; $f.exprs = exprs; $f.i = i; $f.ok = ok; $f.pos = pos; $f.slice = slice; $f.v = v; $f.v$1 = v$1; $f.v$2 = v$2; $f.v$3 = v$3; $f.v$4 = v$4; $f.v$5 = v$5; $f.v$6 = v$6; $f.v$7 = v$7; $f.value = value; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	$pkg.LiteralFromInterface = LiteralFromInterface;
-	ptrType$14.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$11.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$5.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$6.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$7.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$20.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$9.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$10.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$8.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$21.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$3.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$2.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$22.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$23.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$12.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$16.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$17.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$18.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$19.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$15.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
-	ptrType$13.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$14.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$11.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$5.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$6.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$7.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$20.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$9.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$10.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$8.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$21.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$3.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$2.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$22.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$23.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$12.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$16.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$17.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$18.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$19.methods = [{prop: "LiteralValue", name: "LiteralValue", pkg: "", typ: $funcType([], [$emptyInterface], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$15.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
+	ptrType$13.methods = [{prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}, {prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}];
 	Token.methods = [{prop: "MarshalJSON", name: "MarshalJSON", pkg: "", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "String", name: "String", pkg: "", typ: $funcType([], [$String], false)}, {prop: "Literal", name: "Literal", pkg: "", typ: $funcType([], [$String], false)}];
 	Position.init("", [{prop: "Start", name: "Start", anonymous: false, exported: true, typ: $Int, tag: ""}, {prop: "End", name: "End", anonymous: false, exported: true, typ: $Int, tag: ""}, {prop: "Source", name: "Source", anonymous: false, exported: true, typ: $String, tag: ""}]);
-	Expression.init([{prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql/ast", typ: $funcType([], [], false)}]);
+	Expression.init([{prop: "GetPos", name: "GetPos", pkg: "", typ: $funcType([], [Position], false)}, {prop: "sealed", name: "sealed", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql/ast", typ: $funcType([], [], false)}]);
 	Everything.init("", [{prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: Position, tag: ""}]);
 	Parent.init("", [{prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: Position, tag: ""}]);
 	Constraint.init("", [{prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: Position, tag: ""}, {prop: "Expression", name: "Expression", anonymous: false, exported: true, typ: Expression, tag: ""}]);
@@ -28481,19 +28481,19 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"] = (function
 	$pkg.$init = $init;
 	return $pkg;
 })();
-$packages["github.com/sanity-io/gradient/pkg/search/gradientql"] = (function() {
+$packages["github.com/VegaPublish/lyra/pkg/search/gradientql"] = (function() {
 	var $pkg = {}, $init, bufio, bytes, hex, json, fmt, ast, strconv, strings, unicode, Params, ParseError, parser, Scanner, ptrType, sliceType, ptrType$1, structType, ptrType$2, sliceType$1, ptrType$3, ptrType$4, ptrType$5, ptrType$6, ptrType$7, ptrType$8, ptrType$9, ptrType$10, sliceType$2, arrayType, ptrType$11, sliceType$3, ptrType$12, ptrType$13, isWhitespace, isLetter, isDigit, isHexDigit, isIdentifierCharacter, isLeadingIdentifierCharacter, isOperatorCharacter, isPrefixOperator, isInfixOperator, isPostfixOperator, isOperator, entailsImplicitPipeOperator, precedenceAndAssociativity, interpretBinOpAsRange, Parse, newParser, NewScanner;
 	bufio = $packages["bufio"];
 	bytes = $packages["bytes"];
 	hex = $packages["encoding/hex"];
 	json = $packages["encoding/json"];
 	fmt = $packages["fmt"];
-	ast = $packages["github.com/sanity-io/gradient/pkg/search/gradientql/ast"];
+	ast = $packages["github.com/VegaPublish/lyra/pkg/search/gradientql/ast"];
 	strconv = $packages["strconv"];
 	strings = $packages["strings"];
 	unicode = $packages["unicode"];
-	Params = $pkg.Params = $newType(4, $kindMap, "gradientql.Params", true, "github.com/sanity-io/gradient/pkg/search/gradientql", true, null);
-	ParseError = $pkg.ParseError = $newType(0, $kindStruct, "gradientql.ParseError", true, "github.com/sanity-io/gradient/pkg/search/gradientql", true, function(Message_, Pos_) {
+	Params = $pkg.Params = $newType(4, $kindMap, "gradientql.Params", true, "github.com/VegaPublish/lyra/pkg/search/gradientql", true, null);
+	ParseError = $pkg.ParseError = $newType(0, $kindStruct, "gradientql.ParseError", true, "github.com/VegaPublish/lyra/pkg/search/gradientql", true, function(Message_, Pos_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.Message = "";
@@ -28503,7 +28503,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql"] = (function() {
 		this.Message = Message_;
 		this.Pos = Pos_;
 	});
-	parser = $pkg.parser = $newType(0, $kindStruct, "gradientql.parser", true, "github.com/sanity-io/gradient/pkg/search/gradientql", false, function(s_, src_, params_, buf_) {
+	parser = $pkg.parser = $newType(0, $kindStruct, "gradientql.parser", true, "github.com/VegaPublish/lyra/pkg/search/gradientql", false, function(s_, src_, params_, buf_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.s = ptrType$1.nil;
@@ -28517,7 +28517,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql"] = (function() {
 		this.params = params_;
 		this.buf = buf_;
 	});
-	Scanner = $pkg.Scanner = $newType(0, $kindStruct, "gradientql.Scanner", true, "github.com/sanity-io/gradient/pkg/search/gradientql", true, function(r_, Pos_) {
+	Scanner = $pkg.Scanner = $newType(0, $kindStruct, "gradientql.Scanner", true, "github.com/VegaPublish/lyra/pkg/search/gradientql", true, function(r_, Pos_) {
 		this.$val = this;
 		if (arguments.length === 0) {
 			this.r = ptrType$10.nil;
@@ -28530,7 +28530,7 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql"] = (function() {
 	ptrType = $ptrType(ast.Range);
 	sliceType = $sliceType($emptyInterface);
 	ptrType$1 = $ptrType(Scanner);
-	structType = $structType("github.com/sanity-io/gradient/pkg/search/gradientql", [{prop: "tok", name: "tok", anonymous: false, exported: false, typ: ast.Token, tag: ""}, {prop: "lit", name: "lit", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "pos", name: "pos", anonymous: false, exported: false, typ: $Int, tag: ""}, {prop: "n", name: "n", anonymous: false, exported: false, typ: $Int, tag: ""}]);
+	structType = $structType("github.com/VegaPublish/lyra/pkg/search/gradientql", [{prop: "tok", name: "tok", anonymous: false, exported: false, typ: ast.Token, tag: ""}, {prop: "lit", name: "lit", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "pos", name: "pos", anonymous: false, exported: false, typ: $Int, tag: ""}, {prop: "n", name: "n", anonymous: false, exported: false, typ: $Int, tag: ""}]);
 	ptrType$2 = $ptrType(ast.Tuple);
 	sliceType$1 = $sliceType(ast.Expression);
 	ptrType$3 = $ptrType(ast.PostfixOperator);
@@ -29895,12 +29895,12 @@ $packages["github.com/sanity-io/gradient/pkg/search/gradientql"] = (function() {
 	};
 	Scanner.prototype.scanString = function(quote) { return this.$val.scanString(quote); };
 	ptrType$12.methods = [{prop: "Error", name: "Error", pkg: "", typ: $funcType([], [$String], false)}];
-	ptrType$13.methods = [{prop: "scan", name: "scan", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanIgnoreWhitespace", name: "scanIgnoreWhitespace", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "unscan", name: "unscan", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [], false)}, {prop: "dereferenceParam", name: "dereferenceParam", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$String, $Int], [ast.Expression, $error], false)}, {prop: "parseAtom", name: "parseAtom", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Bool], [ast.Expression, $error], false)}, {prop: "parseGeneralExpression", name: "parseGeneralExpression", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Int, $Bool, $Bool], [ast.Expression, $error], false)}, {prop: "parseChainedBracketedExpression", name: "parseChainedBracketedExpression", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "parseArrayExpression", name: "parseArrayExpression", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "parseObjectExpression", name: "parseObjectExpression", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "parseTupleExpression", name: "parseTupleExpression", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Bool], [ast.Expression, $error], false)}, {prop: "parseList", name: "parseList", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "parse", name: "parse", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "makeTokenPos", name: "makeTokenPos", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Int, $String], [ast.Position], false)}, {prop: "makeRangePos", name: "makeRangePos", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Int, $Int], [ast.Position], false)}, {prop: "makeSpotPos", name: "makeSpotPos", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Int], [ast.Position], false)}];
-	ptrType$1.methods = [{prop: "read", name: "read", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [$Int32], false)}, {prop: "unread", name: "unread", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [], false)}, {prop: "Scan", name: "Scan", pkg: "", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanWhitespace", name: "scanWhitespace", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanIdent", name: "scanIdent", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanOperator", name: "scanOperator", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanDots", name: "scanDots", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanNumber", name: "scanNumber", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanString", name: "scanString", pkg: "github.com/sanity-io/gradient/pkg/search/gradientql", typ: $funcType([$Int32], [ast.Token, $String, $Int], false)}];
+	ptrType$13.methods = [{prop: "scan", name: "scan", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanIgnoreWhitespace", name: "scanIgnoreWhitespace", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "unscan", name: "unscan", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [], false)}, {prop: "dereferenceParam", name: "dereferenceParam", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$String, $Int], [ast.Expression, $error], false)}, {prop: "parseAtom", name: "parseAtom", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Bool], [ast.Expression, $error], false)}, {prop: "parseGeneralExpression", name: "parseGeneralExpression", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Int, $Bool, $Bool], [ast.Expression, $error], false)}, {prop: "parseChainedBracketedExpression", name: "parseChainedBracketedExpression", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "parseArrayExpression", name: "parseArrayExpression", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "parseObjectExpression", name: "parseObjectExpression", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "parseTupleExpression", name: "parseTupleExpression", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Bool], [ast.Expression, $error], false)}, {prop: "parseList", name: "parseList", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [sliceType$1, $error], false)}, {prop: "parse", name: "parse", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Expression, $error], false)}, {prop: "makeTokenPos", name: "makeTokenPos", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Int, $String], [ast.Position], false)}, {prop: "makeRangePos", name: "makeRangePos", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Int, $Int], [ast.Position], false)}, {prop: "makeSpotPos", name: "makeSpotPos", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Int], [ast.Position], false)}];
+	ptrType$1.methods = [{prop: "read", name: "read", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [$Int32], false)}, {prop: "unread", name: "unread", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [], false)}, {prop: "Scan", name: "Scan", pkg: "", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanWhitespace", name: "scanWhitespace", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanIdent", name: "scanIdent", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanOperator", name: "scanOperator", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanDots", name: "scanDots", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanNumber", name: "scanNumber", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([], [ast.Token, $String, $Int], false)}, {prop: "scanString", name: "scanString", pkg: "github.com/VegaPublish/lyra/pkg/search/gradientql", typ: $funcType([$Int32], [ast.Token, $String, $Int], false)}];
 	Params.init($String, $emptyInterface);
 	ParseError.init("", [{prop: "Message", name: "Message", anonymous: false, exported: true, typ: $String, tag: ""}, {prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: ast.Position, tag: ""}]);
-	parser.init("github.com/sanity-io/gradient/pkg/search/gradientql", [{prop: "s", name: "s", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "src", name: "src", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "params", name: "params", anonymous: false, exported: false, typ: Params, tag: ""}, {prop: "buf", name: "buf", anonymous: false, exported: false, typ: structType, tag: ""}]);
-	Scanner.init("github.com/sanity-io/gradient/pkg/search/gradientql", [{prop: "r", name: "r", anonymous: false, exported: false, typ: ptrType$10, tag: ""}, {prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: $Int, tag: ""}]);
+	parser.init("github.com/VegaPublish/lyra/pkg/search/gradientql", [{prop: "s", name: "s", anonymous: false, exported: false, typ: ptrType$1, tag: ""}, {prop: "src", name: "src", anonymous: false, exported: false, typ: $String, tag: ""}, {prop: "params", name: "params", anonymous: false, exported: false, typ: Params, tag: ""}, {prop: "buf", name: "buf", anonymous: false, exported: false, typ: structType, tag: ""}]);
+	Scanner.init("github.com/VegaPublish/lyra/pkg/search/gradientql", [{prop: "r", name: "r", anonymous: false, exported: false, typ: ptrType$10, tag: ""}, {prop: "Pos", name: "Pos", anonymous: false, exported: true, typ: $Int, tag: ""}]);
 	$init = function() {
 		$pkg.$init = function() {};
 		/* */ var $f, $c = false, $s = 0, $r; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
@@ -29922,7 +29922,7 @@ $packages["."] = (function() {
 	var $pkg = {}, $init, json, js, gradientql, funcType, parse, main;
 	json = $packages["encoding/json"];
 	js = $packages["github.com/gopherjs/gopherjs/js"];
-	gradientql = $packages["github.com/sanity-io/gradient/pkg/search/gradientql"];
+	gradientql = $packages["github.com/VegaPublish/lyra/pkg/search/gradientql"];
 	funcType = $funcType([$String, gradientql.Params], [$String, $error], false);
 	parse = function(query, params) {
 		var _r, _r$1, _tuple, _tuple$1, err, expr, json$1, params, query, $s, $r;

@@ -61,10 +61,10 @@ module.exports = class Patch {
   }
 
   splice(selector, start, deleteCount, items) {
-    // Negative indexes doesn't mean the same in Sanity as they do in JS;
+    // Negative indexes doesn't mean the same in Lyra as they do in JS;
     // -1 means "actually at the end of the array", which allows inserting
     // at the end of the array without knowing its length. We therefore have
-    // to substract negative indexes by one to match JS. If you want Sanity-
+    // to substract negative indexes by one to match JS. If you want Lyra-
     // behaviour, just use `insert('replace', selector, items)` directly
     const delAll = typeof deleteCount === 'undefined' || deleteCount === -1
     const startIndex = start < 0 ? start - 1 : start
