@@ -394,4 +394,64 @@ describe('userCapabilityDiviner', () => {
       isSubmitterInArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
     })
   })
+
+  test('recognizes issue editor in featureState', async () => {
+    const issueEditor = await createUser()
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article'
+    })
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      content: [
+        {
+          _type: 'section',
+          title: 'A Section',
+          articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
+        }
+      ],
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
+    })
+
+    await createDocument({
+      _id: 'FEATURESTATEID1234',
+      _type: 'featureState',
+      article: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(issueEditor._id)
+    expect(capabilities).toMatchObject({
+      isEditorInIssueWithArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
+    })
+  })
+
+  test('recognizes track editor in featureState', async () => {
+    const trackEditor = await createUser()
+
+    const track = await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
+    })
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      track: {_type: 'reference', _ref: track._id}
+    })
+
+    await createDocument({
+      _id: 'FEATURESTATEID1234',
+      _type: 'featureState',
+      article: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(trackEditor._id)
+    expect(capabilities).toMatchObject({
+      isEditorInTrackWithArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
+    })
+  })
 })

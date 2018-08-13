@@ -177,6 +177,21 @@ class UserCapabilityDiviner {
       .then(articleIds => `subject._ref in ${quoteItems(articleIds)}`)
   }
 
+  isEditorInIssueWithArticleInFeatureState() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue.articleIds))
+      .then(nestedArticleIds => flatten(nestedArticleIds))
+      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+  }
+
+  isEditorInTrackWithArticleInFeatureState() {
+    return this.tracksWhereUserIsEditor()
+      .then(tracks => tracks.map(track => track._id))
+      .then(trackIds => this.articlesInTracks(trackIds))
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+  }
+
   runAll() {
     return Promise.all([
       this.isVenueEditor(),
@@ -191,7 +206,9 @@ class UserCapabilityDiviner {
       this.isReviewer(),
       this.isEditorInIssueWithArticleInReviewItem(),
       this.isEditorInTrackWithArticleInReviewItem(),
-      this.isSubmitterInArticleInFeatureState()
+      this.isSubmitterInArticleInFeatureState(),
+      this.isEditorInIssueWithArticleInFeatureState(),
+      this.isEditorInTrackWithArticleInFeatureState()
     ]).then(
       ([
         isVenueEditor,
@@ -206,7 +223,9 @@ class UserCapabilityDiviner {
         isReviewer,
         isEditorInIssueWithArticleInReviewItem,
         isEditorInTrackWithArticleInReviewItem,
-        isSubmitterInArticleInFeatureState
+        isSubmitterInArticleInFeatureState,
+        isEditorInIssueWithArticleInFeatureState,
+        isEditorInTrackWithArticleInFeatureState
       ]) => {
         return {
           isVenueEditor: !!isVenueEditor,
@@ -221,7 +240,9 @@ class UserCapabilityDiviner {
           isReviewer,
           isEditorInIssueWithArticleInReviewItem,
           isEditorInTrackWithArticleInReviewItem,
-          isSubmitterInArticleInFeatureState
+          isSubmitterInArticleInFeatureState,
+          isEditorInIssueWithArticleInFeatureState,
+          isEditorInTrackWithArticleInFeatureState
         }
       }
     )

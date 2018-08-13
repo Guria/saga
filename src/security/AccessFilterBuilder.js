@@ -69,10 +69,11 @@ class AccessFilterBuilder {
       case 'featureConfig':
         return '_type == "featureConfig"'
       case 'featureState':
-        // TODO: track and issue editors for the article
         return `_type == "featureState" && (${capabilities.isVenueEditor} || ${
           capabilities.isSubmitterInArticleInFeatureState
-        })`
+        } || ${capabilities.isEditorInIssueWithArticleInFeatureState}) || ${
+          capabilities.isEditorInTrackWithArticleInFeatureState
+        }`
       default:
         return 'false'
     }
