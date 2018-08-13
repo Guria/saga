@@ -47,7 +47,7 @@ class AccessFilterBuilder {
       case 'article':
         return `_type == "article" && (${capabilities.isVenueEditor} || ${
           capabilities.isEditorInArticleTrack
-        } || ${capabilities.isEditorInArticleIssues}) || ${capabilities.isSubmitterInArticle})`
+        } || ${capabilities.isEditorInArticleIssues} || ${capabilities.isSubmitterInArticle})`
       case 'comment':
         return `_type == "comment" && (${capabilities.isCommentAuthor} || ${
           capabilities.isVenueEditor

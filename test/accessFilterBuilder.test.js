@@ -67,7 +67,7 @@ describe('accessFilterBuilder', () => {
     })
     const filters = await filtersForUser(unprivilegedUser._id)
     expect(filters).toBeTruthy()
-    const expected = `_type == "venue" || _type == "issue" || _type == "track" || _type == "stage" || _type == "user" || _type == "article" && (false || track._ref in [] || _id in []) || _id in []) || _type == "comment" && (author._ref == "${
+    const expected = `_type == "venue" || _type == "issue" || _type == "track" || _type == "stage" || _type == "user" || _type == "article" && (false || track._ref in [] || _id in [] || _id in []) || _type == "comment" && (author._ref == "${
       unprivilegedUser._id
     }" || false || subject._ref in [] || subject._ref in []) || _type == "reviewProcess" && (false || article._ref in [] || article._ref in []) || _type == "reviewItem" && (false || reviewer._ref == "${
       unprivilegedUser._id
