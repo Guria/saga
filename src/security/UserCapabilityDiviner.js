@@ -69,11 +69,10 @@ class UserCapabilityDiviner {
         _id,
         _type,
         "editor": defined(editors) && length(editors[_ref == $userId])>0
-      }
-    `
-    return this.performQuery(query, {userId: this.userId}).then(tracks => {
-      return tracks.filter(track => !!track.editor)
-    })
+      }`
+    return this.performQuery(query, {userId: this.userId}).then(tracks =>
+      tracks.filter(track => !!track.editor)
+    )
   }
 
   articlesWhereUserIsSubmitter() {
@@ -81,11 +80,10 @@ class UserCapabilityDiviner {
         _id,
         _type,
         "submitter": defined(submitters) && length(submitters[_ref == $userId])>0
-      }
-    `
-    return this.performQuery(query, {userId: this.userId}).then(articles => {
-      return articles.filter(article => !!article.submitter)
-    })
+      }`
+    return this.performQuery(query, {userId: this.userId}).then(articles =>
+      articles.filter(article => !!article.submitter)
+    )
   }
 
   // Find all issues where user is editor. Bring along articleIds
@@ -95,40 +93,35 @@ class UserCapabilityDiviner {
         _type,
         "editor": defined(editors) && length(editors[_ref == $userId])>0,
         "articleIds": content[].articles[]._ref
-      }
-    `
-    return this.performQuery(query, {userId: this.userId}).then(issues => {
-      return issues.filter(issue => !!issue.editor)
-    })
+      }`
+    return this.performQuery(query, {userId: this.userId}).then(issues =>
+      issues.filter(issue => !!issue.editor)
+    )
   }
 
-  // does article.track reference any of these tracks
   isEditorInArticleTrack() {
-    return this.tracksWhereUserIsEditor().then(tracks => {
-      return `track._ref in ${quoteItems(tracks.map(track => track._id))}`
-    })
+    return this.tracksWhereUserIsEditor()
+      .then(tracks => tracks.map(track => track._id))
+      .then(trackIds => `track._ref in ${quoteItems(trackIds)}`)
   }
 
-  // Do any of these issues also reference article
   isEditorInArticleIssues() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
-      .then(articleIds => {
-        const flattenedArticleIds = flatten(articleIds)
-        return `_id in ${quoteItems(flattenedArticleIds)}`
-      })
+      .then(nestedArticleIds => flatten(nestedArticleIds))
+      .then(articleIds => `_id in ${quoteItems(articleIds)}`)
   }
 
   isSubmitterInArticle() {
-    return this.articlesWhereUserIsSubmitter().then(articles => {
-      return `_id in ${quoteItems(articles.map(article => article._id))}`
-    })
+    return this.articlesWhereUserIsSubmitter()
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => `_id in ${quoteItems(articleIds)}`)
   }
 
   isSubmitterInArticleInFeatureState() {
-    return this.articlesWhereUserIsSubmitter().then(articles => {
-      return `article._ref in ${quoteItems(articles.map(article => article._id))}`
-    })
+    return this.articlesWhereUserIsSubmitter()
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
   }
 
   isCommentAuthor() {
@@ -138,70 +131,50 @@ class UserCapabilityDiviner {
   isEditorInIssueWithArticleInReviewProcess() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
-      .then(articleIds => {
-        const flattenedArticleIds = flatten(articleIds)
-        return `article._ref in ${quoteItems(flattenedArticleIds)}`
-      })
+      .then(nestedArticleIds => flatten(nestedArticleIds))
+      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
   }
 
   isEditorInIssueWithArticleInReviewItem() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
-      .then(articleIds => {
-        const flattenedArticleIds = flatten(articleIds)
-        return this.reviewProcessesByArticles(flattenedArticleIds).then(reviewProcesses => {
-          const ids = reviewProcesses.map(rp => rp._id)
-          return `reviewProcess._ref in ${quoteItems(ids)}`
-        })
-      })
-  }
-
-  isEditorInTrackWithArticleInReviewItem() {
-    return this.tracksWhereUserIsEditor().then(tracks => {
-      const trackIds = tracks.map(track => track._id)
-      return this.articlesInTracks(trackIds).then(articles => {
-        const articleIds = articles.map(article => article._id)
-        return this.reviewProcessesByArticles(articleIds).then(reviewProcesses => {
-          const ids = reviewProcesses.map(rp => rp._id)
-          return `reviewProcess._ref in ${quoteItems(ids)}`
-        })
-      })
-    })
+      .then(nestedArticleIds => flatten(nestedArticleIds))
+      .then(articleIds => this.reviewProcessesByArticles(articleIds))
+      .then(reviewProcesses => reviewProcesses.map(rp => rp._id))
+      .then(reviewProcessIds => `reviewProcess._ref in ${quoteItems(reviewProcessIds)}`)
   }
 
   isEditorInTrackWithArticleInReviewProcess() {
-    return this.tracksWhereUserIsEditor().then(tracks => {
-      // user is editor in these tracks
-      const trackIds = tracks.map(track => track._id)
-      return this.articlesInTracks(trackIds).then(articles => {
-        // articles in aforementioned tracks
-        const articleIds = articles.map(article => article._id)
-        // reviewProcess reffing those articles
-        return `article._ref in ${quoteItems(articleIds)}`
-      })
-    })
+    return this.tracksWhereUserIsEditor()
+      .then(tracks => tracks.map(track => track._id))
+      .then(trackIds => this.articlesInTracks(trackIds))
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+  }
+
+  isEditorInTrackWithArticleInReviewItem() {
+    return this.tracksWhereUserIsEditor()
+      .then(tracks => tracks.map(track => track._id))
+      .then(trackIds => this.articlesInTracks(trackIds))
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => this.reviewProcessesByArticles(articleIds))
+      .then(reviewProcesses => reviewProcesses.map(rp => rp._id))
+      .then(reviewProcessIds => `reviewProcess._ref in ${quoteItems(reviewProcessIds)}`)
   }
 
   isEditorInIssueWithArticleInComment() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
-      .then(articleIds => {
-        const flattenedArticleIds = flatten(articleIds)
-        return `subject._ref in ${quoteItems(flattenedArticleIds)}`
-      })
+      .then(nestedArticleIds => flatten(nestedArticleIds))
+      .then(articleIds => `subject._ref in ${quoteItems(articleIds)}`)
   }
 
   isEditorInTrackWithArticleInComment() {
-    return this.tracksWhereUserIsEditor().then(tracks => {
-      // user is editor in these tracks
-      const trackIds = tracks.map(track => track._id)
-      return this.articlesInTracks(trackIds).then(articles => {
-        // articles in aforementioned tracks
-        const articleIds = articles.map(article => article._id)
-        // comment reffing any of those articles
-        return `subject._ref in ${quoteItems(articleIds)}`
-      })
-    })
+    return this.tracksWhereUserIsEditor()
+      .then(tracks => tracks.map(track => track._id))
+      .then(trackIds => this.articlesInTracks(trackIds))
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => `subject._ref in ${quoteItems(articleIds)}`)
   }
 
   runAll() {

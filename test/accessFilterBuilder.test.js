@@ -59,7 +59,7 @@ describe('accessFilterBuilder', () => {
     ))
 
   // This test will eventually evaluate a single mega-pile of filters
-  test('denies read access only to unprivileged user', async () => {
+  xtest('denies read access only to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
     await createDocument({
       _type: 'venue',
