@@ -1,3 +1,5 @@
+/* eslint-disable complexity */
+
 import {uniq} from 'lodash'
 const UserCapabilityDiviner = require('./UserCapabilityDiviner')
 const documentTypes = [
@@ -15,6 +17,17 @@ const documentTypes = [
   'featureState'
 ]
 
+function parenthesisify(item) {
+  return `(${item})`
+}
+
+function querifyItems(items) {
+  const uniqeItems = uniq(items).filter(Boolean)
+  return `(${uniqeItems
+    .map(item => (uniqeItems.length === 1 ? item : parenthesisify(item)))
+    .join(' || ')})`
+}
+
 class AccessFilterBuilder {
   constructor(userId, dataStore, venueId) {
     this.userId = userId
@@ -30,7 +43,6 @@ class AccessFilterBuilder {
     return this.userCapabilities
   }
 
-  // eslint-disable-next-line complexity
   canRead(type) {
     const capabilities = this.userCapabilities
     switch (type) {
@@ -45,35 +57,43 @@ class AccessFilterBuilder {
       case 'user':
         return '_type == "user"'
       case 'article':
-        return `_type == "article" && (${capabilities.isVenueEditor} || ${
-          capabilities.isEditorInArticleTrack
-        } || ${capabilities.isEditorInArticleIssues} || ${capabilities.isSubmitterInArticle})`
+        return `_type == "article" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInArticleTrack,
+          capabilities.isEditorInArticleIssues,
+          capabilities.isSubmitterInArticle
+        ])}`
       case 'comment':
-        return `_type == "comment" && (${capabilities.isCommentAuthor} || ${
-          capabilities.isVenueEditor
-        } || ${capabilities.isEditorInTrackWithArticleInComment} || ${
+        return `_type == "comment" && ${querifyItems([
+          capabilities.isCommentAuthor,
+          capabilities.isVenueEditor,
+          capabilities.isEditorInTrackWithArticleInComment,
           capabilities.isEditorInIssueWithArticleInComment
-        })`
+        ])}`
       case 'reviewProcess':
-        return `_type == "reviewProcess" && (${capabilities.isVenueEditor} || ${
-          capabilities.isEditorInIssueWithArticleInReviewProcess
-        } || ${capabilities.isEditorInTrackWithArticleInReviewProcess})`
+        return `_type == "reviewProcess" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInIssueWithArticleInReviewProcess,
+          capabilities.isEditorInTrackWithArticleInReviewProcess
+        ])}`
       case 'reviewItem':
-        return `_type == "reviewItem" && (${capabilities.isVenueEditor} || ${
-          capabilities.isReviewer
-        } || ${capabilities.isEditorInIssueWithArticleInReviewItem} || ${
+        return `_type == "reviewItem" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isReviewer,
+          capabilities.isEditorInIssueWithArticleInReviewItem,
           capabilities.isEditorInTrackWithArticleInReviewItem
-        })`
+        ])}`
       case 'reviewPolicy':
         return '_type == "reviewPolicy"'
       case 'featureConfig':
         return '_type == "featureConfig"'
       case 'featureState':
-        return `_type == "featureState" && (${capabilities.isVenueEditor} || ${
-          capabilities.isSubmitterInArticleInFeatureState
-        } || ${capabilities.isEditorInIssueWithArticleInFeatureState}) || ${
+        return `_type == "featureState" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isSubmitterInArticleInFeatureState,
+          capabilities.isEditorInIssueWithArticleInFeatureState,
           capabilities.isEditorInTrackWithArticleInFeatureState
-        }`
+        ])}`
       default:
         return 'false'
     }
@@ -93,14 +113,15 @@ class AccessFilterBuilder {
 
   async determineFilters() {
     await this.prefetchAllCapabilities()
-    // console.log('----->', this.userCapabilities.read)
 
-    return {
-      read: uniq(documentTypes.map(type => this.canRead(type))).join(' || '),
-      create: uniq(documentTypes.map(type => this.canCreate(type))).join(' || '),
-      update: uniq(documentTypes.map(type => this.canUpdate(type))).join(' || '),
-      delete: uniq(documentTypes.map(type => this.canDelete(type))).join(' || ')
+    const result = {
+      read: querifyItems(documentTypes.map(type => this.canRead(type))),
+      create: querifyItems(documentTypes.map(type => this.canCreate(type))),
+      update: querifyItems(documentTypes.map(type => this.canUpdate(type))),
+      delete: querifyItems(documentTypes.map(type => this.canDelete(type)))
     }
+    //console.log('----->', result)
+    return result
   }
 }
 

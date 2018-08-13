@@ -59,7 +59,7 @@ describe('accessFilterBuilder', () => {
     ))
 
   // This test will eventually evaluate a single mega-pile of filters
-  xtest('denies read access only to unprivileged user', async () => {
+  test('denies read access only to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
     await createDocument({
       _type: 'venue',
@@ -67,11 +67,11 @@ describe('accessFilterBuilder', () => {
     })
     const filters = await filtersForUser(unprivilegedUser._id)
     expect(filters).toBeTruthy()
-    const expected = `_type == "venue" || _type == "issue" || _type == "track" || _type == "stage" || _type == "user" || _type == "article" && (false || track._ref in [] || _id in [] || _id in []) || _type == "comment" && (author._ref == "${
+    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
       unprivilegedUser._id
-    }" || false || subject._ref in [] || subject._ref in []) || _type == "reviewProcess" && (false || article._ref in [] || article._ref in []) || _type == "reviewItem" && (false || reviewer._ref == "${
+    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((reviewer._ref == "${
       unprivilegedUser._id
-    }" || reviewProcess._ref in [] || reviewProcess._ref in []) || _type == "reviewPolicy" || _type == "featureConfig" || _type == "featureState" && (false || article._ref in [])`
+    }") || (false))) || (_type == "reviewPolicy") || (_type == "featureConfig") || (_type == "featureState" && (false)))`
     expect(filters.read).toEqual(expected)
   })
 })

@@ -8,6 +8,10 @@ function quoteItems(items) {
   return `[${items.map(quote).join(',')}]`
 }
 
+function isValueInArrayQuery(valueName, ids = []) {
+  return ids.length > 0 ? `${valueName} in ${quoteItems(ids)}` : 'false'
+}
+
 // A collection of queries used by AccessFilterBuilder
 // They all assume that query params will include {userId: userId}
 class UserCapabilityDiviner {
@@ -59,11 +63,6 @@ class UserCapabilityDiviner {
     return this.performQuery(query, {userId: this.userId})
   }
 
-  isReviewer() {
-    return `reviewer._ref == "${this.userId}"`
-  }
-
-  // Find all tracks where user is editor
   tracksWhereUserIsEditor() {
     const query = `*[_type == "track" && references($userId)]{
         _id,
@@ -102,26 +101,30 @@ class UserCapabilityDiviner {
   isEditorInArticleTrack() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
-      .then(trackIds => `track._ref in ${quoteItems(trackIds)}`)
+      .then(trackIds => isValueInArrayQuery('track._ref', trackIds))
   }
 
   isEditorInArticleIssues() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => `_id in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('_id', articleIds))
   }
 
   isSubmitterInArticle() {
     return this.articlesWhereUserIsSubmitter()
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => `_id in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('_id', articleIds))
   }
 
   isSubmitterInArticleInFeatureState() {
     return this.articlesWhereUserIsSubmitter()
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
+  }
+
+  isReviewer() {
+    return `reviewer._ref == "${this.userId}"`
   }
 
   isCommentAuthor() {
@@ -132,7 +135,7 @@ class UserCapabilityDiviner {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
   }
 
   isEditorInIssueWithArticleInReviewItem() {
@@ -141,7 +144,7 @@ class UserCapabilityDiviner {
       .then(nestedArticleIds => flatten(nestedArticleIds))
       .then(articleIds => this.reviewProcessesByArticles(articleIds))
       .then(reviewProcesses => reviewProcesses.map(rp => rp._id))
-      .then(reviewProcessIds => `reviewProcess._ref in ${quoteItems(reviewProcessIds)}`)
+      .then(reviewProcessIds => isValueInArrayQuery('reviewProcess._ref', reviewProcessIds))
   }
 
   isEditorInTrackWithArticleInReviewProcess() {
@@ -149,7 +152,7 @@ class UserCapabilityDiviner {
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
   }
 
   isEditorInTrackWithArticleInReviewItem() {
@@ -159,14 +162,14 @@ class UserCapabilityDiviner {
       .then(articles => articles.map(article => article._id))
       .then(articleIds => this.reviewProcessesByArticles(articleIds))
       .then(reviewProcesses => reviewProcesses.map(rp => rp._id))
-      .then(reviewProcessIds => `reviewProcess._ref in ${quoteItems(reviewProcessIds)}`)
+      .then(reviewProcessIds => isValueInArrayQuery('reviewProcess._ref', reviewProcessIds))
   }
 
   isEditorInIssueWithArticleInComment() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => `subject._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('subject._ref', articleIds))
   }
 
   isEditorInTrackWithArticleInComment() {
@@ -174,14 +177,14 @@ class UserCapabilityDiviner {
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => `subject._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('subject._ref', articleIds))
   }
 
   isEditorInIssueWithArticleInFeatureState() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
   }
 
   isEditorInTrackWithArticleInFeatureState() {
@@ -189,7 +192,7 @@ class UserCapabilityDiviner {
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => `article._ref in ${quoteItems(articleIds)}`)
+      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
   }
 
   runAll() {
