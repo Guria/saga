@@ -44,6 +44,13 @@ class UserCapabilityDiviner {
     return this.performQuery(query)
   }
 
+  reviewProcessesByArticles(articleIds) {
+    const query = `*[_type=="reviewProcess" && article._ref in ${quoteItems(articleIds)}]{
+      _id, _type
+    }`
+    return this.performQuery(query)
+  }
+
   isVenueEditor() {
     const query = `*[_type=="venue" && references($userId)][0]{
       _id, _type,
@@ -142,9 +149,24 @@ class UserCapabilityDiviner {
       .then(issues => issues.map(issue => issue.articleIds))
       .then(articleIds => {
         const flattenedArticleIds = flatten(articleIds)
-        // PICKUP HERE reviewprocessess for article ids
-        return `article._ref in ${quoteItems(flattenedArticleIds)}`
+        return this.reviewProcessesByArticles(flattenedArticleIds).then(reviewProcesses => {
+          const ids = reviewProcesses.map(rp => rp._id)
+          return `reviewProcess._ref in ${quoteItems(ids)}`
+        })
       })
+  }
+
+  isEditorInTrackWithArticleInReviewItem() {
+    return this.tracksWhereUserIsEditor().then(tracks => {
+      const trackIds = tracks.map(track => track._id)
+      return this.articlesInTracks(trackIds).then(articles => {
+        const articleIds = articles.map(article => article._id)
+        return this.reviewProcessesByArticles(articleIds).then(reviewProcesses => {
+          const ids = reviewProcesses.map(rp => rp._id)
+          return `reviewProcess._ref in ${quoteItems(ids)}`
+        })
+      })
+    })
   }
 
   isEditorInTrackWithArticleInReviewProcess() {
@@ -195,6 +217,7 @@ class UserCapabilityDiviner {
       this.isEditorInTrackWithArticleInReviewProcess(),
       this.isReviewer(),
       this.isEditorInIssueWithArticleInReviewItem(),
+      this.isEditorInTrackWithArticleInReviewItem(),
       this.isSubmitterInArticleInFeatureState()
     ]).then(
       ([
@@ -209,6 +232,7 @@ class UserCapabilityDiviner {
         isEditorInTrackWithArticleInReviewProcess,
         isReviewer,
         isEditorInIssueWithArticleInReviewItem,
+        isEditorInTrackWithArticleInReviewItem,
         isSubmitterInArticleInFeatureState
       ]) => {
         return {
@@ -223,6 +247,7 @@ class UserCapabilityDiviner {
           isEditorInTrackWithArticleInReviewProcess,
           isReviewer,
           isEditorInIssueWithArticleInReviewItem,
+          isEditorInTrackWithArticleInReviewItem,
           isSubmitterInArticleInFeatureState
         }
       }

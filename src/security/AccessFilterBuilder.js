@@ -59,10 +59,11 @@ class AccessFilterBuilder {
           capabilities.isEditorInIssueWithArticleInReviewProcess
         } || ${capabilities.isEditorInTrackWithArticleInReviewProcess})`
       case 'reviewItem':
-        // TODO: track and issue editors for the article being reviewed
         return `_type == "reviewItem" && (${capabilities.isVenueEditor} || ${
           capabilities.isReviewer
-        } || ${capabilities.isEditorInIssueWithArticleInReviewItem})`
+        } || ${capabilities.isEditorInIssueWithArticleInReviewItem} || ${
+          capabilities.isEditorInTrackWithArticleInReviewItem
+        })`
       case 'reviewPolicy':
         return '_type == "reviewPolicy"'
       case 'featureConfig':
@@ -91,7 +92,7 @@ class AccessFilterBuilder {
 
   async determineFilters() {
     await this.prefetchAllCapabilities()
-    console.log('----->', this.userCapabilities.read)
+    // console.log('----->', this.userCapabilities.read)
 
     return {
       read: uniq(documentTypes.map(type => this.canRead(type))).join(' || '),

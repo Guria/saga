@@ -287,6 +287,39 @@ describe('userCapabilityDiviner', () => {
     })
   })
 
+  test('recognizes track editor in reviewItem', async () => {
+    const trackEditor = await createUser()
+
+    const track = await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
+    })
+
+    await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      track: {_type: 'reference', _ref: track._id}
+    })
+
+    await createDocument({
+      _id: 'REVIEWPROCESSID1234',
+      _type: 'reviewProcess',
+      article: {_type: 'reference', _ref: 'ARTICLEID1234'}
+    })
+
+    await createDocument({
+      _id: 'REVIEWITEMID1234',
+      _type: 'reviewItem',
+      reviewProcess: {_type: 'reference', _ref: 'REVIEWPROCESSID1234'}
+    })
+
+    const capabilities = await capabilitiesForUser(trackEditor._id)
+    expect(capabilities).toMatchObject({
+      isEditorInTrackWithArticleInReviewItem: 'reviewProcess._ref in ["REVIEWPROCESSID1234"]'
+    })
+  })
+
   test('recognizes a reviewer', async () => {
     const reviewerUser = await createUser()
 
@@ -323,7 +356,7 @@ describe('userCapabilityDiviner', () => {
       editors: [{_type: 'reference', _ref: issueEditorUser._id}]
     })
 
-    const reviewProcess = await createDocument({
+    await createDocument({
       _id: 'REVIEWPROCESSID1234',
       _type: 'reviewProcess',
       article: {_type: 'reference', _ref: 'ARTICLEID1234'}
@@ -332,12 +365,12 @@ describe('userCapabilityDiviner', () => {
     await createDocument({
       _id: 'REVIEWITEMID1234',
       _type: 'reviewItem',
-      reviewProcess: {_type: 'reference', _ref: reviewProcess._id}
+      reviewProcess: {_type: 'reference', _ref: 'REVIEWPROCESSID1234'}
     })
 
     const capabilities = await capabilitiesForUser(issueEditorUser._id)
     expect(capabilities).toMatchObject({
-      isEditorInIssueWithArticleInReviewItem: 'article._ref in ["ARTICLEID1234"]'
+      isEditorInIssueWithArticleInReviewItem: 'reviewProcess._ref in ["REVIEWPROCESSID1234"]'
     })
   })
 
