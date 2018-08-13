@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/VegaPublish/saga#readme",
   "dependencies": {
-    "@saga/mutator": "^0.0.3",
+    "@lyra/mutator": "^0.0.3",
     "body-parser": "^1.18.3",
     "boom": "^5.2.0",
     "celebrate": "^7.0.6",

@@ -1,7 +1,7 @@
 const EventEmitter = require('events')
 const PQueue = require('p-queue')
 const {find, isEqual} = require('lodash')
-const {Patcher} = require('@saga/mutator')
+const {Patcher} = require('@lyra/mutator')
 const {query: execQuery} = require('../groq')
 const Transaction = require('./Transaction')
 const TransactionError = require('./errors/TransactionError')
