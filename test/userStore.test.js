@@ -22,7 +22,7 @@ describe('query', () => {
 
   afterEach(() =>
     Promise.all(
-      ['lyra-system-test', 'lyra-test'].map(dsName =>
+      ['saga-system-test', 'saga-test'].map(dsName =>
         app.services.dataStore.forDataset(dsName).then(ds => ds.truncate())
       )
     ))
@@ -57,17 +57,17 @@ describe('query', () => {
     const ident = await userStore.createIdentity(identity)
     expect(ident).toMatchObject(identity)
 
-    const stub = await userStore.createAdminUser({}, 'lyra-test')
+    const stub = await userStore.createAdminUser({}, 'saga-test')
     expect(stub).toMatchObject({isAdmin: true})
 
-    const claimed = await userStore.claimUser(stub._id, ident._id, 'lyra-test', {
+    const claimed = await userStore.claimUser(stub._id, ident._id, 'saga-test', {
       name: 'Espen',
       arb: 'i'
     })
     expect(claimed).toMatchObject({isAdmin: true, identity: ident._id, name: 'Espen'})
     expect(claimed).not.toHaveProperty('arb')
 
-    const {globalUser, venueUser} = await userStore.fetchUsersForIdentity(ident._id, 'lyra-test')
+    const {globalUser, venueUser} = await userStore.fetchUsersForIdentity(ident._id, 'saga-test')
     expect(venueUser).toMatchObject(claimed)
     expect(globalUser).toBe(null)
   })

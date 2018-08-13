@@ -15,8 +15,8 @@ describe('invitations', () => {
 
     dataStore = app.services.dataStore
     return Promise.all([
-      dataStore.forDataset('lyra-test').then(ds => ds.truncate()),
-      dataStore.forDataset('lyra-system-test').then(ds => ds.truncate())
+      dataStore.forDataset('saga-test').then(ds => ds.truncate()),
+      dataStore.forDataset('saga-system-test').then(ds => ds.truncate())
     ])
   })
 
@@ -25,7 +25,7 @@ describe('invitations', () => {
   test('can fetch invitations by id', async () => {
     const invite = await createMockInvite(dataStore)
     return request(app)
-      .get(`/v1/invitations/${invite._id}?venueId=lyra-test`)
+      .get(`/v1/invitations/${invite._id}?venueId=saga-test`)
       .expect(200)
       .then(res => expect(res.body).toMatchObject(invite))
   })
@@ -34,7 +34,7 @@ describe('invitations', () => {
     const invite = await createMockInvite(dataStore)
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=lyra-test`)
+      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -48,7 +48,7 @@ describe('invitations', () => {
     const invite = await createMockInvite(dataStore)
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=lyra-test`)
+      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -58,7 +58,7 @@ describe('invitations', () => {
       .expect('Location', '/v1/users/me')
 
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=lyra-test`)
+      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -75,7 +75,7 @@ describe('invitations', () => {
     })
 
     const agent = request.agent(app)
-    await agent.post(`/v1/invitations/claim/${invite._id}?venueId=lyra-test`).then(res =>
+    await agent.post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`).then(res =>
       expect(res.body).toMatchObject({
         error: 'Unauthorized',
         message: 'Valid session required to claim invitation',
@@ -90,10 +90,10 @@ describe('invitations', () => {
       _type: 'user'
     })
 
-    const session = await createUserlessSession(app, 'lyra-test')
+    const session = await createUserlessSession(app, 'saga-test')
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=lyra-test`)
+      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .set('Cookie', getSessionCookie(app, session))
       .expect(200, {claimed: true})
   })
@@ -104,10 +104,10 @@ describe('invitations', () => {
       _type: 'user'
     })
 
-    const session = await createUserlessSession(app, 'lyra-test')
+    const session = await createUserlessSession(app, 'saga-test')
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=lyra-test`)
+      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .set('Cookie', getSessionCookie(app, session))
       .expect(200, {claimed: true})
   })
@@ -143,7 +143,7 @@ describe('invitations', () => {
         rootInviteId = res.body
       })
 
-    const session = await createUserlessSession(app, 'lyra-test')
+    const session = await createUserlessSession(app, 'saga-test')
     await agent
       .post(`/v1/invitations/claim/${rootInviteId}`)
       .set('Cookie', getSessionCookie(app, session))
@@ -158,7 +158,7 @@ describe('invitations', () => {
 
 async function createMockInvite(dataStore, userObject = null) {
   const user = userObject || {_id: 'someGuestId', _type: 'guest', isRevoked: false}
-  const ds = await dataStore.forDataset('lyra-test')
+  const ds = await dataStore.forDataset('saga-test')
   const trx = ds.newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
   const invite = {
     _id: 'someRandomStringOfSufficientLength',

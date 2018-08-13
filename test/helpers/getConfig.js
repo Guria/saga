@@ -7,7 +7,7 @@ const defaultConfig = require('../../src/config')
 const executionId = randomstring()
 
 const getTestConfig = () => {
-  const testId = uniqueId(`lyra-test-${executionId}-`)
+  const testId = uniqueId(`saga-test-${executionId}-`)
   return {
     env: 'test',
     logLevel: 'warn',

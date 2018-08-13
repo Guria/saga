@@ -14,7 +14,7 @@ module.exports = async (req, res, next) => {
 
   // Verify that the session has access to create the document
   const doc = removeUndefined({
-    _type: `lyra.fileAsset`,
+    _type: `saga.fileAsset`,
     label,
     title,
     description,

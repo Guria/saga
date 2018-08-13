@@ -1,4 +1,4 @@
-const assetTypes = ['lyra.imageAsset', 'lyra.fileAsset']
+const assetTypes = ['saga.imageAsset', 'saga.fileAsset']
 
 module.exports = async (app, evt) => {
   if (!evt.previous || !assetTypes.includes(evt.previous._type)) {

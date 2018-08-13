@@ -16,8 +16,8 @@ describe('query', () => {
 
     const dataStore = app.services.dataStore
     await Promise.all([
-      dataStore.forDataset('lyra-test').then(ds => ds.truncate()),
-      dataStore.forDataset('lyra-system-test').then(ds => ds.truncate())
+      dataStore.forDataset('saga-test').then(ds => ds.truncate()),
+      dataStore.forDataset('saga-system-test').then(ds => ds.truncate())
     ])
 
     adminUser = await createAdminUser(app)
@@ -33,7 +33,7 @@ describe('query', () => {
     }
     const transactionId = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .post('/v1/data/mutate/saga-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
         mutations: [
@@ -54,7 +54,7 @@ describe('query', () => {
       })
 
     await request(app)
-      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent(`*[_id == "${doc._id}"]`)}`)
+      .get(`/v1/data/query/saga-test/?query=${encodeURIComponent(`*[_id == "${doc._id}"]`)}`)
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
@@ -79,7 +79,7 @@ describe('query', () => {
     }
     const transactionId = uuid()
     await request(app)
-      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .post('/v1/data/mutate/saga-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
         mutations: [
@@ -108,7 +108,7 @@ describe('query', () => {
 
     await request(app)
       .get(
-        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+        `/v1/data/query/saga-test/?query=${encodeURIComponent(
           `*[_id == "foo"]{isBar, "bar": bar->{isBar}}`
         )}`
       )
@@ -125,7 +125,7 @@ describe('query', () => {
       })
 
     await request(app)
-      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent('*[references("bar")]{_id}')}`)
+      .get(`/v1/data/query/saga-test/?query=${encodeURIComponent('*[references("bar")]{_id}')}`)
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
@@ -179,7 +179,7 @@ describe('query', () => {
       ]
     }
     await request(app)
-      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .post('/v1/data/mutate/saga-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
         mutations: [baz1, baz2, bar1, bar2, foo].map(create => ({
@@ -190,7 +190,7 @@ describe('query', () => {
 
     await request(app)
       .get(
-        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+        `/v1/data/query/saga-test/?query=${encodeURIComponent(
           `*[_id == "foo"]{isBar, "refs": refs[]->{
             _id, isBar, "bazs": bazs[]->{_id, isBaz}
           }}`
@@ -226,7 +226,7 @@ describe('query', () => {
       })
 
     await request(app)
-      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent('*[references("bar1")]{_id}')}`)
+      .get(`/v1/data/query/saga-test/?query=${encodeURIComponent('*[references("bar1")]{_id}')}`)
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {
@@ -278,7 +278,7 @@ describe('query', () => {
       .map(doc => doc.i)
 
     await request(app)
-      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .post('/v1/data/mutate/saga-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
         mutations: documents.map(create => ({
@@ -289,7 +289,7 @@ describe('query', () => {
 
     await request(app)
       .get(
-        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+        `/v1/data/query/saga-test/?query=${encodeURIComponent(
           `*[_type == "test"] | order (i asc) [1...6]`
         )}`
       )
@@ -354,7 +354,7 @@ describe('query', () => {
       .map(doc => doc.i)
 
     await request(app)
-      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .post('/v1/data/mutate/saga-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({
         mutations: documents.map(create => ({
@@ -365,7 +365,7 @@ describe('query', () => {
 
     await request(app)
       .get(
-        `/v1/data/query/lyra-test/?query=${encodeURIComponent(
+        `/v1/data/query/saga-test/?query=${encodeURIComponent(
           `*[_type == "test"] | order(coalesce(i,100) asc) [1...6]`
         )}`
       )
@@ -414,13 +414,13 @@ describe('query', () => {
     ]
 
     await request(app)
-      .post('/v1/data/mutate/lyra-test?returnIds=true')
+      .post('/v1/data/mutate/saga-test?returnIds=true')
       .set('Cookie', getSessionCookie(app, adminUser))
       .send({mutations: documents.map(create => ({create}))})
       .expect(200)
 
     await request(app)
-      .get(`/v1/data/query/lyra-test/?query=${encodeURIComponent(`*["a1" in authors[]._ref]`)}`)
+      .get(`/v1/data/query/saga-test/?query=${encodeURIComponent(`*["a1" in authors[]._ref]`)}`)
       .set('Cookie', getSessionCookie(app, adminUser))
       .expect(200)
       .expect(res => {

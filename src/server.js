@@ -12,7 +12,7 @@ if (config.env === 'production' && config.session.secret === config.DEV_SESSION_
 const server = app(config)
 
 const httpServer = server.listen(config.port, config.hostname, () => {
-  console.log(`Lyra running on http://${config.hostname}:${config.port}`)
+  console.log(`Saga running on http://${config.hostname}:${config.port}`)
 })
 
 wsServer({app: server, wsOptions: {server: httpServer}})

@@ -19,7 +19,7 @@ const validation = celebrate({
 })
 
 /**
- * Get the root invitation token for a brand new vega/lyra installation
+ * Get the root invitation token for a brand new vega/saga installation
  */
 router.get('/root', require('./getRootInvite'))
 

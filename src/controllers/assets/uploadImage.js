@@ -19,7 +19,7 @@ module.exports = async (req, res, next) => {
   }
 
   const doc = removeUndefined({
-    _type: `lyra.imageAsset`,
+    _type: `saga.imageAsset`,
     label,
     title,
     description,

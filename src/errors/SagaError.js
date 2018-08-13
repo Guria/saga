@@ -1,4 +1,4 @@
-class LyraError extends Error {
+class SagaError extends Error {
   constructor(message, options = {}) {
     super(message)
     const {statusCode, payload} = options
@@ -13,4 +13,4 @@ class LyraError extends Error {
   }
 }
 
-module.exports = LyraError
+module.exports = SagaError

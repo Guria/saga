@@ -1,6 +1,6 @@
-const LyraError = require('../../errors/LyraError')
+const SagaError = require('../../errors/SagaError')
 
-class TransactionError extends LyraError {
+class TransactionError extends SagaError {
   constructor(options = {}) {
     const {payload, errors} = options
 

@@ -14,7 +14,7 @@ describe('accessFilterBuilder', () => {
 
   async function getScopedDataStore() {
     if (!scopedDataStore) {
-      scopedDataStore = await app.services.dataStore.forDataset('lyra-test')
+      scopedDataStore = await app.services.dataStore.forDataset('saga-test')
     }
     return scopedDataStore
   }
@@ -22,7 +22,7 @@ describe('accessFilterBuilder', () => {
   async function createUser() {
     const userStore = app.services.userStore
     const identity = await userStore.createIdentity(identityTemplate)
-    const user = await userStore.createUser(identity, 'lyra-test')
+    const user = await userStore.createUser(identity, 'saga-test')
     return user
   }
 
@@ -36,7 +36,7 @@ describe('accessFilterBuilder', () => {
   }
 
   async function filtersForUser(userId) {
-    const filterBuilder = new AccessFilterBuilder(userId, app.services.dataStore, 'lyra-test')
+    const filterBuilder = new AccessFilterBuilder(userId, app.services.dataStore, 'saga-test')
     const filters = await filterBuilder.determineFilters()
     return filters
   }
@@ -53,7 +53,7 @@ describe('accessFilterBuilder', () => {
 
   afterEach(() =>
     Promise.all(
-      ['lyra-system-test', 'lyra-test'].map(dsName =>
+      ['saga-system-test', 'saga-test'].map(dsName =>
         app.services.dataStore.forDataset(dsName).then(ds => ds.truncate())
       )
     ))

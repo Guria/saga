@@ -1,5 +1,5 @@
 {
-  "name": "lyra",
+  "name": "saga",
   "private": true,
   "version": "1.0.0",
   "description": "Backend for Vega",
@@ -16,11 +16,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/VegaPublish/lyra.git"
+    "url": "git+ssh://git@github.com/VegaPublish/saga.git"
   },
   "keywords": [
     "vega",
-    "lyra"
+    "saga"
   ],
   "engines": {
     "node": ">=8.6.0"
@@ -28,11 +28,11 @@
   "author": "Vega Publish <hello@vegapublish.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/VegaPublish/lyra/issues"
+    "url": "https://github.com/VegaPublish/saga/issues"
   },
-  "homepage": "https://github.com/VegaPublish/lyra#readme",
+  "homepage": "https://github.com/VegaPublish/saga#readme",
   "dependencies": {
-    "@lyra/mutator": "^0.0.3",
+    "@saga/mutator": "^0.0.3",
     "body-parser": "^1.18.3",
     "boom": "^5.2.0",
     "celebrate": "^7.0.6",

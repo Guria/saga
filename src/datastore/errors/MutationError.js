@@ -1,6 +1,6 @@
-const LyraError = require('../../errors/LyraError')
+const SagaError = require('../../errors/SagaError')
 
-class MutationError extends LyraError {
+class MutationError extends SagaError {
   constructor(options = {}) {
     const description = options.description || 'An unknown error occured'
     super(description, options)

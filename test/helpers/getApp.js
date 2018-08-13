@@ -1,4 +1,4 @@
-const lyra = require('../../src/app')
+const saga = require('../../src/app')
 const getConfig = require('./getConfig')
 
-module.exports = (config = {}) => lyra(getConfig(config))
+module.exports = (config = {}) => saga(getConfig(config))

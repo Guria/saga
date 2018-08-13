@@ -28,23 +28,23 @@ describe('securityManager', () => {
 
   afterEach(() =>
     Promise.all(
-      ['lyra-system-test', 'lyra-test'].map(dsName =>
+      ['saga-system-test', 'saga-test'].map(dsName =>
         app.services.dataStore.forDataset(dsName).then(ds => ds.truncate())
       )
     ))
 
   test('denies access to unknown user', async () => {
-    const filters = await securityManager.getFilterExpressionsForUser('lyra-test', 'unknownUser')
+    const filters = await securityManager.getFilterExpressionsForUser('saga-test', 'unknownUser')
     expect(filters).toEqual(noAccessFilterExpressions)
   })
 
   test('denies access if no user is given', async () => {
-    const filters = await securityManager.getFilterExpressionsForUser('lyra-test')
+    const filters = await securityManager.getFilterExpressionsForUser('saga-test')
     expect(filters).toEqual(noAccessFilterExpressions)
   })
 
   test('grants full access to system user', async () => {
-    const filters = await securityManager.getFilterExpressionsForUser('lyra-test', '_system_')
+    const filters = await securityManager.getFilterExpressionsForUser('saga-test', '_system_')
     expect(filters).toEqual(fullAccessFilterExpressions)
   })
 
@@ -59,8 +59,8 @@ describe('securityManager', () => {
   test('grants full access to venue admin user', async () => {
     const userStore = app.services.userStore
     const identity = await userStore.createIdentity(identityTemplate)
-    const user = await userStore.createAdminUser(identity, 'lyra-test')
-    const filters = await securityManager.getFilterExpressionsForUser('lyra-test', user.identity)
+    const user = await userStore.createAdminUser(identity, 'saga-test')
+    const filters = await securityManager.getFilterExpressionsForUser('saga-test', user.identity)
     expect(filters).toEqual(fullAccessFilterExpressions)
   })
 })

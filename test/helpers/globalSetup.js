@@ -3,7 +3,7 @@ const MongoDbConnector = require('../../src/datastore/adapters/MongoDB/MongoDbCo
 const config = require('../../src/config')
 
 module.exports = async () => {
-  const dbPrefix = 'lyra-test-'
+  const dbPrefix = 'saga-test-'
   const connector = new MongoDbConnector(config.datastore)
   const client = await connector.connect()
   const db = await client.db('admin')
