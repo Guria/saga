@@ -74,7 +74,8 @@ async function run() {
     open(claimUrl, {wait: false})
   }
 
-  console.log('Goodbye 👋')
+  console.log()
+  console.log(`That's it. Goodbye 👋`)
   dataStore.disconnect()
 }
 
