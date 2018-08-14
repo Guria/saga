@@ -250,15 +250,15 @@ class AccessFilterBuilder {
 
   async determineFilters() {
     await this.prefetchAllCapabilities()
-
-    const result = {
+    console.log('All capabilities', this.userCapabilities)
+    const filters = {
       read: querifyItems(documentTypes.map(type => this.canRead(type))),
       create: querifyItems(documentTypes.map(type => this.canCreate(type))),
       update: querifyItems(documentTypes.map(type => this.canUpdate(type))),
       delete: querifyItems(documentTypes.map(type => this.canDelete(type)))
     }
-    //console.log('----->', result)
-    return result
+    console.log('All filters', filters)
+    return filters
   }
 }
 
