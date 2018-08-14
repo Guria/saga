@@ -455,7 +455,7 @@ describe('userCapabilityDiviner', () => {
     })
   })
 
-  test('recognizes an issue editor', async () => {
+  test('recognizes an editor in any issue', async () => {
     const issueEditor = await createUser()
     const unprivilegedUser = await createUser()
 
@@ -464,8 +464,8 @@ describe('userCapabilityDiviner', () => {
       _type: 'issue',
       editors: [{_type: 'reference', _ref: issueEditor._id}]
     })
-    const trackEditorCapabilities = await capabilitiesForUser(issueEditor._id)
-    expect(trackEditorCapabilities).toMatchObject({
+    const issueEditorCapabilities = await capabilitiesForUser(issueEditor._id)
+    expect(issueEditorCapabilities).toMatchObject({
       isEditorInAnyIssue: true
     })
     const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
@@ -474,7 +474,7 @@ describe('userCapabilityDiviner', () => {
     })
   })
 
-  test('recognizes a track editor', async () => {
+  test('recognizes an editor in any track', async () => {
     const trackEditor = await createUser()
     const unprivilegedUser = await createUser()
 
@@ -490,6 +490,34 @@ describe('userCapabilityDiviner', () => {
     const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
     expect(unprivilegedUserCapabilities).toMatchObject({
       isEditorInAnyTrack: false
+    })
+  })
+
+  test('recognizes an editor in a specific issue', async () => {
+    const issueEditor = await createUser()
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
+    })
+    const capabilities = await capabilitiesForUser(issueEditor._id)
+    expect(capabilities).toMatchObject({
+      isIssueEditor: '_id in ["ISSUEID1234"]'
+    })
+  })
+
+  test('recognizes an editor in a specific track', async () => {
+    const trackEditor = await createUser()
+
+    await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
+    })
+    const capabilities = await capabilitiesForUser(trackEditor._id)
+    expect(capabilities).toMatchObject({
+      isTrackEditor: '_id in ["TRACKID1234"]'
     })
   })
 })

@@ -203,6 +203,18 @@ class UserCapabilityDiviner {
     return this.tracksWhereUserIsEditor().then(tracks => tracks.length > 0)
   }
 
+  isIssueEditor() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue._id))
+      .then(issueIds => isValueInArrayQuery('_id', issueIds))
+  }
+
+  isTrackEditor() {
+    return this.tracksWhereUserIsEditor()
+      .then(tracks => tracks.map(track => track._id))
+      .then(trackIds => isValueInArrayQuery('_id', trackIds))
+  }
+
   runAll() {
     return Promise.all([
       this.isVenueEditor(),
@@ -221,7 +233,9 @@ class UserCapabilityDiviner {
       this.isEditorInIssueWithArticleInFeatureState(),
       this.isEditorInTrackWithArticleInFeatureState(),
       this.isEditorInAnyIssue(),
-      this.isEditorInAnyTrack()
+      this.isEditorInAnyTrack(),
+      this.isIssueEditor(),
+      this.isTrackEditor()
     ]).then(
       ([
         isVenueEditor,
@@ -240,7 +254,9 @@ class UserCapabilityDiviner {
         isEditorInIssueWithArticleInFeatureState,
         isEditorInTrackWithArticleInFeatureState,
         isEditorInAnyIssue,
-        isEditorInAnyTrack
+        isEditorInAnyTrack,
+        isIssueEditor,
+        isTrackEditor
       ]) => {
         return {
           isVenueEditor: !!isVenueEditor,
@@ -259,7 +275,9 @@ class UserCapabilityDiviner {
           isEditorInIssueWithArticleInFeatureState,
           isEditorInTrackWithArticleInFeatureState,
           isEditorInAnyIssue,
-          isEditorInAnyTrack
+          isEditorInAnyTrack,
+          isIssueEditor,
+          isTrackEditor
         }
       }
     )
