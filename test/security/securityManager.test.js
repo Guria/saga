@@ -1,8 +1,8 @@
-const {close, getApp} = require('./helpers')
+const {close, getApp} = require('../helpers')
 const {
   noAccessFilterExpressions,
   fullAccessFilterExpressions
-} = require('../src/security/defaultFilters')
+} = require('../../src/security/defaultFilters')
 
 describe('securityManager', () => {
   const identityTemplate = {
