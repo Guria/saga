@@ -59,7 +59,7 @@ describe('accessFilterBuilder', () => {
     ))
 
   // This test will eventually evaluate a single mega-pile of filters
-  test('denies read access only to unprivileged user', async () => {
+  test('sparse read access to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
     await createDocument({
       _type: 'venue',
@@ -69,9 +69,27 @@ describe('accessFilterBuilder', () => {
     expect(filters).toBeTruthy()
     const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
       unprivilegedUser._id
-    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((reviewer._ref == "${
+    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((false) || (reviewer._ref == "${
       unprivilegedUser._id
-    }") || (false))) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
+    }"))) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
     expect(filters.read).toEqual(expected)
+  })
+
+  test('grants update on comment for comment author', async () => {
+    const author = await createUser()
+
+    await createDocument({
+      _type: 'comment',
+      title: 'Stuff I chew on',
+      author: {_type: 'reference', _ref: author._id}
+    })
+    const filters = await filtersForUser(author._id)
+
+    const expected = `((_type == "venue" && (false)) || (_type == "issue" && (false)) || (_type == "track" && (false)) || (_type == "stage" && (false)) || (_type == "user" && (false)) || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
+      author._id
+    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((false) || (reviewer._ref == "${
+      author._id
+    }"))) || (_type == "featureConfig" && (false)) || (_type == "featureState" && (false)))`
+    expect(filters.update).toEqual(expected)
   })
 })
