@@ -1,7 +1,7 @@
 /* eslint-disable complexity, class-methods-use-this */
 
-import { toObjectOperations } from './objectExpressionOps';
-import { newFunctionCall } from './functions'
+import {toObjectOperations} from './objectExpressionOps'
+import {newFunctionCall} from './functions'
 import debug from '../debug'
 import rewrite from './rewrite'
 
@@ -23,10 +23,7 @@ export default class Composer {
             alias: operation.alias,
             operations: operation.operations.reduce((result, element) => {
               if (element.op == 'source') {
-                return result.concat([
-                  element,
-                  new ops.Filter(filterOperations)
-                ])
+                return result.concat([element, new ops.Filter(filterOperations)])
               }
               return result.concat(element)
             }, [])
@@ -122,8 +119,8 @@ export default class Composer {
       case 'range':
         return new ops.Subscript({
           start: this.compose(node.value.start).value,
-          end: node.value.inclusive ?
-            this.compose(node.value.end).value + 1
+          end: node.value.inclusive
+            ? this.compose(node.value.end).value + 1
             : this.compose(node.value.end).value,
           first: false
         })
@@ -167,9 +164,7 @@ export default class Composer {
 
   nodeEverything(node) {
     return new ops.Pipeline({
-      operations: [
-        new ops.Source()
-      ]
+      operations: [new ops.Source()]
     })
   }
 
@@ -191,9 +186,7 @@ export default class Composer {
   }
 
   nodeAttribute(node) {
-    return new ops.Accessor([
-      new ops.Attribute(node.path)
-    ])
+    return new ops.Accessor([new ops.Attribute(node.path)])
   }
 
   nodeLiteral(node) {
