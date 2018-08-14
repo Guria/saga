@@ -27,6 +27,9 @@ function querifyItems(items) {
     .join(' || ')})`
 }
 
+// This class defines which capabilities a given user must have in order
+// to gain access to a document type.
+// The filters produced here are applied in SecurityManager
 class AccessFilterBuilder {
   constructor(userId, dataStore, venueId) {
     this.userId = userId

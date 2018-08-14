@@ -12,8 +12,8 @@ function isValueInArrayQuery(valueName, ids = []) {
   return ids.length > 0 ? `${valueName} in ${quoteItems(ids)}` : 'false'
 }
 
-// A collection of queries used by AccessFilterBuilder
-// They all assume that query params will include {userId: userId}
+// This class figures out all capabilities for a given user
+// Please update/add the relevant test if you change anything
 class UserCapabilityDiviner {
   constructor(userId, dataStore, venueId) {
     this.userId = userId
