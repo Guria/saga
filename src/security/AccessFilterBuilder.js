@@ -12,7 +12,6 @@ const documentTypes = [
   'comment',
   'reviewProcess',
   'reviewItem',
-  'reviewPolicy',
   'featureConfig',
   'featureState'
 ]
@@ -83,8 +82,6 @@ class AccessFilterBuilder {
           capabilities.isEditorInIssueWithArticleInReviewItem,
           capabilities.isEditorInTrackWithArticleInReviewItem
         ])}`
-      case 'reviewPolicy':
-        return '_type == "reviewPolicy"'
       case 'featureConfig':
         return '_type == "featureConfig"'
       case 'featureState':
@@ -100,15 +97,152 @@ class AccessFilterBuilder {
   }
 
   canCreate(type) {
-    return 'false'
+    const capabilities = this.userCapabilities
+    switch (type) {
+      case 'venue':
+        return `_type == "venue" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'issue':
+        return `_type == "issue" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'track':
+        return `_type == "track" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'stage':
+        return `_type == "stage" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'user':
+        return `_type == "user" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInAnyIssue,
+          capabilities.isEditorInAnyTrack
+        ])}`
+      case 'article':
+        return `_type == "article" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInAnyIssue,
+          capabilities.isEditorInAnyTrack
+        ])}`
+      case 'comment':
+        return '_type == "comment"'
+      case 'reviewProcess':
+        return `_type == "reviewProcess" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInAnyIssue,
+          capabilities.isEditorInAnyTrack
+        ])}`
+      case 'reviewItem':
+        return `_type == "reviewItem" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInIssueWithArticleInReviewProcess,
+          capabilities.isEditorInTrackWithArticleInReviewProcess
+        ])}`
+      case 'featureConfig':
+        return `_type == "featureConfig" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'featureState':
+        return `_type == "featureState" && ${querifyItems([capabilities.isVenueEditor])}`
+      default:
+        return 'false'
+    }
   }
 
   canUpdate(type) {
-    return 'false'
+    const capabilities = this.userCapabilities
+    switch (type) {
+      case 'venue':
+        return `_type == "venue" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'issue':
+        return `_type == "issue" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isIssueEditor
+        ])}`
+      case 'track':
+        return `_type == "track" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isTrackEditor
+        ])}`
+      case 'stage':
+        return `_type == "stage" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'user':
+        return `_type == "user" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'article':
+        return `_type == "article" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInArticleTrack,
+          capabilities.isEditorInArticleIssues,
+          capabilities.isSubmitterInArticle
+        ])}`
+      case 'comment':
+        return `_type == "comment" && ${querifyItems([
+          capabilities.isCommentAuthor,
+          capabilities.isVenueEditor,
+          capabilities.isEditorInTrackWithArticleInComment,
+          capabilities.isEditorInIssueWithArticleInComment
+        ])}`
+      case 'reviewProcess':
+        return `_type == "reviewProcess" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInIssueWithArticleInReviewProcess,
+          capabilities.isEditorInTrackWithArticleInReviewProcess
+        ])}`
+      case 'reviewItem':
+        return `_type == "reviewItem" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isReviewer,
+          capabilities.isEditorInIssueWithArticleInReviewItem,
+          capabilities.isEditorInTrackWithArticleInReviewItem
+        ])}`
+      case 'featureConfig':
+        return `_type == "featureConfig" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'featureState':
+        return `_type == "featureState" && ${querifyItems([capabilities.isVenueEditor])}`
+      default:
+        return 'false'
+    }
   }
 
   canDelete(type) {
-    return 'false'
+    const capabilities = this.userCapabilities
+    switch (type) {
+      case 'venue':
+        return 'false'
+      case 'issue':
+        return `_type == "issue" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'track':
+        return `_type == "track" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'stage':
+        return `_type == "stage" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'user':
+        return `_type == "user" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'article':
+        return `_type == "article" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInArticleTrack,
+          capabilities.isEditorInArticleIssues
+        ])}`
+      case 'comment':
+        return `_type == "comment" && ${querifyItems([
+          capabilities.isCommentAuthor,
+          capabilities.isVenueEditor,
+          capabilities.isEditorInTrackWithArticleInComment,
+          capabilities.isEditorInIssueWithArticleInComment
+        ])}`
+      case 'reviewProcess':
+        return `_type == "reviewProcess" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isEditorInIssueWithArticleInReviewProcess,
+          capabilities.isEditorInTrackWithArticleInReviewProcess
+        ])}`
+      case 'reviewItem':
+        return `_type == "reviewItem" && ${querifyItems([
+          capabilities.isVenueEditor,
+          capabilities.isReviewer,
+          capabilities.isEditorInIssueWithArticleInReviewItem,
+          capabilities.isEditorInTrackWithArticleInReviewItem
+        ])}`
+      case 'featureConfig':
+        return `_type == "featureConfig" && ${querifyItems([capabilities.isVenueEditor])}`
+      case 'featureState':
+        return `_type == "featureState" && ${querifyItems([capabilities.isVenueEditor])}`
+      default:
+        return 'false'
+    }
   }
 
   async determineFilters() {

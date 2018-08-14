@@ -71,7 +71,7 @@ describe('accessFilterBuilder', () => {
       unprivilegedUser._id
     }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((reviewer._ref == "${
       unprivilegedUser._id
-    }") || (false))) || (_type == "reviewPolicy") || (_type == "featureConfig") || (_type == "featureState" && (false)))`
+    }") || (false))) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
     expect(filters.read).toEqual(expected)
   })
 })
