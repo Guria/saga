@@ -2,8 +2,6 @@ const Joi = require('joi')
 const express = require('express')
 const {celebrate} = require('celebrate')
 
-const router = express.Router()
-
 const validation = celebrate({
   params: Joi.object({
     token: Joi.string()
@@ -18,19 +16,23 @@ const validation = celebrate({
   })
 })
 
-/**
- * Get the root invitation token for a brand new vega/saga installation
- */
-router.get('/root', require('./getRootInvite'))
+module.exports = providers => {
+  const router = express.Router()
 
-/**
- * Accept an invitation
- */
-router.post('/claim/:token', validation, require('./claimInvitation'))
+  /**
+   * Get the root invitation token for a brand new vega/saga installation
+   */
+  router.get('/root', require('./loginAsRoot').bind(null, providers))
 
-/**
- * Fetch specific invitation
- */
-router.get('/:token', validation, require('./getInvitation'))
+  /**
+   * Accept an invitation
+   */
+  router.get('/claim/:token', validation, require('./claimInvitation'))
 
-module.exports = router
+  /**
+   * Fetch specific invitation
+   */
+  router.get('/:token', validation, require('./getInvitation'))
+
+  return router
+}

@@ -89,7 +89,7 @@ module.exports = class UserStore {
 
   getRootInvite() {
     return this.connect().then(store =>
-      store.fetch('*[_type == "invite" && isRootUser == true && isAccepted == false][0]')
+      store.fetch('*[_type == "invite" && isRootUser == true][0]')
     )
   }
 

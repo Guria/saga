@@ -34,7 +34,7 @@ describe('invitations', () => {
     const invite = await createMockInvite(dataStore)
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
+      .get(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -48,7 +48,7 @@ describe('invitations', () => {
     const invite = await createMockInvite(dataStore)
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
+      .get(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -58,7 +58,7 @@ describe('invitations', () => {
       .expect('Location', '/v1/users/me')
 
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
+      .get(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .expect(302)
       .expect('Location', '/v1/users/me')
 
@@ -75,7 +75,7 @@ describe('invitations', () => {
     })
 
     const agent = request.agent(app)
-    await agent.post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`).then(res =>
+    await agent.get(`/v1/invitations/claim/${invite._id}?venueId=saga-test`).then(res =>
       expect(res.body).toMatchObject({
         error: 'Unauthorized',
         message: 'Valid session required to claim invitation',
@@ -93,7 +93,7 @@ describe('invitations', () => {
     const session = await createUserlessSession(app, 'saga-test')
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
+      .get(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .set('Cookie', getSessionCookie(app, session))
       .expect(200, {claimed: true})
   })
@@ -107,52 +107,9 @@ describe('invitations', () => {
     const session = await createUserlessSession(app, 'saga-test')
     const agent = request.agent(app)
     await agent
-      .post(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
+      .get(`/v1/invitations/claim/${invite._id}?venueId=saga-test`)
       .set('Cookie', getSessionCookie(app, session))
       .expect(200, {claimed: true})
-  })
-
-  test('can fetch root invitation if none is created', async () => {
-    let rootInviteId
-
-    // Should be created on first call
-    await request(app)
-      .get(`/v1/invitations/root`)
-      .expect(200)
-      .then(res => {
-        expect(res.body).toMatch(/^[A-Z0-9]{32,}$/i)
-        rootInviteId = res.body
-      })
-
-    // Should only be generated once
-    await request(app)
-      .get(`/v1/invitations/root`)
-      .expect(200)
-      .then(res => expect(res.body).toEqual(rootInviteId))
-  })
-
-  test('will not expose root invite once claimed', async () => {
-    let rootInviteId
-    const agent = request.agent(app)
-
-    await agent
-      .get(`/v1/invitations/root`)
-      .expect(200)
-      .then(res => {
-        expect(res.body).toMatch(/^[A-Z0-9]{32,}$/i)
-        rootInviteId = res.body
-      })
-
-    const session = await createUserlessSession(app, 'saga-test')
-    await agent
-      .post(`/v1/invitations/claim/${rootInviteId}`)
-      .set('Cookie', getSessionCookie(app, session))
-      .expect(200, {claimed: true})
-
-    await request(app)
-      .get(`/v1/invitations/root`)
-      .expect(200)
-      .then(res => expect(res.body).toEqual(null))
   })
 })
 
