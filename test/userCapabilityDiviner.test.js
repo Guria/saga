@@ -454,4 +454,42 @@ describe('userCapabilityDiviner', () => {
       isEditorInTrackWithArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
     })
   })
+
+  test('recognizes an issue editor', async () => {
+    const issueEditor = await createUser()
+    const unprivilegedUser = await createUser()
+
+    await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
+    })
+    const trackEditorCapabilities = await capabilitiesForUser(issueEditor._id)
+    expect(trackEditorCapabilities).toMatchObject({
+      isEditorInAnyIssue: true
+    })
+    const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
+    expect(unprivilegedUserCapabilities).toMatchObject({
+      isEditorInAnyIssue: false
+    })
+  })
+
+  test('recognizes a track editor', async () => {
+    const trackEditor = await createUser()
+    const unprivilegedUser = await createUser()
+
+    await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
+    })
+    const trackEditorCapabilities = await capabilitiesForUser(trackEditor._id)
+    expect(trackEditorCapabilities).toMatchObject({
+      isEditorInAnyTrack: true
+    })
+    const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
+    expect(unprivilegedUserCapabilities).toMatchObject({
+      isEditorInAnyTrack: false
+    })
+  })
 })
