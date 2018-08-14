@@ -1,5 +1,5 @@
-const {close, getApp} = require('./helpers')
-const UserCapabilityDiviner = require('../src/security/UserCapabilityDiviner')
+const {close, getApp} = require('../helpers')
+const UserCapabilityDiviner = require('../../src/security/UserCapabilityDiviner')
 
 describe('userCapabilityDiviner', () => {
   const identityTemplate = {

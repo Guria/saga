@@ -1,5 +1,5 @@
-const {close, getApp} = require('./helpers')
-const AccessFilterBuilder = require('../src/security/AccessFilterBuilder')
+const {close, getApp} = require('../helpers')
+const AccessFilterBuilder = require('../../src/security/AccessFilterBuilder')
 
 describe('accessFilterBuilder', () => {
   const identityTemplate = {
