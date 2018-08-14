@@ -410,6 +410,7 @@ async function filterMatchesDocument(filter, doc) {
     return true
   }
 
+  console.log('SSSS filter and doc', filter, doc)
   const results = await execQuery({
     source: filter,
     params: {},
@@ -418,6 +419,7 @@ async function filterMatchesDocument(filter, doc) {
       start: 0
     })
   })
+  console.log('SSSS results', results)
 
   return Array.isArray(results && results.value) && results.value.length > 0
 }
