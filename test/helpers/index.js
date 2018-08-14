@@ -3,6 +3,7 @@ const getConfig = require('./getConfig')
 const getApp = require('./getApp')
 const getCallbackServer = require('./getCallbackServer')
 const createAdminUser = require('./createAdminUser')
+const createSession = require('./createSession')
 const getSessionCookie = require('./getSessionCookie')
 const createUserlessSession = require('./createUserlessSession')
 
@@ -16,6 +17,7 @@ module.exports = {
   getConfig,
   getCallbackServer,
   createAdminUser,
+  createSession,
   createUserlessSession,
   getSessionCookie
 }
