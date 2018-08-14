@@ -60,7 +60,7 @@ class UserCapabilityDiviner {
       _id, _type,
       "editor": defined(editors) && length(editors[_ref == $userId])>0,
     }.editor`
-    return this.performQuery(query, {userId: this.userId})
+    return this.performQuery(query, {userId: this.userId}).then(result => result.toString())
   }
 
   tracksWhereUserIsEditor() {
@@ -196,11 +196,11 @@ class UserCapabilityDiviner {
   }
 
   isEditorInAnyIssue() {
-    return this.issuesWhereUserIsEditor().then(issues => issues.length > 0)
+    return this.issuesWhereUserIsEditor().then(issues => (issues.length > 0).toString())
   }
 
   isEditorInAnyTrack() {
-    return this.tracksWhereUserIsEditor().then(tracks => tracks.length > 0)
+    return this.tracksWhereUserIsEditor().then(tracks => (tracks.length > 0).toString())
   }
 
   isIssueEditor() {
@@ -259,7 +259,7 @@ class UserCapabilityDiviner {
         isTrackEditor
       ]) => {
         return {
-          isVenueEditor: !!isVenueEditor,
+          isVenueEditor,
           isEditorInArticleTrack,
           isEditorInArticleIssues,
           isSubmitterInArticle,
