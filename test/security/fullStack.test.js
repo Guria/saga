@@ -113,7 +113,6 @@ describe('fullStack', () => {
       title: 'Stuff I chew on',
       author: {_type: 'reference', _ref: author._id}
     })
-
     const transactionId = getId()
     await request(app)
       .post('/v1/data/mutate/saga-test?returnIds=true')
@@ -122,9 +121,107 @@ describe('fullStack', () => {
         mutations: [{patch: {id: comment._id, set: {title: 'Other stuff'}}}],
         transactionId
       })
-      .expect({
+      .expect(200, {
         transactionId,
         results: [{id: comment._id, operation: 'update'}]
+      })
+  })
+
+  test('grants comment update access to venueEditor', async () => {
+    const venueEditor = await createUser()
+
+    const comment = await createDocument({
+      _type: 'comment',
+      title: 'Stuff I chew on'
+    })
+    await createDocument({
+      _type: 'venue',
+      name: 'journal-of-snah',
+      editors: [{_type: 'reference', _ref: venueEditor._id}]
+    })
+
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, venueEditor))
+      .send({
+        mutations: [{patch: {id: comment._id, set: {title: 'We could make pasta'}}}],
+        transactionId
+      })
+      .expect(200, {
+        transactionId,
+        results: [{id: comment._id, operation: 'update'}]
+      })
+  })
+
+  test('denies comment update access to the unprivileged', async () => {
+    const unprivilegedUser = await createUser()
+
+    const comment = await createDocument({
+      _type: 'comment',
+      title: 'Stuff I chew on'
+    })
+
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, unprivilegedUser))
+      .send({
+        mutations: [{patch: {id: comment._id, set: {title: 'LOLZ'}}}],
+        transactionId
+      })
+      .expect(403)
+      .expect(result => {
+        expect(result.body).toMatchObject({error: 'Forbidden', type: 'mutationError'})
+      })
+  })
+
+  test('grants article delete access to track editor', async () => {
+    const trackEditor = await createUser()
+
+    const track = await createDocument({
+      _id: 'TRACKID1234',
+      _type: 'track',
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
+    })
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      track: {_type: 'reference', _ref: track._id}
+    })
+
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, trackEditor))
+      .send({mutations: [{delete: {id: article._id}}], transactionId})
+      .expect(200, {
+        transactionId,
+        results: [{id: article._id, operation: 'delete'}]
+      })
+  })
+
+  test('grants article create access to venue editor', async () => {
+    const venueEditor = await createUser()
+    await createDocument({
+      _type: 'venue',
+      editors: [{_type: 'reference', _ref: venueEditor._id}]
+    })
+
+    const article = {
+      _id: 'ARTICLEID1234',
+      _type: 'article'
+    }
+
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, venueEditor))
+      .send({mutations: [{create: article}], transactionId})
+      .expect(200, {
+        transactionId,
+        results: [{id: article._id, operation: 'create'}]
       })
   })
 })
