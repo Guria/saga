@@ -37,7 +37,7 @@ class AccessFilterBuilder {
     this.dataStore = dataStore
   }
 
-  async prefetchAllCapabilities() {
+  async fetchAllCapabilities() {
     if (!this.userCapabilities) {
       const userCapabilities = new UserCapabilityDiviner(this.userId, this.dataStore, this.venueId)
       this.userCapabilities = await userCapabilities.runAll()
@@ -249,16 +249,15 @@ class AccessFilterBuilder {
   }
 
   async determineFilters() {
-    await this.prefetchAllCapabilities()
-    // console.log('All capabilities', this.userCapabilities)
-    const filters = {
+    await this.fetchAllCapabilities()
+    const result = {
       read: querifyItems(documentTypes.map(type => this.canRead(type))),
       create: querifyItems(documentTypes.map(type => this.canCreate(type))),
       update: querifyItems(documentTypes.map(type => this.canUpdate(type))),
-      delete: querifyItems(documentTypes.map(type => this.canDelete(type)))
+      delete: querifyItems(documentTypes.map(type => this.canDelete(type))),
+      capabilities: this.userCapabilities
     }
-    // console.log('All filters', filters)
-    return filters
+    return result
   }
 }
 

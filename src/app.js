@@ -73,6 +73,12 @@ module.exports = config => {
   )
 
   app.use(
+    '/v1/grants',
+    bodyParser.json({limit: config.data.maxInputBytes}),
+    require('./controllers/grants')
+  )
+
+  app.use(
     '/v1/invitations',
     bodyParser.json({limit: config.data.maxInputBytes}),
     require('./controllers/invitations')(applyAuthStrategies(app, config))

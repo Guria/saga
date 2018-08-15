@@ -48,7 +48,7 @@ class SecurityManager {
     return noAccessFilterExpressions
   }
 
-  // Figure out which users must have there cached filters purged
+  // Figure out which users must have their cached filters purged
   accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
     return []
   }
