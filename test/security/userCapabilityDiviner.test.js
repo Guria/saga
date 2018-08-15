@@ -67,7 +67,7 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(unprivilegedUser._id)
 
     expect(capabilities).toMatchObject({
-      isVenueEditor: false
+      isVenueEditor: 'false'
     })
   })
 
@@ -80,7 +80,7 @@ describe('userCapabilityDiviner', () => {
     })
     const capabilities = await capabilitiesForUser(venueEditorUser._id)
     expect(capabilities).toMatchObject({
-      isVenueEditor: true
+      isVenueEditor: 'true'
     })
   })
 
@@ -466,11 +466,11 @@ describe('userCapabilityDiviner', () => {
     })
     const issueEditorCapabilities = await capabilitiesForUser(issueEditor._id)
     expect(issueEditorCapabilities).toMatchObject({
-      isEditorInAnyIssue: true
+      isEditorInAnyIssue: 'true'
     })
     const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
     expect(unprivilegedUserCapabilities).toMatchObject({
-      isEditorInAnyIssue: false
+      isEditorInAnyIssue: 'false'
     })
   })
 
@@ -485,11 +485,11 @@ describe('userCapabilityDiviner', () => {
     })
     const trackEditorCapabilities = await capabilitiesForUser(trackEditor._id)
     expect(trackEditorCapabilities).toMatchObject({
-      isEditorInAnyTrack: true
+      isEditorInAnyTrack: 'true'
     })
     const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
     expect(unprivilegedUserCapabilities).toMatchObject({
-      isEditorInAnyTrack: false
+      isEditorInAnyTrack: 'false'
     })
   })
 
