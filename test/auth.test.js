@@ -41,10 +41,7 @@ describe('auth', () => {
       .get('/v1/auth/login/google')
       .query({origin})
       .expect(302)
-      .expect(
-        'Location',
-        'http://localhost:4000/v1/auth/callback/google?__mock_strategy_callback=true'
-      )
+      .expect('Location', '/v1/auth/callback/google?__mock_strategy_callback=true')
 
     // Callback (creates profile)
     await agent
