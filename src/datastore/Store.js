@@ -409,19 +409,17 @@ async function filterMatchesDocument(filter, doc) {
   if (!filter) {
     return true
   }
-
-  console.log('SSSS filter and doc', filter, doc)
+  const filterAsQuery = `*[${filter}]`
   const results = await execQuery({
-    source: filter,
+    source: filterAsQuery,
     params: {},
     fetcher: spec => ({
       results: [doc],
       start: 0
     })
   })
-  console.log('SSSS results', results)
 
-  return Array.isArray(results && results.value) && results.value.length > 0
+  return Array.isArray(results) && results.length > 0
 }
 
 module.exports = Store
