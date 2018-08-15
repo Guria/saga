@@ -11,9 +11,9 @@
     "prepublishOnly": "npm run compile",
     "postpublish": "npm run clean",
     "coverage": "NODE_ENV=test jest --coverage --runInBand",
-    "start": "babel-node src/server.js",
+    "start": "babel-node src/server.js | pino",
     "bootstrap": "babel-node scripts/bootstrap.js",
-    "watch": "remon -r babel-register src/server.js",
+    "watch": "remon -r babel-register src/server.js | pino",
     "test": "NODE_ENV=test jest --runInBand"
   },
   "repository": {
