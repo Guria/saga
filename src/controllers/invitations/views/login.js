@@ -15,9 +15,9 @@ const unary = fn => value => fn(value)
 
 const renderProvider = provider => h('div')(h('a', {href: provider.url})(provider.title))
 
-module.exports = ({providers, script}) =>
+module.exports = ({providers}) =>
   h('html')(
-    h('head')(h('script')(script)),
+    h('head'),
     h('body')(
       h('h2')('Select provider'),
       h('ul')(providers.map(unary(renderProvider)).map(unary(h('li'))))

@@ -6,8 +6,6 @@ const withUrl = ({baseUrl, origin}) => provider => ({
   url: `${baseUrl}/v1/auth/login/${provider.name}?origin=${encodeURIComponent(origin)}`
 })
 
-const browserScript = fse.readFile(`${__dirname}/views/login-browser.js`)
-
 module.exports = async (providers, req, res) => {
   const {userStore} = req.app.services
   const rootInvite = await userStore.getRootInvite()
