@@ -1,5 +1,4 @@
 const render = require('./views/login')
-const fse = require('fs-extra')
 
 const withUrl = ({baseUrl, origin}) => provider => ({
   ...provider,
@@ -20,7 +19,6 @@ module.exports = async (providers, req, res) => {
   const baseUrl = `${req.protocol}://${req.headers.host}`
   res.type('text/html; charset=utf-8').send(
     render({
-      script: await browserScript,
       providers: providers.map(
         withUrl({
           origin: `${baseUrl}/v1/invitations/claim/${inviteId}`,
