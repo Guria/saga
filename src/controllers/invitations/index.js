@@ -25,6 +25,11 @@ module.exports = providers => {
   router.get('/root', require('./loginAsRoot').bind(null, providers))
 
   /**
+   * Claim the root invitation for a brand new vega/saga installation
+   */
+  router.get('/claim/root', require('./claimRootInvitation'))
+
+  /**
    * Accept an invitation
    */
   router.get('/claim/:token', validation, require('./claimInvitation'))

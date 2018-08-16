@@ -88,9 +88,14 @@ module.exports = class UserStore {
   }
 
   getRootInvite() {
-    return this.connect().then(store =>
-      store.fetch('*[_type == "invite" && isRootUser == true][0]')
-    )
+    return this.connect()
+      .then(store => store.fetch('*[_type == "invite" && isRootUser == true]'))
+      .then(rootInvites => {
+        if (rootInvites.length > 1) {
+          throw new Error('Invalid state: multiple root invites')
+        }
+        return rootInvites[0]
+      })
   }
 
   async createUser(identity, venueId = null, options = {}) {
@@ -136,7 +141,7 @@ module.exports = class UserStore {
       .create(invite)
       .commit()
 
-    return invite._id
+    return invite
   }
 }
 

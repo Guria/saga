@@ -17,9 +17,10 @@ const renderProvider = provider => h('div')(h('a', {href: provider.url})(provide
 
 module.exports = ({providers}) =>
   h('html')(
-    h('head'),
+    h('head')(h('title')('Claim root identity')),
     h('body')(
-      h('h2')('Select provider'),
+      h('h1')('Claim root identity'),
+      h('h2')('Select an auth provider to continue'),
       h('ul')(providers.map(unary(renderProvider)).map(unary(h('li'))))
     )
   )
