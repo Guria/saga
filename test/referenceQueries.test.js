@@ -5,7 +5,7 @@ import yaml from 'js-yaml'
 import query from '../src/groq/query'
 import debug from '../src/groq/debug'
 
-describe('Reference queries', () => {
+describe('Reference queries (only through the runtime query executor)', () => {
   const suites = glob.sync(path.join(__dirname, 'reference_queries', '*.yml')).map(filename => {
     try {
       const yamlSrc = fs.readFileSync(filename, {

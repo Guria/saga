@@ -3,6 +3,7 @@ documents:
 - _id: "k1"
   _type: "koan"
   text: "What is your original face before you were born?"
+  title: "The Medina"
   v_match: ["before", "bo*"]
 - _id: "k2"
   _type: "koan"
@@ -48,12 +49,16 @@ tests:
       *[_type == "koan" && text match "reduced"]._id,
       *[_type == "koan" && text match "ReDuCeD"]._id,
       *[_type == "koan" && text match "foo"]._id,
+      *[_type == "koan" && text match "The*"]._id,
+      *[(title match 'The*')][0...10]._id,
     ]
   result: [
     ['k2', 'k3'],
     ['k3'],
     ['k3'],
     [],
+    ['k3'],
+    ['k1']
   ]
 
 - title: "match filter attributes"

@@ -14,14 +14,20 @@ async function performQuery(options, req, res, next) {
   let result
   try {
     const store = await dataStore.forDataset(dataset)
-    const results = await store.fetch(query, params, {globalFilter: globalFilters.read})
+    const results = await store.fetch(query, params, {
+      globalFilter: globalFilters.read
+    })
     result = typeof results === 'undefined' ? null : results
   } catch (err) {
     next(err)
     return
   }
 
-  res.json({ms: Date.now() - start, query, result})
+  res.json({
+    ms: Date.now() - start,
+    query,
+    result
+  })
 }
 
 const get = (req, res, next) => {
@@ -33,7 +39,10 @@ const get = (req, res, next) => {
     }, {})
 
   const query = req.query.query
-  return performQuery({query, params}, req, res, next)
+  return performQuery({
+    query,
+    params
+  }, req, res, next)
 }
 
 const post = (req, res, next) => performQuery(req.body, req, res, next)
@@ -51,4 +60,7 @@ function parseJson(key, value) {
   }
 }
 
-module.exports = {get, post}
+module.exports = {
+  get,
+  post
+}

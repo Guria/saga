@@ -4,9 +4,10 @@ module.exports = function findReferences(item, path = []) {
   if (Array.isArray(item)) {
     return flatten(
       item
-        .map((arrItem, i) =>
-          findReferences(arrItem, path.concat(arrItem._key ? {_key: arrItem._key} : i))
-        )
+        .map((arrItem, i) => findReferences(arrItem, path.concat(arrItem && arrItem._key ? {
+          _key: arrItem._key
+        } : i))
+      )
         .filter(Boolean)
     )
   }
@@ -24,5 +25,9 @@ module.exports = function findReferences(item, path = []) {
     )
   }
 
-  return {id: item._ref, weak: Boolean(item._weak), path}
+  return {
+    id: item._ref,
+    weak: Boolean(item._weak),
+    path
+  }
 }
