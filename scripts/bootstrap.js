@@ -4,8 +4,30 @@ const {fullAccessFilterExpressions} = require('../src/security/defaultFilters')
 const config = require('../src/config')
 const url = require('url')
 const deburr = require('lodash/deburr')
+const tracks = require('./bootstrap/tracks')
+const stages = require('./bootstrap/stages')
 const inquirer = require('inquirer')
-import open from 'opn'
+const fetch = require('node-fetch')
+const open = require('opn')
+const ora = require('ora')
+
+const SERVER_URL = url.format({
+  protocol: 'http',
+  hostname: config.hostname,
+  port: config.port
+})
+const CLAIM_URL = url.format({
+  protocol: 'http',
+  hostname: config.hostname,
+  port: config.port,
+  pathname: `/v1/invitations/root/login`
+})
+const ROOT_INVITE_URL = url.format({
+  protocol: 'http',
+  hostname: config.hostname,
+  port: config.port,
+  pathname: `/v1/invitations/root`
+})
 
 function prompt(questions) {
   return inquirer.prompt(questions)
@@ -24,59 +46,104 @@ const sluggedName = str =>
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9]/g, '')
 
-async function createVenue(datasetName, venue) {
+function createAllIfNotExists(transaction, docs) {
+  return docs.reduce((trx, doc) => trx.createIfNotExists(doc), transaction)
+}
+
+async function fetchRootInvite() {
+  return (await fetch(ROOT_INVITE_URL)).json()
+}
+
+async function connect() {
+  try {
+    await fetch(SERVER_URL)
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED') {
+      await prompt.single({
+        message:
+          'The Saga server does not seem to be running. Please start it with `npm start` and press enter to continue.',
+        type: 'input',
+        prefix: '✋'
+      })
+      await connect()
+      return
+    }
+    throw err
+  }
+}
+
+async function waitForRootClaimed() {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  const rootInvite = await fetchRootInvite()
+  if (!rootInvite.isAccepted) {
+    await waitForRootClaimed()
+  }
+}
+async function createRootUser() {
+  const rootInvite = await fetchRootInvite()
+  if (rootInvite.isAccepted) {
+    console.log('✔ Root user already exists')
+    console.log('')
+    return
+  }
+  const doCreate = await prompt.single({
+    message: 'No root user found. Would you like to become the root user now?',
+    type: 'confirm'
+  })
+  if (!doCreate) {
+    return
+  }
+
+  const spinner = ora(`Log in from the browser at ${CLAIM_URL}`).start()
+  open(CLAIM_URL)
+  await waitForRootClaimed()
+  spinner.stop()
+  console.log('✔ ︎Success')
+}
+
+async function createVenue() {
+  const venueName = await prompt.single({
+    message: 'Display name:',
+    type: 'input'
+  })
+  const datasetName = await prompt.single({
+    message: `Name of dataset for venue "${venueName}":`,
+    type: 'input',
+    default: sluggedName(venueName)
+  })
+
+  const venue = {
+    _id: 'venue',
+    _type: 'venue',
+    title: venueName
+  }
+
+  const shouldCreateTracksAndStages = await prompt.single({
+    message: 'Do you want to add a default set of tracks and stages?',
+    type: 'confirm'
+  })
+
+  const docs = [venue, ...(shouldCreateTracksAndStages ? [...tracks, ...stages] : [])]
   const store = await dataStore.forDataset(datasetName)
-  const result = await store
-    .newTransaction()
-    .createOrReplace(venue)
-    .commit()
-  return result.results[0].document
+  return createAllIfNotExists(store.newTransaction(), docs).commit()
 }
 
 async function run() {
-  const claimUrl = url.format({
-    protocol: 'http',
-    hostname: config.hostname,
-    port: config.port,
-    pathname: `/v1/invitations/root`
-  })
-  const createDefaultVenue = await prompt.single({
-    message: 'Would you like to create a default venue?',
+  await connect()
+  await createRootUser()
+
+  const shouldCreateVenue = await prompt.single({
+    message: 'Would you like to create a new venue?',
     type: 'confirm'
   })
-  if (createDefaultVenue) {
-    const venueName = await prompt.single({
-      message: 'Venue display name:',
-      type: 'input'
-    })
-    const datasetName = await prompt.single({
-      message: 'Name of dataset',
-      type: 'input',
-      default: sluggedName(venueName)
-    })
-    const createdVenue = await createVenue(datasetName, {
-      _id: 'venue',
-      _type: 'venue',
-      title: venueName
-    })
-    console.log('Success! Created venue %s', createdVenue.title)
+  if (shouldCreateVenue) {
+    const venues = await createVenue()
+    console.log(venues)
   }
-  const createRootUser = await prompt.single({
-    message: [
-      `To claim the root user, you will have to navigate to ${claimUrl}`,
-      'Note: the Saga backend must be running while logging on.',
-      'Would you like to create a root user now?'
-    ].join('\n'),
-    type: 'confirm'
-  })
-
-  if (createRootUser) {
-    open(claimUrl, {wait: false})
-  }
-
-  console.log()
-  console.log(`That's it. Goodbye 👋`)
   dataStore.disconnect()
 }
 
-run()
+run().then(() => {
+  console.log()
+  console.log(`That's it. Goodbye 👋`)
+})

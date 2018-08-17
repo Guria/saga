@@ -18,11 +18,15 @@ const validation = celebrate({
 
 module.exports = providers => {
   const router = express.Router()
+  /**
+   * Get the root invitation token for a brand new vega/lyra installation
+   */
+  router.get('/root', require('./getRootInvite'))
 
   /**
    * Get the root invitation token for a brand new vega/saga installation
    */
-  router.get('/root', require('./loginAsRoot').bind(null, providers))
+  router.get('/root/login', require('./loginAsRoot').bind(null, providers))
 
   /**
    * Claim the root invitation for a brand new vega/saga installation
