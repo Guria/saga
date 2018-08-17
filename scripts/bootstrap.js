@@ -113,7 +113,7 @@ async function createVenue() {
   })
 
   const venue = {
-    _id: 'venue',
+    _id: datasetName,
     _type: 'venue',
     title: venueName
   }
