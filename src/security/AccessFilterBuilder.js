@@ -95,7 +95,7 @@ class AccessFilterBuilder {
       })
       result[action] = `(${queries.join(' || ')})`
     })
-    result.capabilities = this.userCapabilities
+    result.capabilities = capabilitiesByActionAndType
     return result
   }
 }
