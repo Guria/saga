@@ -520,4 +520,25 @@ describe('userCapabilityDiviner', () => {
       isTrackEditor: ['_id', [track._id]]
     })
   })
+
+  test('recognizes article submitter in comment', async () => {
+    const submitter = await createUser()
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      submitters: [{_type: 'reference', _ref: submitter._id}]
+    })
+
+    await createDocument({
+      _id: 'COMMENTID1234',
+      _type: 'comment',
+      subject: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(submitter._id)
+    expect(capabilities).toMatchObject({
+      isSubmitterInArticleWithComment: ['subject._ref', [article._id]]
+    })
+  })
 })

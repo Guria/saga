@@ -14,6 +14,7 @@ const requiredCapabilities = {
     comment: [
       'isCommentAuthor',
       'isVenueEditor',
+      'isSubmitterInArticleWithComment',
       'isEditorInTrackWithArticleInComment',
       'isEditorInIssueWithArticleInComment'
     ],
@@ -43,7 +44,7 @@ const requiredCapabilities = {
     stage: ['isVenueEditor'],
     user: ['isVenueEditor', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
     article: ['isVenueEditor', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
-    comment: ['isLoggedInUser'],
+    comment: ['isCommentAuthor'],
     reviewProcess: ['isVenueEditor', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
     reviewItem: [
       'isVenueEditor',

@@ -215,6 +215,12 @@ class UserCapabilityDiviner {
       .then(trackIds => isValueInArrayTuple('_id', trackIds))
   }
 
+  isSubmitterInArticleWithComment() {
+    return this.articlesWhereUserIsSubmitter()
+      .then(articles => articles.map(article => article._id))
+      .then(articleIds => isValueInArrayTuple('subject._ref', articleIds))
+  }
+
   runAll() {
     return Promise.all([
       this.isVenueEditor(),
@@ -235,7 +241,8 @@ class UserCapabilityDiviner {
       this.isEditorInAnyIssue(),
       this.isEditorInAnyTrack(),
       this.isIssueEditor(),
-      this.isTrackEditor()
+      this.isTrackEditor(),
+      this.isSubmitterInArticleWithComment()
     ]).then(
       ([
         isVenueEditor,
@@ -256,7 +263,8 @@ class UserCapabilityDiviner {
         isEditorInAnyIssue,
         isEditorInAnyTrack,
         isIssueEditor,
-        isTrackEditor
+        isTrackEditor,
+        isSubmitterInArticleWithComment
       ]) => {
         return {
           isLoggedInUser: [true],
@@ -278,7 +286,8 @@ class UserCapabilityDiviner {
           isEditorInAnyIssue,
           isEditorInAnyTrack,
           isIssueEditor,
-          isTrackEditor
+          isTrackEditor,
+          isSubmitterInArticleWithComment
         }
       }
     )

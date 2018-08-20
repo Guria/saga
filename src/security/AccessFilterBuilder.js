@@ -76,7 +76,7 @@ class AccessFilterBuilder {
       allCapabilityTuples[action] = {}
       documentTypes.forEach(type => {
         const compressedCapabilities = this.compressCapabilities(action, type)
-        if (this.compressCapabilities) {
+        if (compressedCapabilities) {
           allCapabilityTuples[action][type] = compressedCapabilities
         }
       })

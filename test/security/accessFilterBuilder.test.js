@@ -91,7 +91,7 @@ describe('accessFilterBuilder', () => {
   })
 
   // you break it you buy it
-  test('sanity-check capabilities', async () => {
+  test('sanity-check all capabilities - comment author', async () => {
     const author = await createUser()
     await createDocument({
       _type: 'comment',
@@ -101,57 +101,24 @@ describe('accessFilterBuilder', () => {
     const filters = await filtersForUser(author._id)
 
     const expected = {
-      create: {
-        article: false,
-        comment: true,
-        featureConfig: false,
-        featureState: false,
-        issue: false,
-        reviewItem: false,
-        reviewProcess: false,
-        stage: false,
-        track: false,
-        user: false,
-        venue: false
-      },
+      create: {comment: [['author._ref', [`${author._id}`]]]},
       delete: {
-        article: false,
         comment: [['author._ref', [`${author._id}`]]],
-        featureConfig: false,
-        featureState: false,
-        issue: false,
-        reviewItem: [['reviewer._ref', [`${author._id}`]]],
-        reviewProcess: false,
-        stage: false,
-        track: false,
-        user: false,
-        venue: false
+        reviewItem: [['reviewer._ref', [`${author._id}`]]]
       },
       read: {
-        article: false,
         comment: [['author._ref', [`${author._id}`]]],
         featureConfig: true,
-        featureState: false,
         issue: true,
         reviewItem: [['reviewer._ref', [`${author._id}`]]],
-        reviewProcess: false,
         stage: true,
         track: true,
         user: true,
         venue: true
       },
       update: {
-        article: false,
         comment: [['author._ref', [`${author._id}`]]],
-        featureConfig: false,
-        featureState: false,
-        issue: false,
-        reviewItem: [['reviewer._ref', [`${author._id}`]]],
-        reviewProcess: false,
-        stage: false,
-        track: false,
-        user: false,
-        venue: false
+        reviewItem: [['reviewer._ref', [`${author._id}`]]]
       }
     }
     expect(filters.capabilities).toEqual(expected)
