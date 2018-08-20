@@ -58,26 +58,25 @@ describe('accessFilterBuilder', () => {
       )
     ))
 
-  // This test will eventually evaluate a single mega-pile of filters
-  test('sparse read access to unprivileged user', async () => {
+  test('produces groq filters granting some read access to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
     await createDocument({
       _type: 'venue',
       name: 'journal-of-snah'
     })
     const filters = await filtersForUser(unprivilegedUser._id)
+
     expect(filters).toBeTruthy()
-    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
+    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "comment" && (author._ref in ["${
       unprivilegedUser._id
-    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((false) || (reviewer._ref == "${
+    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
       unprivilegedUser._id
-    }"))) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
+    }"])) || (_type == "featureConfig"))`
     expect(filters.read).toEqual(expected)
   })
 
-  test('grants update on comment for comment author', async () => {
+  test('produces groq filters allowing comment author to update own comment', async () => {
     const author = await createUser()
-
     await createDocument({
       _type: 'comment',
       title: 'Stuff I chew on',
@@ -85,11 +84,43 @@ describe('accessFilterBuilder', () => {
     })
     const filters = await filtersForUser(author._id)
 
-    const expected = `((_type == "venue" && (false)) || (_type == "issue" && (false)) || (_type == "track" && (false)) || (_type == "stage" && (false)) || (_type == "user" && (false)) || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
+    const expected = `((_type == "comment" && (author._ref in ["${
       author._id
-    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((false) || (reviewer._ref == "${
-      author._id
-    }"))) || (_type == "featureConfig" && (false)) || (_type == "featureState" && (false)))`
+    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${author._id}"])))`
     expect(filters.update).toEqual(expected)
+  })
+
+  // you break it you buy it
+  test('sanity-check all capabilities - comment author', async () => {
+    const author = await createUser()
+    await createDocument({
+      _type: 'comment',
+      title: 'Stuff I chew on',
+      author: {_type: 'reference', _ref: author._id}
+    })
+    const filters = await filtersForUser(author._id)
+
+    const expected = {
+      create: {comment: [['author._ref', [`${author._id}`]]]},
+      delete: {
+        comment: [['author._ref', [`${author._id}`]]],
+        reviewItem: [['reviewer._ref', [`${author._id}`]]]
+      },
+      read: {
+        comment: [['author._ref', [`${author._id}`]]],
+        featureConfig: true,
+        issue: true,
+        reviewItem: [['reviewer._ref', [`${author._id}`]]],
+        stage: true,
+        track: true,
+        user: true,
+        venue: true
+      },
+      update: {
+        comment: [['author._ref', [`${author._id}`]]],
+        reviewItem: [['reviewer._ref', [`${author._id}`]]]
+      }
+    }
+    expect(filters.capabilities).toEqual(expected)
   })
 })

@@ -67,30 +67,30 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(unprivilegedUser._id)
 
     expect(capabilities).toMatchObject({
-      isVenueEditor: 'false'
+      isVenueEditor: [false]
     })
   })
 
   test('recognizes a venue editor', async () => {
-    const venueEditorUser = await createUser()
+    const venueEditor = await createUser()
     await createDocument({
       _type: 'venue',
       name: 'journal-of-snah',
-      editors: [{_type: 'reference', _ref: venueEditorUser._id}]
+      editors: [{_type: 'reference', _ref: venueEditor._id}]
     })
-    const capabilities = await capabilitiesForUser(venueEditorUser._id)
+    const capabilities = await capabilitiesForUser(venueEditor._id)
     expect(capabilities).toMatchObject({
-      isVenueEditor: 'true'
+      isVenueEditor: [true]
     })
   })
 
   test('recognizes article track editor', async () => {
-    const articleTrackEditorUser = await createUser()
+    const trackEditor = await createUser()
 
     const track = await createDocument({
       _id: 'TRACKID1234',
       _type: 'track',
-      editors: [{_type: 'reference', _ref: articleTrackEditorUser._id}]
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
     })
 
     await createDocument({
@@ -99,14 +99,14 @@ describe('userCapabilityDiviner', () => {
       track: {_type: 'reference', _ref: track._id}
     })
 
-    const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
-    expect(capabilities).toMatchObject({isEditorInArticleTrack: 'track._ref in ["TRACKID1234"]'})
+    const capabilities = await capabilitiesForUser(trackEditor._id)
+    expect(capabilities).toMatchObject({isEditorInArticleTrack: ['track._ref', [track._id]]})
   })
 
   test('recognizes issue editor', async () => {
-    const issueEditorUser = await createUser()
+    const issueEditor = await createUser()
 
-    await createDocument({
+    const article = await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article'
     })
@@ -121,24 +121,24 @@ describe('userCapabilityDiviner', () => {
           articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
         }
       ],
-      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
     })
 
-    const capabilities = await capabilitiesForUser(issueEditorUser._id)
-    expect(capabilities).toMatchObject({isEditorInArticleIssues: '_id in ["ARTICLEID1234"]'})
+    const capabilities = await capabilitiesForUser(issueEditor._id)
+    expect(capabilities).toMatchObject({isEditorInArticleIssues: ['_id', [article._id]]})
   })
 
   test('recognizes article submitter', async () => {
     const submitter = await createUser()
 
-    await createDocument({
+    const article = await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article',
       submitters: [{_type: 'reference', _ref: submitter._id}]
     })
 
     const capabilities = await capabilitiesForUser(submitter._id)
-    expect(capabilities).toMatchObject({isSubmitterInArticle: '_id in ["ARTICLEID1234"]'})
+    expect(capabilities).toMatchObject({isSubmitterInArticle: ['_id', [article._id]]})
   })
 
   test('recognizes comment owner', async () => {
@@ -151,16 +151,16 @@ describe('userCapabilityDiviner', () => {
     })
 
     const capabilities = await capabilitiesForUser(creator._id)
-    expect(capabilities).toMatchObject({isCommentAuthor: `author._ref == "${creator._id}"`})
+    expect(capabilities).toMatchObject({isCommentAuthor: ['author._ref', [creator._id]]})
   })
 
   test('recognizes track editors in comment', async () => {
-    const articleTrackEditorUser = await createUser()
+    const trackEditor = await createUser()
 
     const track = await createDocument({
       _id: 'TRACKID1234',
       _type: 'track',
-      editors: [{_type: 'reference', _ref: articleTrackEditorUser._id}]
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
     })
 
     const article = await createDocument({
@@ -175,14 +175,14 @@ describe('userCapabilityDiviner', () => {
       subject: {_type: 'reference', _ref: article._id}
     })
 
-    const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
+    const capabilities = await capabilitiesForUser(trackEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInTrackWithArticleInComment: 'subject._ref in ["ARTICLEID1234"]'
+      isEditorInTrackWithArticleInComment: ['subject._ref', [article._id]]
     })
   })
 
   test('recognizes issue editors in comment', async () => {
-    const issueEditorUser = await createUser()
+    const issueEditor = await createUser()
 
     const article = await createDocument({
       _id: 'ARTICLEID1234',
@@ -212,7 +212,7 @@ describe('userCapabilityDiviner', () => {
           ]
         }
       ],
-      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
     })
 
     await createDocument({
@@ -221,16 +221,16 @@ describe('userCapabilityDiviner', () => {
       subject: {_type: 'reference', _ref: article._id}
     })
 
-    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    const capabilities = await capabilitiesForUser(issueEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInIssueWithArticleInComment: 'subject._ref in ["ARTICLEID1234","ARTICLEID12345"]'
+      isEditorInIssueWithArticleInComment: ['subject._ref', ['ARTICLEID1234', 'ARTICLEID12345']]
     })
   })
 
   test('recognizes issue editors in reviewProcess', async () => {
-    const issueEditorUser = await createUser()
+    const issueEditor = await createUser()
 
-    await createDocument({
+    const article = await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article'
     })
@@ -245,7 +245,7 @@ describe('userCapabilityDiviner', () => {
           articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
         }
       ],
-      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
     })
 
     await createDocument({
@@ -254,22 +254,22 @@ describe('userCapabilityDiviner', () => {
       article: {_type: 'reference', _ref: 'ARTICLEID1234'}
     })
 
-    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    const capabilities = await capabilitiesForUser(issueEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInIssueWithArticleInReviewProcess: 'article._ref in ["ARTICLEID1234"]'
+      isEditorInIssueWithArticleInReviewProcess: ['article._ref', [article._id]]
     })
   })
 
   test('recognizes track editors in reviewProcess', async () => {
-    const articleTrackEditorUser = await createUser()
+    const trackEditor = await createUser()
 
     const track = await createDocument({
       _id: 'TRACKID1234',
       _type: 'track',
-      editors: [{_type: 'reference', _ref: articleTrackEditorUser._id}]
+      editors: [{_type: 'reference', _ref: trackEditor._id}]
     })
 
-    await createDocument({
+    const article = await createDocument({
       _id: 'ARTICLEID1234',
       _type: 'article',
       track: {_type: 'reference', _ref: track._id}
@@ -281,9 +281,9 @@ describe('userCapabilityDiviner', () => {
       article: {_type: 'reference', _ref: 'ARTICLEID1234'}
     })
 
-    const capabilities = await capabilitiesForUser(articleTrackEditorUser._id)
+    const capabilities = await capabilitiesForUser(trackEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInTrackWithArticleInReviewProcess: 'article._ref in ["ARTICLEID1234"]'
+      isEditorInTrackWithArticleInReviewProcess: ['article._ref', [article._id]]
     })
   })
 
@@ -302,7 +302,7 @@ describe('userCapabilityDiviner', () => {
       track: {_type: 'reference', _ref: track._id}
     })
 
-    await createDocument({
+    const reviewProcess = await createDocument({
       _id: 'REVIEWPROCESSID1234',
       _type: 'reviewProcess',
       article: {_type: 'reference', _ref: 'ARTICLEID1234'}
@@ -316,27 +316,27 @@ describe('userCapabilityDiviner', () => {
 
     const capabilities = await capabilitiesForUser(trackEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInTrackWithArticleInReviewItem: 'reviewProcess._ref in ["REVIEWPROCESSID1234"]'
+      isEditorInTrackWithArticleInReviewItem: ['reviewProcess._ref', [reviewProcess._id]]
     })
   })
 
   test('recognizes a reviewer', async () => {
-    const reviewerUser = await createUser()
+    const reviewer = await createUser()
 
     await createDocument({
       _id: 'REVIEWITEMID1234',
       _type: 'reviewItem',
-      reviewer: {_type: 'reference', _ref: reviewerUser._id}
+      reviewer: {_type: 'reference', _ref: reviewer._id}
     })
 
-    const capabilities = await capabilitiesForUser(reviewerUser._id)
+    const capabilities = await capabilitiesForUser(reviewer._id)
     expect(capabilities).toMatchObject({
-      isReviewer: `reviewer._ref == "${reviewerUser._id}"`
+      isReviewer: ['reviewer._ref', [reviewer._id]]
     })
   })
 
   test('recognizes issue editors in reviewItem', async () => {
-    const issueEditorUser = await createUser()
+    const issueEditor = await createUser()
 
     await createDocument({
       _id: 'ARTICLEID1234',
@@ -353,10 +353,10 @@ describe('userCapabilityDiviner', () => {
           articles: [{_type: 'reference', _ref: 'ARTICLEID1234'}]
         }
       ],
-      editors: [{_type: 'reference', _ref: issueEditorUser._id}]
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
     })
 
-    await createDocument({
+    const reviewProcess = await createDocument({
       _id: 'REVIEWPROCESSID1234',
       _type: 'reviewProcess',
       article: {_type: 'reference', _ref: 'ARTICLEID1234'}
@@ -368,9 +368,9 @@ describe('userCapabilityDiviner', () => {
       reviewProcess: {_type: 'reference', _ref: 'REVIEWPROCESSID1234'}
     })
 
-    const capabilities = await capabilitiesForUser(issueEditorUser._id)
+    const capabilities = await capabilitiesForUser(issueEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInIssueWithArticleInReviewItem: 'reviewProcess._ref in ["REVIEWPROCESSID1234"]'
+      isEditorInIssueWithArticleInReviewItem: ['reviewProcess._ref', [reviewProcess._id]]
     })
   })
 
@@ -391,7 +391,7 @@ describe('userCapabilityDiviner', () => {
 
     const capabilities = await capabilitiesForUser(submitter._id)
     expect(capabilities).toMatchObject({
-      isSubmitterInArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
+      isSubmitterInArticleInFeatureState: ['article._ref', [article._id]]
     })
   })
 
@@ -424,7 +424,7 @@ describe('userCapabilityDiviner', () => {
 
     const capabilities = await capabilitiesForUser(issueEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInIssueWithArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
+      isEditorInIssueWithArticleInFeatureState: ['article._ref', [article._id]]
     })
   })
 
@@ -451,7 +451,7 @@ describe('userCapabilityDiviner', () => {
 
     const capabilities = await capabilitiesForUser(trackEditor._id)
     expect(capabilities).toMatchObject({
-      isEditorInTrackWithArticleInFeatureState: 'article._ref in ["ARTICLEID1234"]'
+      isEditorInTrackWithArticleInFeatureState: ['article._ref', [article._id]]
     })
   })
 
@@ -466,11 +466,11 @@ describe('userCapabilityDiviner', () => {
     })
     const issueEditorCapabilities = await capabilitiesForUser(issueEditor._id)
     expect(issueEditorCapabilities).toMatchObject({
-      isEditorInAnyIssue: 'true'
+      isEditorInAnyIssue: [true]
     })
     const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
     expect(unprivilegedUserCapabilities).toMatchObject({
-      isEditorInAnyIssue: 'false'
+      isEditorInAnyIssue: [false]
     })
   })
 
@@ -485,39 +485,60 @@ describe('userCapabilityDiviner', () => {
     })
     const trackEditorCapabilities = await capabilitiesForUser(trackEditor._id)
     expect(trackEditorCapabilities).toMatchObject({
-      isEditorInAnyTrack: 'true'
+      isEditorInAnyTrack: [true]
     })
     const unprivilegedUserCapabilities = await capabilitiesForUser(unprivilegedUser._id)
     expect(unprivilegedUserCapabilities).toMatchObject({
-      isEditorInAnyTrack: 'false'
+      isEditorInAnyTrack: [false]
     })
   })
 
   test('recognizes an editor in a specific issue', async () => {
     const issueEditor = await createUser()
 
-    await createDocument({
+    const issue = await createDocument({
       _id: 'ISSUEID1234',
       _type: 'issue',
       editors: [{_type: 'reference', _ref: issueEditor._id}]
     })
     const capabilities = await capabilitiesForUser(issueEditor._id)
     expect(capabilities).toMatchObject({
-      isIssueEditor: '_id in ["ISSUEID1234"]'
+      isIssueEditor: ['_id', [issue._id]]
     })
   })
 
   test('recognizes an editor in a specific track', async () => {
     const trackEditor = await createUser()
 
-    await createDocument({
+    const track = await createDocument({
       _id: 'TRACKID1234',
       _type: 'track',
       editors: [{_type: 'reference', _ref: trackEditor._id}]
     })
     const capabilities = await capabilitiesForUser(trackEditor._id)
     expect(capabilities).toMatchObject({
-      isTrackEditor: '_id in ["TRACKID1234"]'
+      isTrackEditor: ['_id', [track._id]]
+    })
+  })
+
+  test('recognizes article submitter in comment', async () => {
+    const submitter = await createUser()
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article',
+      submitters: [{_type: 'reference', _ref: submitter._id}]
+    })
+
+    await createDocument({
+      _id: 'COMMENTID1234',
+      _type: 'comment',
+      subject: {_type: 'reference', _ref: article._id}
+    })
+
+    const capabilities = await capabilitiesForUser(submitter._id)
+    expect(capabilities).toMatchObject({
+      isSubmitterInArticleWithComment: ['subject._ref', [article._id]]
     })
   })
 })
