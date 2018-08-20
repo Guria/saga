@@ -42,11 +42,17 @@ documents:
   v_true: true
 
 tests:
-- title: "match filter simple multiple"
+- title: "match filter simple, multiple terms"
   query: |
     *[_type == "koan" && text match ['Whe*', 'reduced']]._id
   result:
     ['k3']
+
+- title: "match filter simple, multiple attributes"
+  query: |
+    *[_type == "koan" && [text, title] match 'Medina']._id
+  result:
+    ['k1']
 
 - title: "match filter simple"
   query: |

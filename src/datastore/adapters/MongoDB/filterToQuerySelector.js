@@ -36,6 +36,10 @@ async function fetchForSpec(collection, spec) {
   const end = canSort ? Math.max(0, spec.end || 100) : 0
   const start = canSort ? Math.max(0, (spec.start || 0) - 1) : 0
 
+  // console.log('filter', util.inspect(filter, {
+  //   depth: 10
+  // }))
+
   // Filter might be short-circuited to `false`,
   // don't query mongodb if this is the case
   let documents = []

@@ -1,5 +1,4 @@
-# Tests for arrays.
-title: 'Very basic tests to validate PoC'
+title: 'Very basic tests to validate PoC (banal)'
 documents:
   - _id: 'oneDoc'
     _type: 'test'

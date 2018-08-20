@@ -15,11 +15,6 @@ const getTestConfig = () => {
       options: {
         basePath: path.join(os.tmpdir(), executionId)
       }
-    },
-    datastore: {
-      options: {
-        dbPrefix: testId
-      }
     }
   }
 }
