@@ -13,13 +13,13 @@ Saga is an abbreviation of Sagittarus A\* which is the radio source likely to be
 ```
 {
   read: '(_type == "article" && _id in ["article-123"]) || (_type == "venue")',
-  update: '(_type == "article" && _id in ["article-123"]) || (_type == "venue" && false)',
-  create: '(_type == "article" && false) || (_type == "venue" && false)',
-  delete: '(_type == "article" && false) || (_type == "venue" && false)'
+  update: '(_type == "article" && _id in ["article-123"])',
+  create: 'false',
+  delete: 'false'
 }
 ```
 
-(There will also be filters the the other docment types, not included here for brevity)
+(There will also be filters concerning the other docment types, not included here for brevity)
 
 This filter is applied to any actions the user performs, giving her read access to her own article and all venues. She also has update access to her own article, but not the venue. Create and delete access is denied on all articles and venues.
 
