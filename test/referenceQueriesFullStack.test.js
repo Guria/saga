@@ -21,7 +21,7 @@ describe.skip('Reference queries (through the full stack, including MongoDB driv
   afterAll(() => close(app))
 
   const suites = glob.sync(path.join(__dirname, 'reference_queries', '*.yml'))
-    // .filter(filename => filename.match(/func_references\.yml/))
+    // .filter(filename => filename.match(/ranges\.yml/))
     .map(filename => {
       try {
         const yamlSrc = fs.readFileSync(filename, {

@@ -34,9 +34,19 @@ async function fetchForSpec(collection, spec) {
   const canSort = sort.every(Boolean)
   const filter = spec.filter ? fromNode(spec.filter) : {}
   const end = canSort ? Math.max(0, spec.end || 100) : 0
-  const start = canSort ? Math.max(0, (spec.start || 0) - 1) : 0
+  const start = 0 //canSort ? Math.max(0, (spec.start || 0)) : 0
+  // Currently the range limitation will be done by the run-time groq-engine, so the fetch will always
+  // start at index 0. In the future this result should be able to communicate to the run-time evaluator
+  // when it has performed the range limitation here.
 
-  // console.log('filter', util.inspect(filter, {
+  // console.log('mongo-fetch', util.inspect({
+  //   sort,
+  //   canSort,
+  //   filter,
+  //   start,
+  //   end,
+  //   spec
+  // }, {
   //   depth: 10
   // }))
 
