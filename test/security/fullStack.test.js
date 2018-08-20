@@ -6,8 +6,8 @@ describe('fullStack', () => {
   const identityTemplate = {
     provider: 'google',
     providerId: 'xyzzy',
-    name: 'Profeten Thomax',
-    email: 'thomas@sanity.io'
+    name: 'Test User',
+    email: 'test@example.com'
   }
 
   let app
