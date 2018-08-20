@@ -10,7 +10,7 @@ module.exports = strategies => {
   const auth = express.Router()
 
   auth.get('/error', loginError)
-  auth.get('/logout', logout)
+  auth.post('/logout', logout)
   auth.get('/providers', listProviders.bind(null, strategies))
 
   strategies.forEach(strategy => {
