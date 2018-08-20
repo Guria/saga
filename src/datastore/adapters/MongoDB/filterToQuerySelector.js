@@ -3,15 +3,15 @@ const {merge, omit} = require('lodash')
 const {query: execQuery} = require('../../../groq')
 
 const log = (prefix, ast) =>
-  // eslint-disable-next-line no-console
-  console.log(
-    '%s: ',
-    prefix,
-    util.inspect(ast, {
-      colors: true,
-      depth: 15
-    })
-  )
+// eslint-disable-next-line no-console
+console.log(
+  '%s: ',
+  prefix,
+  util.inspect(ast, {
+    colors: true,
+    depth: 15
+  })
+)
 
 module.exports = {
   toMongo,
@@ -440,20 +440,36 @@ function fromReferencesFilter(node) {
 
 function fromMatchFilter(node) {
   const {type, lhs, rhs} = filterParts(node)
+
+  if (Array.isArray(rhs)) {
+    return {
+      '$and': rhs.map(term => fromMatchFilter(
+        Object.assign({}, node, {
+          rhs: {
+            op: 'literal',
+            type: 'string',
+            value: term
+          }
+        })
+      ))
+    }
+  }
+
   const pattern = escapeRegExp(rhs)
     // * -> .*?
     .replace(/\*/g, '.*?')
     // Multiple occurences -> Single occurence (*** -> .*?)
     .replace(/(\.\*\?)+/g, '.*?')
 
-  const $regex = new RegExp(`${pattern}`, 'i')
   if (type === 'literalComparison') {
+    const $regex = new RegExp(pattern, 'i')
     return $regex.test(lhs)
   }
 
   return {
     [lhs]: {
-      $regex
+      $regex: pattern,
+      $options: "i"
     }
   }
 }

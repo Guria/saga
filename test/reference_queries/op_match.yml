@@ -42,6 +42,18 @@ documents:
   v_true: true
 
 tests:
+- title: "match filter simple multiple"
+  query: |
+    *[_type == "koan" && text match ['Whe*', 'reduced']]._id
+  result:
+    ['k3']
+
+- title: "match filter simple"
+  query: |
+    *[_type == "koan" && text match 'Whe*']._id
+  result:
+    ['k2', 'k3']
+
 - title: "match filter simple"
   query: |
     [
@@ -62,6 +74,7 @@ tests:
   ]
 
 - title: "match filter attributes"
+  skip: true
   # FIXME we should have a test here with v_array, which should not error out
   query: |
     [
