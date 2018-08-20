@@ -29,6 +29,7 @@ function query(collection, groqQuery, params = {}, options) {
 }
 
 async function fetchForSpec(collection, spec) {
+
   const sort = spec.ordering.map(fromNode)
   const canSort = sort.every(Boolean)
   const filter = spec.filter ? fromNode(spec.filter) : {}
@@ -455,16 +456,34 @@ function fromMatchFilter(node) {
     }
   }
 
+  if (Array.isArray(lhs)) {
+    return {
+      '$or': lhs.map(name => fromMatchFilter(
+        Object.assign({}, node, {
+          lhs: {
+            op: 'accessor',
+            path: [{
+              op: 'attribute',
+              name
+            }]
+          }
+        })
+      ))
+    }
+  }
+
   const pattern = escapeRegExp(rhs)
     // * -> .*?
     .replace(/\*/g, '.*?')
     // Multiple occurences -> Single occurence (*** -> .*?)
     .replace(/(\.\*\?)+/g, '.*?')
 
+
   if (type === 'literalComparison') {
     const $regex = new RegExp(pattern, 'i')
     return $regex.test(lhs)
   }
+
 
   return {
     [lhs]: {
