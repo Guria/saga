@@ -67,11 +67,11 @@ describe('accessFilterBuilder', () => {
     const filters = await filtersForUser(unprivilegedUser._id)
 
     expect(filters).toBeTruthy()
-    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "article" && (false)) || (_type == "comment" && (author._ref in ["${
+    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "comment" && (author._ref in ["${
       unprivilegedUser._id
-    }"]) || (false)) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && (false) || (reviewer._ref in ["${
+    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
       unprivilegedUser._id
-    }"])) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
+    }"])) || (_type == "featureConfig"))`
     expect(filters.read).toEqual(expected)
   })
 
@@ -84,11 +84,9 @@ describe('accessFilterBuilder', () => {
     })
     const filters = await filtersForUser(author._id)
 
-    const expected = `((_type == "venue" && (false)) || (_type == "issue" && (false)) || (_type == "track" && (false)) || (_type == "stage" && (false)) || (_type == "user" && (false)) || (_type == "article" && (false)) || (_type == "comment" && (author._ref in ["${
+    const expected = `((_type == "comment" && (author._ref in ["${
       author._id
-    }"]) || (false)) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && (false) || (reviewer._ref in ["${
-      author._id
-    }"])) || (_type == "featureConfig" && (false)) || (_type == "featureState" && (false)))`
+    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${author._id}"])))`
     expect(filters.update).toEqual(expected)
   })
 
@@ -104,56 +102,56 @@ describe('accessFilterBuilder', () => {
 
     const expected = {
       create: {
-        article: [[false]],
-        comment: [[true]],
-        featureConfig: [[false]],
-        featureState: [[false]],
-        issue: [[false]],
-        reviewItem: [[false]],
-        reviewProcess: [[false]],
-        stage: [[false]],
-        track: [[false]],
-        user: [[false]],
-        venue: []
+        article: false,
+        comment: true,
+        featureConfig: false,
+        featureState: false,
+        issue: false,
+        reviewItem: false,
+        reviewProcess: false,
+        stage: false,
+        track: false,
+        user: false,
+        venue: false
       },
       delete: {
-        article: [[false]],
-        comment: [['author._ref', [`${author._id}`]], [false]],
-        featureConfig: [[false]],
-        featureState: [[false]],
-        issue: [[false]],
-        reviewItem: [[false], ['reviewer._ref', [`${author._id}`]]],
-        reviewProcess: [[false]],
-        stage: [[false]],
-        track: [[false]],
-        user: [[false]],
-        venue: []
+        article: false,
+        comment: [['author._ref', [`${author._id}`]]],
+        featureConfig: false,
+        featureState: false,
+        issue: false,
+        reviewItem: [['reviewer._ref', [`${author._id}`]]],
+        reviewProcess: false,
+        stage: false,
+        track: false,
+        user: false,
+        venue: false
       },
       read: {
-        article: [[false]],
-        comment: [['author._ref', [`${author._id}`]], [false]],
-        featureConfig: [[true]],
-        featureState: [[false]],
-        issue: [[true]],
-        reviewItem: [[false], ['reviewer._ref', [`${author._id}`]]],
-        reviewProcess: [[false]],
-        stage: [[true]],
-        track: [[true]],
-        user: [[true]],
-        venue: [[true]]
+        article: false,
+        comment: [['author._ref', [`${author._id}`]]],
+        featureConfig: true,
+        featureState: false,
+        issue: true,
+        reviewItem: [['reviewer._ref', [`${author._id}`]]],
+        reviewProcess: false,
+        stage: true,
+        track: true,
+        user: true,
+        venue: true
       },
       update: {
-        article: [[false]],
-        comment: [['author._ref', [`${author._id}`]], [false]],
-        featureConfig: [[false]],
-        featureState: [[false]],
-        issue: [[false]],
-        reviewItem: [[false], ['reviewer._ref', [`${author._id}`]]],
-        reviewProcess: [[false]],
-        stage: [[false]],
-        track: [[false]],
-        user: [[false]],
-        venue: [[false]]
+        article: false,
+        comment: [['author._ref', [`${author._id}`]]],
+        featureConfig: false,
+        featureState: false,
+        issue: false,
+        reviewItem: [['reviewer._ref', [`${author._id}`]]],
+        reviewProcess: false,
+        stage: false,
+        track: false,
+        user: false,
+        venue: false
       }
     }
     expect(filters.capabilities).toEqual(expected)

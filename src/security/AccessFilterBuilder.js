@@ -1,6 +1,5 @@
 /* eslint-disable complexity */
 
-import {uniqBy} from 'lodash'
 const UserCapabilityDiviner = require('./UserCapabilityDiviner')
 const requiredCapabilities = require('./requiredCapabilities.js')
 const actions = ['read', 'create', 'update', 'delete']
@@ -28,20 +27,10 @@ function arrayAsQuotedString(items) {
 
 function querifyTuples(tuples) {
   const queryfied = tuples
-    .map(tuple => {
-      if (tuples.length === 1) {
-        // no sense in returning a single true, it just adds noise
-        return tuple[0] === true ? null : `(${tuple[0]})`
-      }
-      return tuple.length === 1
-        ? `(${tuple[0]})`
-        : `(${tuple[0]} in ${arrayAsQuotedString(tuple[1])})`
-    })
-    .filter(Boolean)
-  if (queryfied.length > 1) {
-    return queryfied.join(' || ')
-  }
-  return queryfied.length < 1 ? null : queryfied
+    .map(tuple => `(${tuple[0]} in ${arrayAsQuotedString(tuple[1])})`)
+    .join(' || ')
+
+  return queryfied
 }
 
 // This class defines which capabilities a given user must have in order
@@ -62,10 +51,23 @@ class AccessFilterBuilder {
     return this.userCapabilities
   }
 
-  // Cosmetic
-  // [[false], [false]] --> [[false]]
-  deepUniq(array) {
-    return uniqBy(array, JSON.stringify)
+  compressCapabilities(action, type) {
+    // Needed requirements for this action and type
+    const requirements = requiredCapabilities[action][type]
+    // The users' capability-tuples for those requirements
+    const tuples = requirements.map(requirement => this.userCapabilities[requirement])
+    // A single true grants access
+    const explicitAllow = tuples.some(tuple => tuple[0] === true)
+    if (explicitAllow) {
+      return true
+    }
+    // All false denies access
+    const allDisallow = tuples.every(tuple => tuple[0] === false)
+    if (allDisallow) {
+      return false
+    }
+    // Return all non-true/false rules we have
+    return tuples.filter(tuple => tuple.length > 1)
   }
 
   assembleCapabilitiesByActionAndType() {
@@ -73,10 +75,10 @@ class AccessFilterBuilder {
     actions.forEach(action => {
       allCapabilityTuples[action] = {}
       documentTypes.forEach(type => {
-        const requirements = requiredCapabilities[action][type]
-        allCapabilityTuples[action][type] = this.deepUniq(
-          requirements.map(requirement => this.userCapabilities[requirement])
-        )
+        const compressedCapabilities = this.compressCapabilities(action, type)
+        if (this.compressCapabilities) {
+          allCapabilityTuples[action][type] = compressedCapabilities
+        }
       })
     })
     return allCapabilityTuples
@@ -85,16 +87,21 @@ class AccessFilterBuilder {
   async determineFilters() {
     await this.fetchAllCapabilities()
     const capabilitiesByActionAndType = this.assembleCapabilitiesByActionAndType()
-    //console.log('capabilitiesByActionAndType', JSON.stringify(capabilitiesByActionAndType, null, 2))
     const result = {}
     actions.forEach(action => {
-      const queries = documentTypes.map(type => {
-        const specificCapabilities = capabilitiesByActionAndType[action][type]
-        const query = [`_type == "${type}"`, querifyTuples(specificCapabilities)]
-          .filter(Boolean)
-          .join(' && ')
-        return `(${query})`
-      })
+      const queries = documentTypes
+        .map(type => {
+          const specificCapabilities = capabilitiesByActionAndType[action][type]
+          if (!specificCapabilities) {
+            return null
+          }
+          if (specificCapabilities === true) {
+            return `(_type == "${type}")`
+          }
+          const query = [`_type == "${type}"`, querifyTuples(specificCapabilities)].join(' && ')
+          return `(${query})`
+        })
+        .filter(Boolean)
       result[action] = `(${queries.join(' || ')})`
     })
     result.capabilities = capabilitiesByActionAndType
