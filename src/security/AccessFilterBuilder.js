@@ -22,7 +22,7 @@ function quote(item) {
   return `"${item}"`
 }
 
-function quoteItems(items) {
+function arrayAsQuotedString(items) {
   return `[${items.map(quote).join(',')}]`
 }
 
@@ -33,7 +33,9 @@ function querifyTuples(tuples) {
         // no sense in returning a single true, it just adds noise
         return tuple[0] === true ? null : `(${tuple[0]})`
       }
-      return tuple.length === 1 ? `(${tuple[0]})` : `(${tuple[0]} in ${quoteItems(tuple[1])})`
+      return tuple.length === 1
+        ? `(${tuple[0]})`
+        : `(${tuple[0]} in ${arrayAsQuotedString(tuple[1])})`
     })
     .filter(Boolean)
   if (queryfied.length > 1) {
