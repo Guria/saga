@@ -58,7 +58,6 @@ describe('accessFilterBuilder', () => {
       )
     ))
 
-  // This test will eventually evaluate a single mega-pile of filters
   test('sparse read access to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
     await createDocument({
@@ -66,18 +65,18 @@ describe('accessFilterBuilder', () => {
       name: 'journal-of-snah'
     })
     const filters = await filtersForUser(unprivilegedUser._id)
+
     expect(filters).toBeTruthy()
-    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
+    const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "article" && (false)) || (_type == "comment" && (author._ref in ["${
       unprivilegedUser._id
-    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((false) || (reviewer._ref == "${
+    }"]) || (false)) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && (false) || (reviewer._ref in ["${
       unprivilegedUser._id
-    }"))) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
+    }"])) || (_type == "featureConfig") || (_type == "featureState" && (false)))`
     expect(filters.read).toEqual(expected)
   })
 
   test('grants update on comment for comment author', async () => {
     const author = await createUser()
-
     await createDocument({
       _type: 'comment',
       title: 'Stuff I chew on',
@@ -85,11 +84,11 @@ describe('accessFilterBuilder', () => {
     })
     const filters = await filtersForUser(author._id)
 
-    const expected = `((_type == "venue" && (false)) || (_type == "issue" && (false)) || (_type == "track" && (false)) || (_type == "stage" && (false)) || (_type == "user" && (false)) || (_type == "article" && (false)) || (_type == "comment" && ((author._ref == "${
+    const expected = `((_type == "venue" && (false)) || (_type == "issue" && (false)) || (_type == "track" && (false)) || (_type == "stage" && (false)) || (_type == "user" && (false)) || (_type == "article" && (false)) || (_type == "comment" && (author._ref in ["${
       author._id
-    }") || (false))) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && ((false) || (reviewer._ref == "${
+    }"]) || (false)) || (_type == "reviewProcess" && (false)) || (_type == "reviewItem" && (false) || (reviewer._ref in ["${
       author._id
-    }"))) || (_type == "featureConfig" && (false)) || (_type == "featureState" && (false)))`
+    }"])) || (_type == "featureConfig" && (false)) || (_type == "featureState" && (false)))`
     expect(filters.update).toEqual(expected)
   })
 })

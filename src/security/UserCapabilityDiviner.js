@@ -8,8 +8,8 @@ function quoteItems(items) {
   return `[${items.map(quote).join(',')}]`
 }
 
-function isValueInArrayQuery(valueName, ids = []) {
-  return ids.length > 0 ? `${valueName} in ${quoteItems(ids)}` : 'false'
+function isValueInArrayTuple(valueName, ids = []) {
+  return ids.length > 0 ? [valueName, ids] : [false]
 }
 
 // This class figures out all capabilities for a given user
@@ -60,7 +60,7 @@ class UserCapabilityDiviner {
       _id, _type,
       "editor": defined(editors) && length(editors[_ref == $userId])>0,
     }.editor`
-    return this.performQuery(query, {userId: this.userId}).then(result => result.toString())
+    return this.performQuery(query, {userId: this.userId}).then(result => [result])
   }
 
   tracksWhereUserIsEditor() {
@@ -101,41 +101,41 @@ class UserCapabilityDiviner {
   isEditorInArticleTrack() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
-      .then(trackIds => isValueInArrayQuery('track._ref', trackIds))
+      .then(trackIds => isValueInArrayTuple('track._ref', trackIds))
   }
 
   isEditorInArticleIssues() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => isValueInArrayQuery('_id', articleIds))
+      .then(articleIds => isValueInArrayTuple('_id', articleIds))
   }
 
   isSubmitterInArticle() {
     return this.articlesWhereUserIsSubmitter()
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayQuery('_id', articleIds))
+      .then(articleIds => isValueInArrayTuple('_id', articleIds))
   }
 
   isSubmitterInArticleInFeatureState() {
     return this.articlesWhereUserIsSubmitter()
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
   }
 
   isReviewer() {
-    return `reviewer._ref == "${this.userId}"`
+    return isValueInArrayTuple('reviewer._ref', [this.userId])
   }
 
   isCommentAuthor() {
-    return `author._ref == "${this.userId}"`
+    return isValueInArrayTuple('author._ref', [this.userId])
   }
 
   isEditorInIssueWithArticleInReviewProcess() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
   }
 
   isEditorInIssueWithArticleInReviewItem() {
@@ -144,7 +144,7 @@ class UserCapabilityDiviner {
       .then(nestedArticleIds => flatten(nestedArticleIds))
       .then(articleIds => this.reviewProcessesByArticles(articleIds))
       .then(reviewProcesses => reviewProcesses.map(rp => rp._id))
-      .then(reviewProcessIds => isValueInArrayQuery('reviewProcess._ref', reviewProcessIds))
+      .then(reviewProcessIds => isValueInArrayTuple('reviewProcess._ref', reviewProcessIds))
   }
 
   isEditorInTrackWithArticleInReviewProcess() {
@@ -152,7 +152,7 @@ class UserCapabilityDiviner {
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
   }
 
   isEditorInTrackWithArticleInReviewItem() {
@@ -162,14 +162,14 @@ class UserCapabilityDiviner {
       .then(articles => articles.map(article => article._id))
       .then(articleIds => this.reviewProcessesByArticles(articleIds))
       .then(reviewProcesses => reviewProcesses.map(rp => rp._id))
-      .then(reviewProcessIds => isValueInArrayQuery('reviewProcess._ref', reviewProcessIds))
+      .then(reviewProcessIds => isValueInArrayTuple('reviewProcess._ref', reviewProcessIds))
   }
 
   isEditorInIssueWithArticleInComment() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => isValueInArrayQuery('subject._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('subject._ref', articleIds))
   }
 
   isEditorInTrackWithArticleInComment() {
@@ -177,14 +177,14 @@ class UserCapabilityDiviner {
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayQuery('subject._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('subject._ref', articleIds))
   }
 
   isEditorInIssueWithArticleInFeatureState() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
   }
 
   isEditorInTrackWithArticleInFeatureState() {
@@ -192,27 +192,27 @@ class UserCapabilityDiviner {
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
       .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayQuery('article._ref', articleIds))
+      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
   }
 
   isEditorInAnyIssue() {
-    return this.issuesWhereUserIsEditor().then(issues => (issues.length > 0).toString())
+    return this.issuesWhereUserIsEditor().then(issues => [issues.length > 0])
   }
 
   isEditorInAnyTrack() {
-    return this.tracksWhereUserIsEditor().then(tracks => (tracks.length > 0).toString())
+    return this.tracksWhereUserIsEditor().then(tracks => [tracks.length > 0])
   }
 
   isIssueEditor() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue._id))
-      .then(issueIds => isValueInArrayQuery('_id', issueIds))
+      .then(issueIds => isValueInArrayTuple('_id', issueIds))
   }
 
   isTrackEditor() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
-      .then(trackIds => isValueInArrayQuery('_id', trackIds))
+      .then(trackIds => isValueInArrayTuple('_id', trackIds))
   }
 
   runAll() {
@@ -259,6 +259,7 @@ class UserCapabilityDiviner {
         isTrackEditor
       ]) => {
         return {
+          isLoggedInUser: [true],
           isVenueEditor,
           isEditorInArticleTrack,
           isEditorInArticleIssues,
