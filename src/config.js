@@ -65,7 +65,7 @@ module.exports = {
       'http://0.0.0.0:1235',
       'http://localhost:1236',
       'http://127.0.0.1:1236',
-      'http://0.0.0.0:1236',
+      'http://0.0.0.0:1236'
     ],
     exposedHeaders: ['Content-Type', 'Content-Length', 'ETag']
       .concat(split(process.env.SAGA_CORS_EXPOSED_HEADERS))
@@ -76,7 +76,7 @@ module.exports = {
     adapter: 'MongoDB',
     url: process.env.SAGA_MONGODB_URL || 'mongodb://localhost:27017',
     options: {
-      dbPrefix: 'saga',
+      dbPrefix: 'saga-',
       collection: 'documents',
       systemDb: env === 'test' ? 'saga-system-test' : 'saga-system'
     }
