@@ -58,7 +58,7 @@ describe('accessFilterBuilder', () => {
       )
     ))
 
-  test('sparse read access to unprivileged user', async () => {
+  test('produces groq filters granting some read access to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
     await createDocument({
       _type: 'venue',
@@ -75,7 +75,7 @@ describe('accessFilterBuilder', () => {
     expect(filters.read).toEqual(expected)
   })
 
-  test('grants update on comment for comment author', async () => {
+  test('produces groq filters allowing comment author to update own comment', async () => {
     const author = await createUser()
     await createDocument({
       _type: 'comment',
@@ -90,5 +90,72 @@ describe('accessFilterBuilder', () => {
       author._id
     }"])) || (_type == "featureConfig" && (false)) || (_type == "featureState" && (false)))`
     expect(filters.update).toEqual(expected)
+  })
+
+  // you break it you buy it
+  test('sanity-check capabilities', async () => {
+    const author = await createUser()
+    await createDocument({
+      _type: 'comment',
+      title: 'Stuff I chew on',
+      author: {_type: 'reference', _ref: author._id}
+    })
+    const filters = await filtersForUser(author._id)
+
+    const expected = {
+      create: {
+        article: [[false]],
+        comment: [[true]],
+        featureConfig: [[false]],
+        featureState: [[false]],
+        issue: [[false]],
+        reviewItem: [[false]],
+        reviewProcess: [[false]],
+        stage: [[false]],
+        track: [[false]],
+        user: [[false]],
+        venue: []
+      },
+      delete: {
+        article: [[false]],
+        comment: [['author._ref', [`${author._id}`]], [false]],
+        featureConfig: [[false]],
+        featureState: [[false]],
+        issue: [[false]],
+        reviewItem: [[false], ['reviewer._ref', [`${author._id}`]]],
+        reviewProcess: [[false]],
+        stage: [[false]],
+        track: [[false]],
+        user: [[false]],
+        venue: []
+      },
+      read: {
+        article: [[false]],
+        comment: [['author._ref', [`${author._id}`]], [false]],
+        featureConfig: [[true]],
+        featureState: [[false]],
+        issue: [[true]],
+        reviewItem: [[false], ['reviewer._ref', [`${author._id}`]]],
+        reviewProcess: [[false]],
+        stage: [[true]],
+        track: [[true]],
+        user: [[true]],
+        venue: [[true]]
+      },
+      update: {
+        article: [[false]],
+        comment: [['author._ref', [`${author._id}`]], [false]],
+        featureConfig: [[false]],
+        featureState: [[false]],
+        issue: [[false]],
+        reviewItem: [[false], ['reviewer._ref', [`${author._id}`]]],
+        reviewProcess: [[false]],
+        stage: [[false]],
+        track: [[false]],
+        user: [[false]],
+        venue: [[false]]
+      }
+    }
+    expect(filters.capabilities).toEqual(expected)
   })
 })
