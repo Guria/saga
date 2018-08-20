@@ -14,14 +14,6 @@ describe('grants', () => {
   const systemDataset = 'saga-system-test'
 
   let app
-  let scopedDataStore
-
-  async function getScopedDataStore() {
-    if (!scopedDataStore) {
-      scopedDataStore = await app.services.dataStore.forDataset(dataset)
-    }
-    return scopedDataStore
-  }
 
   async function createUser() {
     const userStore = app.services.userStore
