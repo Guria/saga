@@ -6,32 +6,32 @@ const requiredCapabilities = {
     stage: ['isLoggedInUser'],
     user: ['isLoggedInUser'],
     article: [
-      'isVenueEditor',
-      'isEditorInArticleTrack',
-      'isEditorInArticleIssues',
+      'isEditorInVenue',
+      'isEditorInTrackWithArticle',
+      'isEditorInIssueWithArticle',
       'isSubmitterInArticle'
     ],
     comment: [
-      'isCommentAuthor',
-      'isVenueEditor',
+      'isAuthorInComment',
+      'isEditorInVenue',
       'isSubmitterInArticleWithComment',
-      'isEditorInTrackWithArticleInComment',
-      'isEditorInIssueWithArticleInComment'
+      'isEditorInTrackWithArticleWithComment',
+      'isEditorInIssueWithArticleWithComment'
     ],
     reviewProcess: [
-      'isVenueEditor',
+      'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
     reviewItem: [
-      'isVenueEditor',
-      'isReviewer',
+      'isEditorInVenue',
+      'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
     ],
     featureConfig: ['isLoggedInUser'],
     featureState: [
-      'isVenueEditor',
+      'isEditorInVenue',
       'isSubmitterInArticleInFeatureState',
       'isEditorInIssueWithArticleInFeatureState',
       'isEditorInTrackWithArticleInFeatureState'
@@ -39,79 +39,79 @@ const requiredCapabilities = {
   },
   create: {
     venue: [],
-    issue: ['isVenueEditor'],
-    track: ['isVenueEditor'],
-    stage: ['isVenueEditor'],
-    user: ['isVenueEditor', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
-    article: ['isVenueEditor', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
-    comment: ['isCommentAuthor'],
-    reviewProcess: ['isVenueEditor', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
+    issue: ['isEditorInVenue'],
+    track: ['isEditorInVenue'],
+    stage: ['isEditorInVenue'],
+    user: ['isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
+    article: ['isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
+    comment: ['isAuthorInComment'],
+    reviewProcess: ['isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
     reviewItem: [
-      'isVenueEditor',
+      'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
-    featureConfig: ['isVenueEditor'],
-    featureState: ['isVenueEditor']
+    featureConfig: ['isEditorInVenue'],
+    featureState: ['isEditorInVenue']
   },
   update: {
-    venue: ['isVenueEditor'],
-    issue: ['isVenueEditor', 'isIssueEditor'],
-    track: ['isVenueEditor', 'isTrackEditor'],
-    stage: ['isVenueEditor'],
-    user: ['isVenueEditor'],
+    venue: ['isEditorInVenue'],
+    issue: ['isEditorInVenue', 'isEditorInIssue'],
+    track: ['isEditorInVenue', 'isEditorInTrack'],
+    stage: ['isEditorInVenue'],
+    user: ['isEditorInVenue'],
     article: [
-      'isVenueEditor',
-      'isEditorInArticleTrack',
-      'isEditorInArticleIssues',
+      'isEditorInVenue',
+      'isEditorInTrackWithArticle',
+      'isEditorInIssueWithArticle',
       'isSubmitterInArticle'
     ],
     comment: [
-      'isCommentAuthor',
-      'isVenueEditor',
-      'isEditorInTrackWithArticleInComment',
-      'isEditorInIssueWithArticleInComment'
+      'isAuthorInComment',
+      'isEditorInVenue',
+      'isEditorInTrackWithArticleWithComment',
+      'isEditorInIssueWithArticleWithComment'
     ],
     reviewProcess: [
-      'isVenueEditor',
+      'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
     reviewItem: [
-      'isVenueEditor',
-      'isReviewer',
+      'isEditorInVenue',
+      'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
     ],
-    featureConfig: ['isVenueEditor'],
-    featureState: ['isVenueEditor']
+    featureConfig: ['isEditorInVenue'],
+    featureState: ['isEditorInVenue']
   },
   delete: {
     venue: [],
-    issue: ['isVenueEditor'],
-    track: ['isVenueEditor'],
-    stage: ['isVenueEditor'],
-    user: ['isVenueEditor'],
-    article: ['isVenueEditor', 'isEditorInArticleTrack', 'isEditorInArticleIssues'],
+    issue: ['isEditorInVenue'],
+    track: ['isEditorInVenue'],
+    stage: ['isEditorInVenue'],
+    user: ['isEditorInVenue'],
+    article: ['isEditorInVenue', 'isEditorInTrackWithArticle', 'isEditorInIssueWithArticle'],
     comment: [
-      'isCommentAuthor',
-      'isVenueEditor',
-      'isEditorInTrackWithArticleInComment',
-      'isEditorInIssueWithArticleInComment'
+      'isAuthorInComment',
+      'isEditorInVenue',
+      'isEditorInTrackWithArticleWithComment',
+      'isEditorInIssueWithArticleWithComment'
     ],
     reviewProcess: [
-      'isVenueEditor',
+      'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
     reviewItem: [
-      'isVenueEditor',
-      'isReviewer',
+      'isEditorInVenue',
+      'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
     ],
-    featureConfig: ['isVenueEditor'],
-    featureState: ['isVenueEditor']
+    featureConfig: ['isEditorInVenue'],
+    featureState: ['isEditorInVenue']
   }
 }
 module.exports = requiredCapabilities

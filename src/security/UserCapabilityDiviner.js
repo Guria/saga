@@ -55,7 +55,7 @@ class UserCapabilityDiviner {
     return this.performQuery(query)
   }
 
-  isVenueEditor() {
+  isEditorInVenue() {
     const query = `*[_type=="venue" && references($userId)][0]{
       _id, _type,
       "editor": defined(editors) && length(editors[_ref == $userId])>0,
@@ -98,13 +98,13 @@ class UserCapabilityDiviner {
     )
   }
 
-  isEditorInArticleTrack() {
+  isEditorInTrackWithArticle() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => isValueInArrayTuple('track._ref', trackIds))
   }
 
-  isEditorInArticleIssues() {
+  isEditorInIssueWithArticle() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
@@ -123,11 +123,11 @@ class UserCapabilityDiviner {
       .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
   }
 
-  isReviewer() {
+  isReviewerInReviewItem() {
     return isValueInArrayTuple('reviewer._ref', [this.userId])
   }
 
-  isCommentAuthor() {
+  isAuthorInComment() {
     return isValueInArrayTuple('author._ref', [this.userId])
   }
 
@@ -165,14 +165,14 @@ class UserCapabilityDiviner {
       .then(reviewProcessIds => isValueInArrayTuple('reviewProcess._ref', reviewProcessIds))
   }
 
-  isEditorInIssueWithArticleInComment() {
+  isEditorInIssueWithArticleWithComment() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue.articleIds))
       .then(nestedArticleIds => flatten(nestedArticleIds))
       .then(articleIds => isValueInArrayTuple('subject._ref', articleIds))
   }
 
-  isEditorInTrackWithArticleInComment() {
+  isEditorInTrackWithArticleWithComment() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => this.articlesInTracks(trackIds))
@@ -203,13 +203,13 @@ class UserCapabilityDiviner {
     return this.tracksWhereUserIsEditor().then(tracks => [tracks.length > 0])
   }
 
-  isIssueEditor() {
+  isEditorInIssue() {
     return this.issuesWhereUserIsEditor()
       .then(issues => issues.map(issue => issue._id))
       .then(issueIds => isValueInArrayTuple('_id', issueIds))
   }
 
-  isTrackEditor() {
+  isEditorInTrack() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
       .then(trackIds => isValueInArrayTuple('_id', trackIds))
@@ -223,16 +223,16 @@ class UserCapabilityDiviner {
 
   runAll() {
     return Promise.all([
-      this.isVenueEditor(),
-      this.isEditorInArticleTrack(),
-      this.isEditorInArticleIssues(),
+      this.isEditorInVenue(),
+      this.isEditorInTrackWithArticle(),
+      this.isEditorInIssueWithArticle(),
       this.isSubmitterInArticle(),
-      this.isCommentAuthor(),
-      this.isEditorInIssueWithArticleInComment(),
-      this.isEditorInTrackWithArticleInComment(),
+      this.isAuthorInComment(),
+      this.isEditorInIssueWithArticleWithComment(),
+      this.isEditorInTrackWithArticleWithComment(),
       this.isEditorInIssueWithArticleInReviewProcess(),
       this.isEditorInTrackWithArticleInReviewProcess(),
-      this.isReviewer(),
+      this.isReviewerInReviewItem(),
       this.isEditorInIssueWithArticleInReviewItem(),
       this.isEditorInTrackWithArticleInReviewItem(),
       this.isSubmitterInArticleInFeatureState(),
@@ -240,21 +240,21 @@ class UserCapabilityDiviner {
       this.isEditorInTrackWithArticleInFeatureState(),
       this.isEditorInAnyIssue(),
       this.isEditorInAnyTrack(),
-      this.isIssueEditor(),
-      this.isTrackEditor(),
+      this.isEditorInIssue(),
+      this.isEditorInTrack(),
       this.isSubmitterInArticleWithComment()
     ]).then(
       ([
-        isVenueEditor,
-        isEditorInArticleTrack,
-        isEditorInArticleIssues,
+        isEditorInVenue,
+        isEditorInTrackWithArticle,
+        isEditorInIssueWithArticle,
         isSubmitterInArticle,
-        isCommentAuthor,
-        isEditorInIssueWithArticleInComment,
-        isEditorInTrackWithArticleInComment,
+        isAuthorInComment,
+        isEditorInIssueWithArticleWithComment,
+        isEditorInTrackWithArticleWithComment,
         isEditorInIssueWithArticleInReviewProcess,
         isEditorInTrackWithArticleInReviewProcess,
-        isReviewer,
+        isReviewerInReviewItem,
         isEditorInIssueWithArticleInReviewItem,
         isEditorInTrackWithArticleInReviewItem,
         isSubmitterInArticleInFeatureState,
@@ -262,22 +262,22 @@ class UserCapabilityDiviner {
         isEditorInTrackWithArticleInFeatureState,
         isEditorInAnyIssue,
         isEditorInAnyTrack,
-        isIssueEditor,
-        isTrackEditor,
+        isEditorInIssue,
+        isEditorInTrack,
         isSubmitterInArticleWithComment
       ]) => {
         return {
           isLoggedInUser: [true],
-          isVenueEditor,
-          isEditorInArticleTrack,
-          isEditorInArticleIssues,
+          isEditorInVenue,
+          isEditorInTrackWithArticle,
+          isEditorInIssueWithArticle,
           isSubmitterInArticle,
-          isCommentAuthor,
-          isEditorInIssueWithArticleInComment,
-          isEditorInTrackWithArticleInComment,
+          isAuthorInComment,
+          isEditorInIssueWithArticleWithComment,
+          isEditorInTrackWithArticleWithComment,
           isEditorInIssueWithArticleInReviewProcess,
           isEditorInTrackWithArticleInReviewProcess,
-          isReviewer,
+          isReviewerInReviewItem,
           isEditorInIssueWithArticleInReviewItem,
           isEditorInTrackWithArticleInReviewItem,
           isSubmitterInArticleInFeatureState,
@@ -285,8 +285,8 @@ class UserCapabilityDiviner {
           isEditorInTrackWithArticleInFeatureState,
           isEditorInAnyIssue,
           isEditorInAnyTrack,
-          isIssueEditor,
-          isTrackEditor,
+          isEditorInIssue,
+          isEditorInTrack,
           isSubmitterInArticleWithComment
         }
       }
