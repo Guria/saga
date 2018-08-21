@@ -5,8 +5,8 @@ const {celebrate} = require('celebrate')
 const validation = celebrate({
   params: Joi.object({
     token: Joi.string()
-      .token()
       .required()
+      .regex(/^[-\w]+$/)
   }),
   query: Joi.object({
     venueId: Joi.string().optional(),
