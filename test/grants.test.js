@@ -44,10 +44,10 @@ describe('grants', () => {
 
   test('returns no grants for logged out user', async () => {
     const expected = {
-      read: 'false',
-      update: 'false',
-      delete: 'false',
-      create: 'false'
+      read: {},
+      update: {},
+      delete: {},
+      create: {}
     }
     await request(app)
       .get(`/v1/grants/${dataset}`)

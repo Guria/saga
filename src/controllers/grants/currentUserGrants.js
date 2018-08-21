@@ -6,5 +6,13 @@ module.exports = async (req, res, next) => {
     dataset,
     req.user && req.user.id
   )
-  res.json(userGrants)
+  const grants = userGrants.grants || {read: {}, update: {}, create: {}, delete: {}}
+  const result = {
+    read: grants.read,
+    update: grants.update,
+    create: grants.create,
+    delete: grants.delete,
+    capabilities: userGrants.capabilities
+  }
+  res.json(result)
 }
