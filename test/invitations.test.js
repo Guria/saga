@@ -53,7 +53,7 @@ describe('invitations', () => {
       .expect('Location', '/v1/users/me')
 
     await agent
-      .get('/v1/auth/logout')
+      .post('/v1/auth/logout')
       .expect(302)
       .expect('Location', '/v1/users/me')
 
