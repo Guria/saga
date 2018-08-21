@@ -70,7 +70,7 @@ class AccessFilterBuilder {
     return tuples.filter(tuple => tuple.length > 1)
   }
 
-  assembleCapabilitiesByActionAndType() {
+  assembleGrantsByActionAndType() {
     const allCapabilityTuples = {}
     actions.forEach(action => {
       allCapabilityTuples[action] = {}
@@ -86,25 +86,26 @@ class AccessFilterBuilder {
 
   async determineFilters() {
     await this.fetchAllCapabilities()
-    const capabilitiesByActionAndType = this.assembleCapabilitiesByActionAndType()
+    const grantsByActionAndType = this.assembleGrantsByActionAndType()
     const result = {}
     actions.forEach(action => {
       const queries = documentTypes
         .map(type => {
-          const specificCapabilities = capabilitiesByActionAndType[action][type]
-          if (!specificCapabilities) {
+          const specificGrants = grantsByActionAndType[action][type]
+          if (!specificGrants) {
             return null
           }
-          if (specificCapabilities === true) {
+          if (specificGrants === true) {
             return `(_type == "${type}")`
           }
-          const query = [`_type == "${type}"`, querifyTuples(specificCapabilities)].join(' && ')
+          const query = [`_type == "${type}"`, querifyTuples(specificGrants)].join(' && ')
           return `(${query})`
         })
         .filter(Boolean)
       result[action] = `(${queries.join(' || ')})`
     })
-    result.capabilities = capabilitiesByActionAndType
+    result.grants = grantsByActionAndType
+    result.capabilities = this.userCapabilities
     return result
   }
 }

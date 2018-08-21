@@ -121,6 +121,6 @@ describe('accessFilterBuilder', () => {
         reviewItem: [['reviewer._ref', [`${author._id}`]]]
       }
     }
-    expect(filters.capabilities).toEqual(expected)
+    expect(filters.grants).toEqual(expected)
   })
 })
