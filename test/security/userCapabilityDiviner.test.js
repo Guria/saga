@@ -374,6 +374,33 @@ describe('userCapabilityDiviner', () => {
     })
   })
 
+  test('recognizes a reviewer on an article', async () => {
+    const reviewer = await createUser()
+
+    const article = await createDocument({
+      _id: 'ARTICLEID1234',
+      _type: 'article'
+    })
+
+    const reviewProcess = await createDocument({
+      _id: 'REVIEWPROCESSID1234',
+      _type: 'reviewProcess',
+      article: {_type: 'reference', _ref: article._id}
+    })
+
+    await createDocument({
+      _id: 'REVIEWITEMID1234',
+      _type: 'reviewItem',
+      reviewProcess: {_type: 'reference', _ref: reviewProcess._id},
+      reviewer: {_type: 'reference', _ref: reviewer._id}
+    })
+
+    const capabilities = await capabilitiesForUser(reviewer._id)
+    expect(capabilities).toMatchObject({
+      isReviewerInArticle: ['_id', [article._id]]
+    })
+  })
+
   test('recognizes article submitter in featureState', async () => {
     const submitter = await createUser()
 

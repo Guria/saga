@@ -55,6 +55,17 @@ class UserCapabilityDiviner {
     return this.performQuery(query)
   }
 
+  articleIdsByReviewProcesses(reviewProcessIds) {
+    const query = `*[_type=="reviewProcess" && _id in ${quoteItems(reviewProcessIds)}]{
+      _id, _type, article
+    }`
+    return this.performQuery(query).then(reviewProcesses =>
+      reviewProcesses
+        .map(reviewProcess => (reviewProcess.article ? reviewProcess.article._ref : null))
+        .filter(Boolean)
+    )
+  }
+
   isEditorInVenue() {
     const query = `*[_type=="venue" && references($userId)][0]{
       _id, _type,
@@ -98,6 +109,15 @@ class UserCapabilityDiviner {
     )
   }
 
+  reviewItemsWhereUserIsReviewer() {
+    const query = `*[_type == "reviewItem" && reviewer._ref == $userId]{
+      _id,
+      _type,
+      reviewProcess
+    }`
+    return this.performQuery(query, {userId: this.userId})
+  }
+
   isEditorInTrackWithArticle() {
     return this.tracksWhereUserIsEditor()
       .then(tracks => tracks.map(track => track._id))
@@ -125,6 +145,17 @@ class UserCapabilityDiviner {
 
   isReviewerInReviewItem() {
     return isValueInArrayTuple('reviewer._ref', [this.userId])
+  }
+
+  isReviewerInArticle() {
+    return this.reviewItemsWhereUserIsReviewer()
+      .then(reviewItems =>
+        reviewItems
+          .map(reviewItem => (reviewItem.reviewProcess ? reviewItem.reviewProcess._ref : null))
+          .filter(Boolean)
+      )
+      .then(reviewProcessIds => this.articleIdsByReviewProcesses(reviewProcessIds))
+      .then(articleIds => isValueInArrayTuple('_id', articleIds))
   }
 
   isAuthorInComment() {
@@ -233,6 +264,7 @@ class UserCapabilityDiviner {
       this.isEditorInIssueWithArticleInReviewProcess(),
       this.isEditorInTrackWithArticleInReviewProcess(),
       this.isReviewerInReviewItem(),
+      this.isReviewerInArticle(),
       this.isEditorInIssueWithArticleInReviewItem(),
       this.isEditorInTrackWithArticleInReviewItem(),
       this.isSubmitterInArticleInFeatureState(),
@@ -255,6 +287,7 @@ class UserCapabilityDiviner {
         isEditorInIssueWithArticleInReviewProcess,
         isEditorInTrackWithArticleInReviewProcess,
         isReviewerInReviewItem,
+        isReviewerInArticle,
         isEditorInIssueWithArticleInReviewItem,
         isEditorInTrackWithArticleInReviewItem,
         isSubmitterInArticleInFeatureState,
@@ -278,6 +311,7 @@ class UserCapabilityDiviner {
           isEditorInIssueWithArticleInReviewProcess,
           isEditorInTrackWithArticleInReviewProcess,
           isReviewerInReviewItem,
+          isReviewerInArticle,
           isEditorInIssueWithArticleInReviewItem,
           isEditorInTrackWithArticleInReviewItem,
           isSubmitterInArticleInFeatureState,
