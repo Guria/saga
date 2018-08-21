@@ -7,8 +7,7 @@ module.exports = async (req, res, next, invite) => {
 
   const identity = await userStore.createIdentity({
     provider: 'vega-guest',
-    providerId: invite.target._ref,
-    name: 'Anonymous Aardvark'
+    providerId: invite.target._ref
   })
 
   const store = await (venueId ? dataStore.forDataset(venueId) : userStore.connect())

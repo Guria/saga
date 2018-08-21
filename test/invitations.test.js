@@ -41,7 +41,7 @@ describe('invitations', () => {
     await agent
       .get('/v1/users/me')
       .expect(200)
-      .then(res => expect(res.body).toMatchObject({name: 'Anonymous Aardvark'}))
+      .then(res => expect(res.body).toMatchObject({id: /\w+/}))
   })
 
   test('can reuse guest invitation', async () => {
@@ -65,7 +65,7 @@ describe('invitations', () => {
     await agent
       .get('/v1/users/me')
       .expect(200)
-      .then(res => expect(res.body).toMatchObject({name: 'Anonymous Aardvark'}))
+      .then(res => expect(res.body).toMatchObject({id: /\w+/}))
   })
 
   test('cannot claim regular invitations if unauthorized', async () => {
