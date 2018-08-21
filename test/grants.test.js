@@ -47,7 +47,8 @@ describe('grants', () => {
       read: {},
       update: {},
       delete: {},
-      create: {}
+      create: {},
+      capabilities: []
     }
     await request(app)
       .get(`/v1/grants/${dataset}`)

@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
     update: grants.update,
     create: grants.create,
     delete: grants.delete,
-    capabilities: userGrants.capabilities
+    capabilities: userGrants.capabilities || []
   }
   res.json(result)
 }
