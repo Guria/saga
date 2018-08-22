@@ -19,17 +19,28 @@ const bearerToCookie = require('./middleware/bearerToCookie')
 
 module.exports = config => {
   const app = express()
-  const log = pino({level: config.logLevel})
+  const log = pino({
+    level: config.logLevel
+  })
   const fileStore = getFileStore(config.assets)
   const dataStore = new StoreManager(config.datastore)
-  const userStore = new UserStore({dataStore, db: config.datastore.options.systemDb})
-  const securityManager = new SecurityManager({userStore, dataStore})
+  const userStore = new UserStore({
+    dataStore,
+    db: config.datastore.options.systemDb
+  })
+  const securityManager = new SecurityManager({
+    userStore,
+    dataStore
+  })
   const sessionStore = new MongoStore({
     ...config.sessionStore,
     dbPromise: dataStore.connect().then(client => client.db(config.datastore.options.systemDb))
   })
 
-  const sessionParser = session({...config.session, store: sessionStore})
+  const sessionParser = session({
+    ...config.session,
+    store: sessionStore
+  })
 
   dataStore.setSecurityManager(securityManager)
   dataStore.on('mutation', securityManager.onMutation)
@@ -55,44 +66,71 @@ module.exports = config => {
   app.use(passport.initialize())
   app.use(passport.session())
 
-  app.get('/', (req, res) => res.json({service: pkg.name, version: pkg.version}))
+  app.get('/', (req, res) => res.json({
+    service: pkg.name,
+    version: pkg.version
+  }))
 
-  app.get('/v1/ping', (req, res) => res.json({pong: true}))
+  app.get('/v1/ping', (req, res) => res.json({
+    pong: true
+  }))
   app.get('/v1/versions', require('./controllers/versions'))
 
   app.use(
     '/v1/auth',
-    bodyParser.json({limit: config.data.maxInputBytes}),
+    bodyParser.json({
+      limit: config.data.maxInputBytes
+    }),
     require('./controllers/auth')(applyAuthStrategies(app, config))
   )
 
   app.use(
     '/v1/users',
-    bodyParser.json({limit: config.data.maxInputBytes}),
+    bodyParser.json({
+      limit: config.data.maxInputBytes
+    }),
     require('./controllers/users')
   )
 
   app.use(
     '/v1/grants',
-    bodyParser.json({limit: config.data.maxInputBytes}),
+    bodyParser.json({
+      limit: config.data.maxInputBytes
+    }),
     require('./controllers/grants')
   )
 
   app.use(
     '/v1/invitations',
-    bodyParser.json({limit: config.data.maxInputBytes}),
+    bodyParser.json({
+      limit: config.data.maxInputBytes
+    }),
     require('./controllers/invitations')(applyAuthStrategies(app, config))
   )
 
   app.use(
     '/v1/data',
-    bodyParser.json({limit: config.data.maxInputBytes}),
+    bodyParser.json({
+      limit: config.data.maxInputBytes
+    }),
     require('./controllers/data')
   )
 
   app.use(
+    '/v1/datasets',
+    bodyParser.json({
+      limit: config.data.maxInputBytes
+    }),
+    require('./controllers/datasets')
+  )
+
+
+  app.use(
     '/v1/assets',
-    bodyParser.raw({limit: config.assets.maxInputBytes, type: () => true}),
+    bodyParser.raw({
+      limit: config.assets.maxInputBytes,
+      type: () => true
+    }),
     require('./controllers/assets/upload')
   )
 
