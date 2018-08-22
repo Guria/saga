@@ -74,6 +74,13 @@ class UserCapabilityDiviner {
     return this.performQuery(query, {userId: this.userId}).then(result => [result])
   }
 
+  isAdminUser() {
+    const query = `*[_type=="user" && _id == $userId][0]{
+      _id, _type, isAdmin
+    }.isAdmin`
+    return this.performQuery(query, {userId: this.userId}).then(result => [Boolean(result)])
+  }
+
   tracksWhereUserIsEditor() {
     const query = `*[_type == "track" && references($userId)]{
         _id,
@@ -255,6 +262,7 @@ class UserCapabilityDiviner {
   runAll() {
     return Promise.all([
       this.isEditorInVenue(),
+      this.isAdminUser(),
       this.isEditorInTrackWithArticle(),
       this.isEditorInIssueWithArticle(),
       this.isSubmitterInArticle(),
@@ -278,6 +286,7 @@ class UserCapabilityDiviner {
     ]).then(
       ([
         isEditorInVenue,
+        isAdminUser,
         isEditorInTrackWithArticle,
         isEditorInIssueWithArticle,
         isSubmitterInArticle,
@@ -302,6 +311,7 @@ class UserCapabilityDiviner {
         return {
           isLoggedInUser: [true],
           isEditorInVenue,
+          isAdminUser,
           isEditorInTrackWithArticle,
           isEditorInIssueWithArticle,
           isSubmitterInArticle,

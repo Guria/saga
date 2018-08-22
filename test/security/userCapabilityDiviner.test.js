@@ -19,10 +19,10 @@ describe('userCapabilityDiviner', () => {
     return scopedDataStore
   }
 
-  async function createUser() {
+  async function createUser(options = {}) {
     const userStore = app.services.userStore
     const identity = await userStore.createIdentity(identityTemplate)
-    const user = await userStore.createUser(identity, 'saga-test')
+    const user = await userStore.createUser(identity, 'saga-test', options)
     return user
   }
 
@@ -81,6 +81,14 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(venueEditor._id)
     expect(capabilities).toMatchObject({
       isEditorInVenue: [true]
+    })
+  })
+
+  test('recognizes a venue admin', async () => {
+    const admin = await createUser({isAdmin: true})
+    const capabilities = await capabilitiesForUser(admin._id)
+    expect(capabilities).toMatchObject({
+      isAdminUser: [true]
     })
   })
 

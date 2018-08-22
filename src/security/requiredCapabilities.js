@@ -6,12 +6,14 @@ const requiredCapabilities = {
     stage: ['isLoggedInUser'],
     user: ['isLoggedInUser'],
     article: [
+      'isAdminUser',
       'isEditorInVenue',
       'isEditorInTrackWithArticle',
       'isEditorInIssueWithArticle',
       'isSubmitterInArticle'
     ],
     comment: [
+      'isAdminUser',
       'isAuthorInComment',
       'isEditorInVenue',
       'isSubmitterInArticleWithComment',
@@ -19,11 +21,13 @@ const requiredCapabilities = {
       'isEditorInIssueWithArticleWithComment'
     ],
     reviewProcess: [
+      'isAdminUser',
       'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
     reviewItem: [
+      'isAdminUser',
       'isEditorInVenue',
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
@@ -31,6 +35,7 @@ const requiredCapabilities = {
     ],
     featureConfig: ['isLoggedInUser'],
     featureState: [
+      'isAdminUser',
       'isEditorInVenue',
       'isSubmitterInArticleInFeatureState',
       'isEditorInIssueWithArticleInFeatureState',
@@ -39,79 +44,92 @@ const requiredCapabilities = {
   },
   create: {
     venue: [],
-    issue: ['isEditorInVenue'],
-    track: ['isEditorInVenue'],
-    stage: ['isEditorInVenue'],
-    user: ['isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
-    article: ['isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
-    comment: ['isAuthorInComment'],
-    reviewProcess: ['isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
+    issue: ['isAdminUser', 'isEditorInVenue'],
+    track: ['isAdminUser', 'isEditorInVenue'],
+    stage: ['isAdminUser', 'isEditorInVenue'],
+    user: ['isAdminUser', 'isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
+    article: ['isAdminUser', 'isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
+    comment: ['isAdminUser', 'isAuthorInComment'],
+    reviewProcess: ['isAdminUser', 'isEditorInVenue', 'isEditorInAnyIssue', 'isEditorInAnyTrack'],
     reviewItem: [
+      'isAdminUser',
       'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
-    featureConfig: ['isEditorInVenue'],
-    featureState: ['isEditorInVenue']
+    featureConfig: ['isAdminUser', 'isEditorInVenue'],
+    featureState: ['isAdminUser', 'isEditorInVenue']
   },
   update: {
-    venue: ['isEditorInVenue'],
-    issue: ['isEditorInVenue', 'isEditorInIssue'],
-    track: ['isEditorInVenue', 'isEditorInTrack'],
-    stage: ['isEditorInVenue'],
-    user: ['isEditorInVenue'],
+    venue: ['isAdminUser', 'isEditorInVenue'],
+    issue: ['isAdminUser', 'isEditorInVenue', 'isEditorInIssue'],
+    track: ['isAdminUser', 'isEditorInVenue', 'isEditorInTrack'],
+    stage: ['isAdminUser', 'isEditorInVenue'],
+    user: ['isAdminUser', 'isEditorInVenue'],
     article: [
+      'isAdminUser',
       'isEditorInVenue',
       'isEditorInTrackWithArticle',
       'isEditorInIssueWithArticle',
       'isSubmitterInArticle'
     ],
     comment: [
+      'isAdminUser',
       'isAuthorInComment',
       'isEditorInVenue',
       'isEditorInTrackWithArticleWithComment',
       'isEditorInIssueWithArticleWithComment'
     ],
     reviewProcess: [
+      'isAdminUser',
       'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
     reviewItem: [
+      'isAdminUser',
       'isEditorInVenue',
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
     ],
-    featureConfig: ['isEditorInVenue'],
-    featureState: ['isEditorInVenue']
+    featureConfig: ['isAdminUser', 'isEditorInVenue'],
+    featureState: ['isAdminUser', 'isEditorInVenue']
   },
   delete: {
     venue: [],
-    issue: ['isEditorInVenue'],
-    track: ['isEditorInVenue'],
-    stage: ['isEditorInVenue'],
-    user: ['isEditorInVenue'],
-    article: ['isEditorInVenue', 'isEditorInTrackWithArticle', 'isEditorInIssueWithArticle'],
+    issue: ['isAdminUser', 'isEditorInVenue'],
+    track: ['isAdminUser', 'isEditorInVenue'],
+    stage: ['isAdminUser', 'isEditorInVenue'],
+    user: ['isAdminUser', 'isEditorInVenue'],
+    article: [
+      'isAdminUser',
+      'isEditorInVenue',
+      'isEditorInTrackWithArticle',
+      'isEditorInIssueWithArticle'
+    ],
     comment: [
+      'isAdminUser',
       'isAuthorInComment',
       'isEditorInVenue',
       'isEditorInTrackWithArticleWithComment',
       'isEditorInIssueWithArticleWithComment'
     ],
     reviewProcess: [
+      'isAdminUser',
       'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ],
     reviewItem: [
+      'isAdminUser',
       'isEditorInVenue',
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
     ],
-    featureConfig: ['isEditorInVenue'],
-    featureState: ['isEditorInVenue']
+    featureConfig: ['isAdminUser', 'isEditorInVenue'],
+    featureState: ['isAdminUser', 'isEditorInVenue']
   }
 }
 module.exports = requiredCapabilities
