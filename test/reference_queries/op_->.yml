@@ -83,6 +83,7 @@ tests:
   - [null]
   - null
 - title: "-> documents weak"
+  skip: true # Don't support inline ->
   query: |
     [
       *[_id == "a"].weakother->name,
@@ -245,12 +246,14 @@ tests:
   - {others: [{}, {}]}
 
 - title: "-> documents projection array subscript deep nested"
+  skip: true # Subscripts not supported in general accessors during joins
   query: |
     *[_id == "b"]{"other": arrayWithRefs[0]{"name": other->name}}
   result:
   - {other: {name: E}}
 
 - title: "-> documents projection array subscript deep nested, missing"
+  skip: true # Subscripts not supported in general accessors during joins
   query: |
     *[_id == "b"]{"others": arrayWithRefs[0]{"name": other->missing}}
   result:

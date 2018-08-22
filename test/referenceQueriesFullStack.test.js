@@ -21,7 +21,7 @@ describe.skip('Reference queries (through the full stack, including MongoDB driv
   afterAll(() => close(app))
 
   const suites = glob.sync(path.join(__dirname, 'reference_queries', '*.yml'))
-    // .filter(filename => filename.match(/ranges\.yml/))
+    // .filter(filename => filename.match(/basic_joins\.yml/))
     .map(filename => {
       try {
         const yamlSrc = fs.readFileSync(filename, {
@@ -40,10 +40,9 @@ describe.skip('Reference queries (through the full stack, including MongoDB driv
 })
 
 function runSuite(suite) {
-  describe(suite.title, () => {
+  describe(`${suite.title} (fullstack)`, () => {
 
     beforeAll(async () => {
-      console.log("Begin setting up", suite.title)
       jest.setTimeout(15000)
 
       const dataStore = app.services.dataStore
@@ -65,7 +64,6 @@ function runSuite(suite) {
           transactionId
         })
         .expect(200)
-        .then(feh => console.log("Done setting up", suite.title))
     })
 
 
@@ -84,7 +82,6 @@ function runSuite(suite) {
           params = Object.keys(test.params).map(name => `$${name}=${encodeURIComponent(JSON.stringify(test.params[name]))}`
           )
         }
-        console.log(test.title, "starts")
         return request(app)
           .get(
             `/v1/data/query/saga-test/?query=${encodeURIComponent(
@@ -100,7 +97,6 @@ function runSuite(suite) {
               expect(res.body.result).toEqual(test.result)
             }
           })
-          .then(feh => console.log(test.title, "done"))
       })
     })
   })

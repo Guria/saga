@@ -3,6 +3,7 @@ import Scope from './Scope'
 import debug from '../debug'
 import generalizeJoinFilter from './generalizeJoinFilter'
 import { asPlainValue } from './scopeTools'
+import util from 'util'
 
 // Given a pipeline, fetch will make sure the source value for that pipeline
 // gets cached in the parentScope. It does not actually return the retrieved
@@ -32,6 +33,9 @@ export default async function fetch(scope, pipeline, fetcher, executor) {
   const response = await fetcher(fetchSpec)
   // Cache the result on the scope so it will bind to the source
   // when it comes up later
+  debug('fetch() scope:', scope, 'pipeline:', util.inspect(pipeline, {
+    depth: 20
+  }))
   debug('fetch() =>', response)
   scope.cacheRefs(response.refs)
   responder.resolve({

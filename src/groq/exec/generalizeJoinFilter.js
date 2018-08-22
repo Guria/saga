@@ -2,9 +2,12 @@
 
 import rewrite from '../plan/rewrite'
 import debug from '../debug'
+import util from 'util'
 
 export default async function generalizeJoinFilter(node, scope) {
-  debug('generalizeJoinFilter()', node, scope)
+  debug('generalizeJoinFilter()', util.inspect(node, {
+    depth: 10
+  }), scope)
   return rewrite(node, operation => {
     switch (operation.op) {
       case 'eq':
@@ -25,7 +28,7 @@ async function generalizeEQ(operation, scope) {
   }
 
   if (lhsIsJoin && rhsIsJoin) {
-    throw new Error(`In a join, only the lhs or rhs can reference parent`)
+    throw new Error(`In a join, only the lhs or rhs can reference parent (not both)`)
   }
   let join
   let constant

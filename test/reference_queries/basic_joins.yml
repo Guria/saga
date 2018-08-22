@@ -19,12 +19,19 @@ documents:
       - _ref: 'non-existant'
         _weak: true
       - _ref: 'number1'
+  - _id: 'embed'
+    _type: 'embedded'
+    objects:
+      - embedded:
+          _ref: 'number1'
+      - embedded:
+          _ref: 'number2'
 
 tests:
   - title: 'Array map join'
     query: |
       *[_type == 'source']|order(_id)|{
-        refs[]->a
+        refs[]->a,
       }
     result:
       - refs:
@@ -34,3 +41,17 @@ tests:
           - 1
           - null
           - 1
+
+  - title: 'Shallowly embedded simple join'
+    query: |
+      *[_type == 'embedded']{
+        objects[]{
+          embedded->{a}
+        }
+      }
+    result:
+      - objects:
+          - embedded:
+              a: 1
+          - embedded:
+              a: 2

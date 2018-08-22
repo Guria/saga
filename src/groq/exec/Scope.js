@@ -196,20 +196,45 @@ export default class Scope {
     let scope = this // eslint-disable-line consistent-this
     for (let i = 0; i < path.length; i++) {
       const operation = path[i]
+      debug('resolve accessor: next op:', operation)
       switch (operation.op) {
         case 'parent':
           scope = scope.parent
-          debug('^ =>', scope.value)
+          debug('resolve accessor: ^ =>', scope)
           break
         case 'attribute':
           if (scope.sourceId) {
             const source = (await scope.dataForSource(scope.sourceId)).documents // eslint-disable-line no-await-in-loop
+            debug('resolve accessor: (source)', source)
+            // Resolve the path to the source item for every document
+            const sourceScopes = source.map(item => scope.clone({
+              value: item
+            }).resolveAccessor(scope.path))
+
+            const flattenedSourceScopes = []
+
+            // Flatten any arrays we might have seen
+            sourceScopes.forEach(itemScope => {
+              if (Array.isArray(itemScope.value)) {
+                itemScope.value.forEach(itemValue => {
+                  flattenedSourceScopes.push(scope.clone({
+                    value: itemValue
+                  }))
+                })
+              } else {
+                flattenedSourceScopes.push(itemScope)
+              }
+            })
+
+
+            debug('resolve accessor: (expanded scopes)', source)
+            // Now resolve the rest of the path for each item
             const subPath = path.slice(i)
             const result = []
-            source.forEach(item => { // eslint-disable-line no-loop-func, no-await-in-loop
-              const itemScope = scope.clone({
-                value: item
-              })
+            flattenedSourceScopes.forEach(itemScope => { // eslint-disable-line no-loop-func, no-await-in-loop
+              // const itemScope = scope.clone({
+              //   value: item
+              // })
               const resolvedScope = itemScope.resolveAccessor(subPath)
               if (resolvedScope.value !== null) {
                 result.push(resolvedScope)
@@ -228,7 +253,7 @@ export default class Scope {
             parent: scope,
             value: scope.value[operation.name]
           })
-          debug(operation.name, '=>', scope.value)
+          debug('resolve accessor:', operation.name, '=>', scope.value)
           break
         default:
           throw new Error(`Unkown accessor path element ${operation.op}`)
@@ -243,6 +268,7 @@ export default class Scope {
         value: null
       })
     }
+    debug('resolve accessor (all, result):', this.value, path, scope)
     return [scope]
   }
 
@@ -263,7 +289,8 @@ export default class Scope {
   }
 
   inspect() {
-    return `Scope<${this.pathAsString()}: ${JSON.stringify(this.value)}>`
+    const sourceIdStr = this.sourceId ? `#${this.sourceId} ` : ''
+    return `Scope<${sourceIdStr}${this.pathAsString()}: ${JSON.stringify(this.value)}>`
   }
 
 }

@@ -1,6 +1,7 @@
 const util = require('util')
 const {merge, omit} = require('lodash')
 const {query: execQuery} = require('../../../groq')
+const debug = require('debug')('groq-mongo')
 
 const log = (prefix, ast) =>
 // eslint-disable-next-line no-console
@@ -39,16 +40,16 @@ async function fetchForSpec(collection, spec) {
   // start at index 0. In the future this result should be able to communicate to the run-time evaluator
   // when it has performed the range limitation here.
 
-  // console.log('mongo-fetch', util.inspect({
-  //   sort,
-  //   canSort,
-  //   filter,
-  //   start,
-  //   end,
-  //   spec
-  // }, {
-  //   depth: 10
-  // }))
+  debug('mongo-fetch', util.inspect({
+    sort,
+    canSort,
+    filter,
+    start,
+    end,
+  // spec
+  }, {
+    depth: 10
+  }))
 
   // Filter might be short-circuited to `false`,
   // don't query mongodb if this is the case

@@ -1,5 +1,6 @@
 import { determineUnambiguousAlias } from './objectExpressionOps'
 import debug from '../debug'
+import util from 'util'
 
 let nextSourceId = 1
 
@@ -25,7 +26,9 @@ class Pipeline {
     // The alias will be used to auto-assign this pipeline if it appears
     // without an explicit assignment in an object expression
     this.alias = alias
-    debug("new pipeline:", this, options)
+    debug("new pipeline:", util.inspect(this, {
+      depth: 10
+    }), options)
   }
 
   pipeOp(operation) {
