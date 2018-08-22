@@ -12,7 +12,9 @@
     "postpublish": "npm run clean",
     "coverage": "NODE_ENV=test jest --coverage --runInBand",
     "start": "babel-node src/server.js | pino",
-    "bootstrap": "babel-node scripts/bootstrap.js",
+    "setup": "babel-node scripts/commands/setup.js",
+    "create-venue": "babel-node scripts/commands/createVenue.js",
+    "claim-root": "babel-node scripts/commands/claimRoot.js",
     "watch": "remon -r babel-register src/server.js | pino",
     "test": "NODE_ENV=test jest --runInBand"
   },
