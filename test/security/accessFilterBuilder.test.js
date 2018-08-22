@@ -51,12 +51,13 @@ describe('accessFilterBuilder', () => {
 
   afterAll(() => close(app))
 
-  afterEach(() =>
-    Promise.all(
-      ['saga-system-test', 'saga-test'].map(dsName =>
-        app.services.dataStore.forDataset(dsName).then(ds => ds.truncate())
-      )
-    ))
+  afterEach(async () => {
+    const dataStore = app.services.dataStore
+    await Promise.all([
+      dataStore.forDataset('saga-test').then(ds => ds.truncate()),
+      dataStore.forDataset('saga-system-test').then(ds => ds.truncate())
+    ])
+  })
 
   test('produces groq filters granting some read access to unprivileged user', async () => {
     const unprivilegedUser = await createUser()
