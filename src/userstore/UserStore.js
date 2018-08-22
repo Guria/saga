@@ -83,7 +83,7 @@ module.exports = class UserStore {
     })
   }
 
-  hasRootUser() {
+  getRootIdentity() {
     return this.connect().then(store => store.fetch('*[_type == "user" && isRootUser == true][0]'))
   }
 
@@ -98,9 +98,24 @@ module.exports = class UserStore {
       })
   }
 
+  async createVenueAdminFrom(identity, venueId) {
+    const store = await this.dataStore.forDataset(venueId)
+    return store
+      .newTransaction({identity: SecurityManager.SYSTEM_IDENTITY})
+      .create({
+        _type: 'user',
+        identity: identity._id,
+        name: identity.name,
+        isAdmin: true,
+        email: identity.email,
+        externalProfileImageUrl: identity.externalProfileImageUrl
+      })
+      .commit()
+      .then(getFirstDocument)
+  }
+
   async createUser(identity, venueId = null, options = {}) {
-    const {_id, name, email, profileImage} = identity
-    const externalProfileImageUrl = profileImage
+    const {_id, name, email, externalProfileImageUrl} = identity
 
     const store = await (venueId ? this.dataStore.forDataset(venueId) : this.connect())
     return store

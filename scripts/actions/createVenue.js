@@ -10,7 +10,13 @@ const sluggedName = str =>
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9]/g, '')
 
-export async function createVenue({dataStore}) {
+export async function createVenue({dataStore, userStore}) {
+  const rootIdentity = await userStore.getRootIdentity()
+  if (!rootIdentity) {
+    console.error(`Could not find root identity. Please run 'npm run setup' instead`)
+    return
+  }
+
   const venueName = await prompt.single({
     message: 'Display name:',
     type: 'input'
@@ -35,9 +41,12 @@ export async function createVenue({dataStore}) {
   const docs = [venue, ...(shouldCreateTracksAndStages ? [...tracks, ...stages] : [])]
   const store = await dataStore.forDataset(datasetName)
   await createAllIfNotExists(store.newTransaction(), docs).commit()
+  // Make root identity admin in venue
+  await userStore.createVenueAdminFrom(rootIdentity, venue._id)
   console.log(
-    '✔ Venue %s created %s',
+    '✔ Venue %s created with %s as admin %s',
     venue.title,
-    shouldCreateTracksAndStages ? 'with default tracks and stages' : ''
+    rootIdentity.name,
+    shouldCreateTracksAndStages ? 'and default tracks and stages' : ''
   )
 }

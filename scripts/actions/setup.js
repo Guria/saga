@@ -3,7 +3,7 @@ import {prompt} from '../utils'
 import {createVenue} from './createVenue'
 import {claimRoot} from './claimRoot'
 
-export async function setup({dataStore, rootInviteUrl, claimUrl}) {
+export async function setup({dataStore, userStore, rootInviteUrl, claimUrl}) {
   await claimRoot({claimUrl, rootInviteUrl})
 
   const shouldCreateVenue = await prompt.single({
@@ -11,6 +11,6 @@ export async function setup({dataStore, rootInviteUrl, claimUrl}) {
     type: 'confirm'
   })
   if (shouldCreateVenue) {
-    await createVenue({dataStore})
+    await createVenue({dataStore, userStore})
   }
 }

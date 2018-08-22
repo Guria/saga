@@ -4,6 +4,7 @@ const StoreManager = require('../src/datastore/StoreManager')
 const {fullAccessFilterExpressions} = require('../src/security/defaultFilters')
 const config = require('../src/config')
 const url = require('url')
+const UserStore = require('../src/userstore')
 
 const SERVER_URL = url.format({
   protocol: 'http',
@@ -30,8 +31,16 @@ fullAccessDatastore.setSecurityManager({
   getFilterExpressionsForUser: () => Promise.resolve(fullAccessFilterExpressions)
 })
 
+const userStore = new UserStore({
+  dataStore: fullAccessDatastore,
+  db: config.datastore.options.systemDb
+})
+
 export function withFullAccessDataStore(task) {
   return task(fullAccessDatastore).finally(() => fullAccessDatastore.disconnect())
+}
+export function withUserStore(task) {
+  return task(userStore).finally(() => fullAccessDatastore.disconnect())
 }
 
 export function connect() {
