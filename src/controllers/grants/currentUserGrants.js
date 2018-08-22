@@ -14,5 +14,7 @@ module.exports = async (req, res, next) => {
     delete: grants.delete,
     capabilities: userGrants.capabilities || {}
   }
+  //result.capabilities.isAdminUser = [true]
+  console.log(JSON.stringify(result, null, 2))
   res.json(result)
 }
