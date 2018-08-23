@@ -28,7 +28,7 @@ export const ROOT_INVITE_URL = url.format({
 
 const fullAccessDatastore = new StoreManager(config.datastore)
 fullAccessDatastore.setSecurityManager({
-  getPermissionsForUser: () => Promise.resolve({adminPermissions})
+  getPermissionsForUser: () => Promise.resolve(adminPermissions)
 })
 
 const userStore = new UserStore({
