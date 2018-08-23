@@ -115,6 +115,14 @@ class Store extends EventEmitter {
             await checkPermissions(filters.update, targetDoc, 'update', m)
           }
 
+          if (operation === 'createIfNotExists') {
+            const _id = idFromMutation(operation, body)
+            if (this.getDocumentById(_id)) {
+              console.log(`Skipped createIfNotExists for ${_id} because it actually does exist.`)
+              continue
+            }
+          }
+
           if (operation === 'create' || operation === 'createIfNotExists') {
             await checkPermissions(filters.create, body, 'create', m)
           }
@@ -123,9 +131,9 @@ class Store extends EventEmitter {
             const prev = documents.find(doc => doc._id === body._id)
             await (prev
               ? Promise.all([
-                  checkPermissions(filters.delete, prev, 'delete', m),
-                  checkPermissions(filters.create, body, 'create', m)
-                ])
+                checkPermissions(filters.delete, prev, 'delete', m),
+                checkPermissions(filters.create, body, 'create', m)
+              ])
               : checkPermissions(filters.create, body, 'create', m))
           }
 
@@ -204,7 +212,7 @@ class Store extends EventEmitter {
     }
 
     const description = `Document "${
-      targetDoc._id
+    targetDoc._id
     }" cannot be deleted as there are references to it from "${referencingIDs[0]}"`
 
     throw new TransactionError({
@@ -337,18 +345,18 @@ function idFromMutation(operation, body) {
 
 function mergeCreatedDocuments(mutations, existing) {
   return (
-    mutations
-      // Remove non-create (or id-less) mutations
-      .filter(mut => mut.operation.startsWith('create') && mut.body._id)
-      // Remove create/createIfNotExists if document exists
-      .filter(mut => isReplace(mut) || !existing.find(doc => doc._id === mut.body._id))
-      // Remove creates that exist later in mutation array
-      .filter((mut, i, muts) => !find(muts, item => item.body._id === mut.body._id, i + 1))
-      // Merge remaining mutations, make sure to override existing documents with same ID
-      .reduce((docs, mut) => {
-        const prev = existing.findIndex(doc => doc._id === mut._id)
-        return prev === -1 ? docs.concat(mut.body) : docs.splice(prev, 1, mut.body) && docs
-      }, existing.slice())
+  mutations
+    // Remove non-create (or id-less) mutations
+    .filter(mut => mut.operation.startsWith('create') && mut.body._id)
+    // Remove create/createIfNotExists if document exists
+    .filter(mut => isReplace(mut) || !existing.find(doc => doc._id === mut.body._id))
+    // Remove creates that exist later in mutation array
+    .filter((mut, i, muts) => !find(muts, item => item.body._id === mut.body._id, i + 1))
+    // Merge remaining mutations, make sure to override existing documents with same ID
+    .reduce((docs, mut) => {
+      const prev = existing.findIndex(doc => doc._id === mut._id)
+      return prev === -1 ? docs.concat(mut.body) : docs.splice(prev, 1, mut.body) && docs
+    }, existing.slice())
   )
 }
 
@@ -368,10 +376,9 @@ function generateDocumentReferencePatches(results, prevDocs) {
       return false
     }
 
-    const hasDiff =
-      !prevDoc ||
-      prevRefs.length !== newRefs.length ||
-      prevRefs.some((prevRef, idx) => !isEqual(prevRef, newRefs[idx]))
+    const hasDiff = !prevDoc ||
+    prevRefs.length !== newRefs.length ||
+    prevRefs.some((prevRef, idx) => !isEqual(prevRef, newRefs[idx]))
 
     return (
       hasDiff && {
