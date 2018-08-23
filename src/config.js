@@ -82,6 +82,10 @@ module.exports = {
     }
   },
 
+  vega: {
+    featurePlugins: ['checklist', 'declaration', 'dueDate']
+  },
+
   DEV_SESSION_SECRET,
   DEFAULT_AUTH_PROVIDER_CONFIG_PATH
 }
