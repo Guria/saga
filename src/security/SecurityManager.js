@@ -1,7 +1,7 @@
 const LruCache = require('lru-cache')
 const PermissionsBuilder = require('./PermissionsBuilder')
 const {noPermissions, adminPermissions} = require('./securityConstants')
-import { union, difference, isEqual } from 'lodash'
+import {union, difference, isEqual} from 'lodash'
 
 function extractUserIds(value) {
   if (!value) return []
@@ -72,7 +72,6 @@ class SecurityManager {
   }
 
   async computePermissionsForUser(venueId, identityId) {
-    console.log("computePermissionsForUser")
     if (!identityId) {
       return noPermissions
     }
@@ -111,7 +110,8 @@ class SecurityManager {
   }
 
   // Figure out which users must have their access privilege cache purged
-  accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) { // eslint-disable-line class-methods-use-this
+  accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
+    // eslint-disable-line class-methods-use-this
     const _type = valueAtAnyPoint(previousDoc, nextDoc, '_type')
 
     // If this is a user object, just invalidate the user regardless of what just happened
@@ -130,7 +130,8 @@ class SecurityManager {
     return usersToInvalidate
   }
 
-  doesRequireFullCacheReset(venueId, previousDoc, nextDoc) { // eslint-disable-line class-methods-use-this
+  doesRequireFullCacheReset(venueId, previousDoc, nextDoc) {
+    // eslint-disable-line class-methods-use-this
     const _type = valueAtAnyPoint(previousDoc, nextDoc, '_type')
     switch (_type) {
       case 'issue':
@@ -149,12 +150,7 @@ class SecurityManager {
     const venueId = mutation.annotations.venueId
 
     // Check if we should just reset the entire cache
-    if (this.doesRequireFullCacheReset(
-        venueId,
-        mutation.previous,
-        mutation.result
-      )) {
-      console.log("Did reset entire access cache")
+    if (this.doesRequireFullCacheReset(venueId, mutation.previous, mutation.result)) {
       this.cache.reset()
       return
     }
@@ -168,7 +164,6 @@ class SecurityManager {
     )
 
     changedFor.forEach(userId => {
-      console.log('Invalidating access cache for user', userId)
       this.cache.del(getCacheKey(venueId, userId))
     })
   }
