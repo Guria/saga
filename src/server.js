@@ -12,7 +12,6 @@ commander
   .option('-c, --config [path]', 'Path to config file')
   .parse(process.argv);
 
-
 let config = defaultConfig
 
 if (commander.config) {

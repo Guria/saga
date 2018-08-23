@@ -30,7 +30,8 @@ module.exports = config => {
   })
   const securityManager = new SecurityManager({
     userStore,
-    dataStore
+    dataStore,
+    featurePlugins: config.vega.featurePlugins
   })
   const sessionStore = new MongoStore({
     ...config.sessionStore,
