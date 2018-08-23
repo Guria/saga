@@ -23,7 +23,7 @@ function querifyTuples(tuples) {
 // This class defines which capabilities a given user must have in order
 // to gain access to a document type.
 // The filters produced here are applied in SecurityManager
-class AccessFilterBuilder {
+class PermissionsBuilder {
   constructor(userId, dataStore, venueId) {
     this.userId = userId
     this.venueId = venueId
@@ -100,4 +100,4 @@ class AccessFilterBuilder {
   }
 }
 
-module.exports = AccessFilterBuilder
+module.exports = PermissionsBuilder
