@@ -1,4 +1,11 @@
+const config = require('../config')
 const actions = ['read', 'create', 'update', 'delete']
+
+const additionalTypes = []
+config.vega.featurePlugins.forEach(feature => {
+  additionalTypes.push(`${feature}Config`)
+  additionalTypes.push(`${feature}State`)
+})
 const documentTypes = [
   'venue',
   'issue',
@@ -8,10 +15,8 @@ const documentTypes = [
   'article',
   'comment',
   'reviewProcess',
-  'reviewItem',
-  'featureConfig',
-  'featureState'
-]
+  'reviewItem'
+].concat(additionalTypes)
 
 const noAccessFilterExpressions = {
   create: 'false',

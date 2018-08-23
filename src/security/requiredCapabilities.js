@@ -1,3 +1,6 @@
+const {merge} = require('lodash')
+const config = require('../config')
+
 const requiredCapabilities = {
   read: {
     venue: ['isLoggedInUser'],
@@ -32,14 +35,6 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
-    ],
-    featureConfig: ['isLoggedInUser'],
-    featureState: [
-      'isAdminUser',
-      'isEditorInVenue',
-      'isSubmitterInArticleInFeatureState',
-      'isEditorInIssueWithArticleInFeatureState',
-      'isEditorInTrackWithArticleInFeatureState'
     ]
   },
   create: {
@@ -56,9 +51,7 @@ const requiredCapabilities = {
       'isEditorInVenue',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
-    ],
-    featureConfig: ['isAdminUser', 'isEditorInVenue'],
-    featureState: ['isAdminUser', 'isEditorInVenue']
+    ]
   },
   update: {
     venue: ['isAdminUser', 'isEditorInVenue'],
@@ -92,9 +85,7 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
-    ],
-    featureConfig: ['isAdminUser', 'isEditorInVenue'],
-    featureState: ['isAdminUser', 'isEditorInVenue']
+    ]
   },
   delete: {
     venue: [],
@@ -127,9 +118,39 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
-    ],
-    featureConfig: ['isAdminUser', 'isEditorInVenue'],
-    featureState: ['isAdminUser', 'isEditorInVenue']
+    ]
   }
 }
-module.exports = requiredCapabilities
+
+const features = {
+  read: config.vega.featurePlugins.reduce((obj, documentType) => {
+    const featureSet = {
+      [`${documentType}Config`]: ['isLoggedInUser'],
+      [`${documentType}State`]: ['isLoggedInUser']
+    }
+    return {...obj, ...featureSet}
+  }, {}),
+  create: config.vega.featurePlugins.reduce((obj, documentType) => {
+    const featureSet = {
+      [`${documentType}Config`]: ['isAdminUser', 'isEditorInVenue'],
+      [`${documentType}State`]: ['isLoggedInUser']
+    }
+    return {...obj, ...featureSet}
+  }, {}),
+  update: config.vega.featurePlugins.reduce((obj, documentType) => {
+    const featureSet = {
+      [`${documentType}Config`]: ['isAdminUser', 'isEditorInVenue'],
+      [`${documentType}State`]: ['isLoggedInUser']
+    }
+    return {...obj, ...featureSet}
+  }, {}),
+  delete: config.vega.featurePlugins.reduce((obj, documentType) => {
+    const featureSet = {
+      [`${documentType}Config`]: ['isAdminUser', 'isEditorInVenue'],
+      [`${documentType}State`]: ['isLoggedInUser']
+    }
+    return {...obj, ...featureSet}
+  }, {})
+}
+
+module.exports = merge({}, requiredCapabilities, features)

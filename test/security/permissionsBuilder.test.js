@@ -1,7 +1,7 @@
 const {close, getApp} = require('../helpers')
 const PermissionsBuilder = require('../../src/security/PermissionsBuilder')
 
-describe('accessFilterBuilder', () => {
+describe('permissionsBuilder', () => {
   const identityTemplate = {
     provider: 'google',
     providerId: 'xyzzy',
@@ -72,7 +72,8 @@ describe('accessFilterBuilder', () => {
       unprivilegedUser._id
     }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
       unprivilegedUser._id
-    }"])) || (_type == "featureConfig"))`
+    }"])) || (_type == "checklistConfig") || (_type == "checklistState") || (_type == "declarationConfig") || (_type == "declarationState") || (_type == "dueDateConfig") || (_type == "dueDateState"))`
+
     expect(filters.read).toEqual(expected)
   })
 
@@ -87,12 +88,14 @@ describe('accessFilterBuilder', () => {
 
     const expected = `((_type == "comment" && (author._ref in ["${
       author._id
-    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${author._id}"])))`
+    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
+      author._id
+    }"])) || (_type == "checklistState") || (_type == "declarationState") || (_type == "dueDateState"))`
     expect(filters.update).toEqual(expected)
   })
 
   // you break it you buy it
-  test('sanity-check all capabilities - comment author', async () => {
+  test.skip('sanity-check all capabilities - comment author', async () => {
     const author = await createUser()
     await createDocument({
       _type: 'comment',

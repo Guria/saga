@@ -144,12 +144,6 @@ class UserCapabilityDiviner {
       .then(articleIds => isValueInArrayTuple('_id', articleIds))
   }
 
-  isSubmitterInArticleInFeatureState() {
-    return this.articlesWhereUserIsSubmitter()
-      .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
-  }
-
   isReviewerInReviewItem() {
     return isValueInArrayTuple('reviewer._ref', [this.userId])
   }
@@ -218,21 +212,6 @@ class UserCapabilityDiviner {
       .then(articleIds => isValueInArrayTuple('subject._ref', articleIds))
   }
 
-  isEditorInIssueWithArticleInFeatureState() {
-    return this.issuesWhereUserIsEditor()
-      .then(issues => issues.map(issue => issue.articleIds))
-      .then(nestedArticleIds => flatten(nestedArticleIds))
-      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
-  }
-
-  isEditorInTrackWithArticleInFeatureState() {
-    return this.tracksWhereUserIsEditor()
-      .then(tracks => tracks.map(track => track._id))
-      .then(trackIds => this.articlesInTracks(trackIds))
-      .then(articles => articles.map(article => article._id))
-      .then(articleIds => isValueInArrayTuple('article._ref', articleIds))
-  }
-
   isEditorInAnyIssue() {
     return this.issuesWhereUserIsEditor().then(issues => [issues.length > 0])
   }
@@ -275,9 +254,6 @@ class UserCapabilityDiviner {
       this.isReviewerInArticle(),
       this.isEditorInIssueWithArticleInReviewItem(),
       this.isEditorInTrackWithArticleInReviewItem(),
-      this.isSubmitterInArticleInFeatureState(),
-      this.isEditorInIssueWithArticleInFeatureState(),
-      this.isEditorInTrackWithArticleInFeatureState(),
       this.isEditorInAnyIssue(),
       this.isEditorInAnyTrack(),
       this.isEditorInIssue(),
@@ -299,9 +275,6 @@ class UserCapabilityDiviner {
         isReviewerInArticle,
         isEditorInIssueWithArticleInReviewItem,
         isEditorInTrackWithArticleInReviewItem,
-        isSubmitterInArticleInFeatureState,
-        isEditorInIssueWithArticleInFeatureState,
-        isEditorInTrackWithArticleInFeatureState,
         isEditorInAnyIssue,
         isEditorInAnyTrack,
         isEditorInIssue,
@@ -324,9 +297,6 @@ class UserCapabilityDiviner {
           isReviewerInArticle,
           isEditorInIssueWithArticleInReviewItem,
           isEditorInTrackWithArticleInReviewItem,
-          isSubmitterInArticleInFeatureState,
-          isEditorInIssueWithArticleInFeatureState,
-          isEditorInTrackWithArticleInFeatureState,
           isEditorInAnyIssue,
           isEditorInAnyTrack,
           isEditorInIssue,
