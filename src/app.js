@@ -66,17 +66,15 @@ module.exports = config => {
   app.use(passport.initialize())
   app.use(passport.session())
 
-  app.get('/', (req, res) =>
-    res.json({
-      service: pkg.name,
-      version: pkg.version
-    })
+  app.get('/', (req, res) => res.json({
+    service: pkg.name,
+    version: pkg.version
+  })
   )
 
-  app.get('/v1/ping', (req, res) =>
-    res.json({
-      pong: true
-    })
+  app.get('/v1/ping', (req, res) => res.json({
+    pong: true
+  })
   )
   app.get('/v1/versions', require('./controllers/versions'))
 
