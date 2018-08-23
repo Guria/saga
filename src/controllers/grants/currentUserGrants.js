@@ -14,7 +14,32 @@ module.exports = async (req, res, next) => {
     delete: grants.delete,
     capabilities: userGrants.capabilities || {}
   }
-  //result.capabilities.isAdminUser = [true]
+  // result.capabilities = {
+  //   isAuthorInComment: [true],
+  //   isEditorInAnyIssue: [false],
+  //   isEditorInAnyTrack: [false],
+  //   isEditorInIssue: [false],
+  //   isEditorInIssueWithArticle: [false],
+  //   isEditorInIssueWithArticleInFeatureState: [false],
+  //   isEditorInIssueWithArticleInReviewItem: [false],
+  //   isEditorInIssueWithArticleInReviewProcess: [false],
+  //   isEditorInIssueWithArticleWithComment: [false],
+  //   isEditorInTrack: [false],
+  //   isEditorInTrackWithArticle: [false],
+  //   isEditorInTrackWithArticleInFeatureState: [false],
+  //   isEditorInTrackWithArticleInReviewItem: [false],
+  //   isEditorInTrackWithArticleInReviewProcess: [false],
+  //   isEditorInTrackWithArticleWithComment: [false],
+  //   isEditorInVenue: [true],
+  //   isLoggedInUser: [true],
+  //   isReviewerInReviewItem: [true],
+  //   isSubmitterInArticle: [true],
+  //   isSubmitterInArticleInFeatureState: [false],
+  //   isSubmitterInArticleWithComment: [false]
+  // }
+  // result.update.issue = true
+  // result.update.article = true
+  // result.read.comment = true
   console.log(JSON.stringify(result, null, 2))
   res.json(result)
 }
