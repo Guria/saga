@@ -66,14 +66,18 @@ module.exports = config => {
   app.use(passport.initialize())
   app.use(passport.session())
 
-  app.get('/', (req, res) => res.json({
-    service: pkg.name,
-    version: pkg.version
-  }))
+  app.get('/', (req, res) =>
+    res.json({
+      service: pkg.name,
+      version: pkg.version
+    })
+  )
 
-  app.get('/v1/ping', (req, res) => res.json({
-    pong: true
-  }))
+  app.get('/v1/ping', (req, res) =>
+    res.json({
+      pong: true
+    })
+  )
   app.get('/v1/versions', require('./controllers/versions'))
 
   app.use(
@@ -93,11 +97,11 @@ module.exports = config => {
   )
 
   app.use(
-    '/v1/grants',
+    '/v1/permissions',
     bodyParser.json({
       limit: config.data.maxInputBytes
     }),
-    require('./controllers/grants')
+    require('./controllers/permissions')
   )
 
   app.use(
@@ -123,7 +127,6 @@ module.exports = config => {
     }),
     require('./controllers/datasets')
   )
-
 
   app.use(
     '/v1/assets',

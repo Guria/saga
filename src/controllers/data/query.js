@@ -6,16 +6,13 @@ async function performQuery(options, req, res, next) {
   const {dataStore, securityManager} = req.app.services
   const {dataset} = req.params
   const {query, params} = options
-  const globalFilters = await securityManager.getFilterExpressionsForUser(
-    dataset,
-    req.user && req.user.id
-  )
+  const {filters} = await securityManager.getPermissionsForUser(dataset, req.user && req.user.id)
 
   let result
   try {
     const store = await dataStore.forDataset(dataset)
     const results = await store.fetch(query, params, {
-      globalFilter: globalFilters.read
+      globalFilter: filters.read
     })
     result = typeof results === 'undefined' ? null : results
   } catch (err) {
@@ -39,10 +36,15 @@ const get = (req, res, next) => {
     }, {})
 
   const query = req.query.query
-  return performQuery({
-    query,
-    params
-  }, req, res, next)
+  return performQuery(
+    {
+      query,
+      params
+    },
+    req,
+    res,
+    next
+  )
 }
 
 const post = (req, res, next) => performQuery(req.body, req, res, next)

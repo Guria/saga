@@ -1,6 +1,7 @@
 const request = require('supertest')
-const {close, createSession, getApp, getSessionCookie} = require('./helpers')
 const getId = require('randomstring').generate
+const {close, createSession, getApp, getSessionCookie} = require('./helpers')
+const {noPermissions, adminPermissions} = require('../src/security/securityConstants')
 
 describe('grants', () => {
   const identityTemplate = {
@@ -15,10 +16,10 @@ describe('grants', () => {
 
   let app
 
-  async function createUser() {
+  async function createUser(options = {}) {
     const userStore = app.services.userStore
     const identity = await userStore.createIdentity(identityTemplate)
-    const user = await userStore.createUser(identity, 'saga-test')
+    const user = await userStore.createUser(identity, 'saga-test', options)
     const sessionId = getId()
     await createSession(app, sessionId, identity._id)
     user.sessionId = sessionId
@@ -44,14 +45,11 @@ describe('grants', () => {
 
   test('returns no grants for logged out user', async () => {
     const expected = {
-      read: {},
-      update: {},
-      delete: {},
-      create: {},
-      capabilities: {}
+      grants: noPermissions.grants,
+      capabilities: noPermissions.capabilities
     }
     await request(app)
-      .get(`/v1/grants/${dataset}`)
+      .get(`/v1/permissions/${dataset}`)
       .expect(200, expected)
   })
 
@@ -59,16 +57,16 @@ describe('grants', () => {
     const user = await createUser()
 
     await request(app)
-      .get(`/v1/grants/${dataset}`)
+      .get(`/v1/permissions/${dataset}`)
       .set('Cookie', getSessionCookie(app, user))
       .expect(200)
       .expect(result => {
-        const userGrants = result.body
-        expect(userGrants.read).toBeTruthy()
-        expect(userGrants.create).toBeTruthy()
-        expect(userGrants.update).toBeTruthy()
-        expect(userGrants.delete).toBeTruthy()
-        expect(userGrants.capabilities).toBeTruthy()
+        const {grants, capabilities} = result.body
+        expect(grants.read).toBeTruthy()
+        expect(grants.create).toBeTruthy()
+        expect(grants.update).toBeTruthy()
+        expect(grants.delete).toBeTruthy()
+        expect(capabilities).toBeTruthy()
       })
   })
 
@@ -76,16 +74,13 @@ describe('grants', () => {
     const user = await createUser({isAdmin: true})
 
     await request(app)
-      .get(`/v1/grants/${dataset}`)
+      .get(`/v1/permissions/${dataset}`)
       .set('Cookie', getSessionCookie(app, user))
       .expect(200)
       .expect(result => {
-        const userGrants = result.body
-        expect(userGrants.read).toEqual({})
-        // expect(userGrants.create).toBeTruthy()
-        // expect(userGrants.update).toBeTruthy()
-        // expect(userGrants.delete).toBeTruthy()
-        // expect(userGrants.capabilities).toBeTruthy()
+        const {grants, capabilities} = result.body
+        expect(grants).toEqual(adminPermissions.grants)
+        expect(capabilities).toEqual(adminPermissions.capabilities)
       })
   })
 })

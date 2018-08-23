@@ -60,7 +60,7 @@ class Store extends EventEmitter {
       throw new Error('Transaction cannot be performed; store is closing')
     }
 
-    const filters = await this.securityManager.getFilterExpressionsForUser(
+    const {filters} = await this.securityManager.getPermissionsForUser(
       this.dataset,
       options.identity
     )

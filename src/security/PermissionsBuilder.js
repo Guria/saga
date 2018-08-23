@@ -1,21 +1,8 @@
 /* eslint-disable complexity */
 
 const UserCapabilityDiviner = require('./UserCapabilityDiviner')
-const requiredCapabilities = require('./requiredCapabilities.js')
-const actions = ['read', 'create', 'update', 'delete']
-const documentTypes = [
-  'venue',
-  'issue',
-  'track',
-  'stage',
-  'user',
-  'article',
-  'comment',
-  'reviewProcess',
-  'reviewItem',
-  'featureConfig',
-  'featureState'
-]
+const requiredCapabilities = require('./requiredCapabilities')
+const {actions, documentTypes} = require('./securityConstants')
 
 function quote(item) {
   return `"${item}"`
@@ -87,7 +74,7 @@ class AccessFilterBuilder {
   async determineFilters() {
     await this.fetchAllCapabilities()
     const grantsByActionAndType = this.assembleGrantsByActionAndType()
-    const result = {}
+    const filters = {}
     actions.forEach(action => {
       const queries = documentTypes
         .map(type => {
@@ -102,11 +89,14 @@ class AccessFilterBuilder {
           return `(${query})`
         })
         .filter(Boolean)
-      result[action] = `(${queries.join(' || ')})`
+      filters[action] = `(${queries.join(' || ')})`
     })
-    result.grants = grantsByActionAndType
-    result.capabilities = this.userCapabilities
-    return result
+
+    return {
+      filters: filters,
+      grants: grantsByActionAndType,
+      capabilities: this.userCapabilities
+    }
   }
 }
 

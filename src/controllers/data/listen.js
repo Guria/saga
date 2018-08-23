@@ -66,9 +66,11 @@ module.exports = async (req, res, next) => {
 async function emitOnMutationMatch(mut, messageId, options) {
   const {query, params, channel, omitProps, filterOptions} = options
 
-  const matchesPrev = mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
+  const matchesPrev =
+    mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
 
-  const matchesNext = mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
+  const matchesNext =
+    mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
 
   let transition
   if (matchesPrev && matchesNext) {
@@ -95,11 +97,11 @@ async function emitOnMutationMatch(mut, messageId, options) {
 
 async function queryMatchesDocument(query, doc, params, filterOptions) {
   const {dataset, user, securityManager} = filterOptions
-  const globalFilter = (await securityManager.getFilterExpressionsForUser(dataset, user)).read
+  const {filters} = (await securityManager.getPermissionsForUser(dataset, user)).read
 
   const results = await execQuery({
     source: query,
-    globalFilter: globalFilter,
+    globalFilter: filters,
     params,
     fetcher: spec => ({
       results: [doc],

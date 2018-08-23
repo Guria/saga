@@ -1,5 +1,5 @@
 const {close, getApp} = require('../helpers')
-const AccessFilterBuilder = require('../../src/security/AccessFilterBuilder')
+const PermissionsBuilder = require('../../src/security/PermissionsBuilder')
 
 describe('accessFilterBuilder', () => {
   const identityTemplate = {
@@ -35,10 +35,10 @@ describe('accessFilterBuilder', () => {
     return createdDocument
   }
 
-  async function filtersForUser(userId) {
-    const filterBuilder = new AccessFilterBuilder(userId, app.services.dataStore, 'saga-test')
-    const filters = await filterBuilder.determineFilters()
-    return filters
+  async function permissionsForUser(userId) {
+    const permissionsBuilder = new PermissionsBuilder(userId, app.services.dataStore, 'saga-test')
+    const permissions = await permissionsBuilder.determineFilters()
+    return permissions
   }
 
   beforeAll(() => {
@@ -65,7 +65,7 @@ describe('accessFilterBuilder', () => {
       _type: 'venue',
       name: 'journal-of-snah'
     })
-    const filters = await filtersForUser(unprivilegedUser._id)
+    const {filters} = await permissionsForUser(unprivilegedUser._id)
 
     expect(filters).toBeTruthy()
     const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "comment" && (author._ref in ["${
@@ -83,7 +83,7 @@ describe('accessFilterBuilder', () => {
       title: 'Stuff I chew on',
       author: {_type: 'reference', _ref: author._id}
     })
-    const filters = await filtersForUser(author._id)
+    const {filters} = await permissionsForUser(author._id)
 
     const expected = `((_type == "comment" && (author._ref in ["${
       author._id
@@ -99,7 +99,7 @@ describe('accessFilterBuilder', () => {
       title: 'Stuff I chew on',
       author: {_type: 'reference', _ref: author._id}
     })
-    const filters = await filtersForUser(author._id)
+    const {grants} = await permissionsForUser(author._id)
 
     const expected = {
       create: {comment: [['author._ref', [`${author._id}`]]]},
@@ -122,6 +122,6 @@ describe('accessFilterBuilder', () => {
         reviewItem: [['reviewer._ref', [`${author._id}`]]]
       }
     }
-    expect(filters.grants).toEqual(expected)
+    expect(grants).toEqual(expected)
   })
 })

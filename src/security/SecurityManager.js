@@ -1,6 +1,6 @@
 const LruCache = require('lru-cache')
-const AccessFilterBuilder = require('./AccessFilterBuilder')
-const {noAccessFilterExpressions, fullAccessFilterExpressions} = require('./defaultFilters')
+const PermissionsBuilder = require('./PermissionsBuilder')
+const {noPermissions, adminPermissions} = require('./securityConstants')
 
 class SecurityManager {
   constructor(options = {}) {
@@ -23,29 +23,30 @@ class SecurityManager {
     }
   }
 
-  async getFilterExpressionsForUser(venueId, identityId) {
+  async getPermissionsForUser(venueId, identityId) {
     if (!identityId) {
-      return noAccessFilterExpressions
+      return noPermissions
     }
 
     if (identityId === SecurityManager.SYSTEM_IDENTITY) {
-      return fullAccessFilterExpressions
+      return adminPermissions
     }
 
     this.confirmStoresArePresent()
 
     const {globalUser, venueUser} = await this.userStore.fetchUsersForIdentity(identityId, venueId)
+    console.info('🦄', `hasGlobalUser: ${!!globalUser} // hasVenueUser: ${!!venueUser}`)
 
     if (globalUser) {
       // Will there ever be a globalUser who is not admin?
-      return globalUser.isAdmin ? fullAccessFilterExpressions : noAccessFilterExpressions
+      return globalUser.isAdmin ? adminPermissions : noPermissions
     }
     if (venueUser) {
-      const filterBuilder = new AccessFilterBuilder(venueUser._id, this.dataStore, venueId)
-      return venueUser.isAdmin ? fullAccessFilterExpressions : filterBuilder.determineFilters()
+      const permissionsBuilder = new PermissionsBuilder(venueUser._id, this.dataStore, venueId)
+      return venueUser.isAdmin ? adminPermissions : permissionsBuilder.determineFilters()
     }
 
-    return noAccessFilterExpressions
+    return noPermissions
   }
 
   // Figure out which users must have their cached filters purged

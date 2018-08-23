@@ -1,7 +1,7 @@
 import {ensureConnected} from './utils'
 
 const StoreManager = require('../src/datastore/StoreManager')
-const {fullAccessFilterExpressions} = require('../src/security/defaultFilters')
+const {adminPermissions} = require('../src/security/securityConstants')
 const config = require('../src/config')
 const url = require('url')
 const UserStore = require('../src/userstore')
@@ -28,7 +28,7 @@ export const ROOT_INVITE_URL = url.format({
 
 const fullAccessDatastore = new StoreManager(config.datastore)
 fullAccessDatastore.setSecurityManager({
-  getFilterExpressionsForUser: () => Promise.resolve(fullAccessFilterExpressions)
+  getPermissionsForUser: () => Promise.resolve({adminPermissions})
 })
 
 const userStore = new UserStore({

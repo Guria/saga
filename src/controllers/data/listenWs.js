@@ -43,23 +43,38 @@ async function listen(msg, ws, req) {
   listeners.set(id, {
     cancel
   })
-  send(ws, formatRpcMessage({
-    listenerName: id,
-    type: 'welcome'
-  }, id, {
-    stream: true
-  }))
+  send(
+    ws,
+    formatRpcMessage(
+      {
+        listenerName: id,
+        type: 'welcome'
+      },
+      id,
+      {
+        stream: true
+      }
+    )
+  )
   store.on('mutation', onMutation)
   ws.on('close', cancel)
 }
 
-listen.cancel = (msg, ws, req) => listeners.has(msg.id) &&
+listen.cancel = (msg, ws, req) =>
+  listeners.has(msg.id) &&
   listeners.get(msg.id).cancel() &&
-  send(ws, formatRpcMessage({
-    type: 'complete'
-  }, msg.id, {
-    complete: true
-  }))
+  send(
+    ws,
+    formatRpcMessage(
+      {
+        type: 'complete'
+      },
+      msg.id,
+      {
+        complete: true
+      }
+    )
+  )
 
 function send(ws, data) {
   if (ws.readyState === WebSocket.OPEN) {
@@ -69,11 +84,11 @@ function send(ws, data) {
 
 async function queryMatchesDocument(query, doc, params, filterOptions) {
   const {dataset, user, securityManager} = filterOptions
-  const globalFilter = (await securityManager.getFilterExpressionsForUser(dataset, user)).read
+  const {filters} = (await securityManager.getPermissionsForUser(dataset, user)).read
 
   const results = await execQuery({
     source: query,
-    globalFilter: globalFilter,
+    globalFilter: filters,
     params,
     fetcher: spec => ({
       results: [doc],
@@ -87,9 +102,11 @@ async function queryMatchesDocument(query, doc, params, filterOptions) {
 async function emitOnMutationMatch(mut, options) {
   const {id, query, params, ws, omitProps, filterOptions} = options
 
-  const matchesPrev = mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
+  const matchesPrev =
+    mut.previous && (await queryMatchesDocument(query, mut.previous, params, filterOptions))
 
-  const matchesNext = mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
+  const matchesNext =
+    mut.result && (await queryMatchesDocument(query, mut.result, params, filterOptions))
 
   let transition
   if (matchesPrev && matchesNext) {
@@ -104,9 +121,15 @@ async function emitOnMutationMatch(mut, options) {
 
   const data = omitProps.length > 0 ? omit(mut, omitProps) : mut
 
-  send(ws, formatRpcMessage({
-    ...data,
-    type: 'mutation',
-    transition
-  }, id))
+  send(
+    ws,
+    formatRpcMessage(
+      {
+        ...data,
+        type: 'mutation',
+        transition
+      },
+      id
+    )
+  )
 }
