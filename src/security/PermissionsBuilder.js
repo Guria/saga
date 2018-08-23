@@ -71,7 +71,7 @@ class AccessFilterBuilder {
     return allCapabilityTuples
   }
 
-  async determineFilters() {
+  async determinePermissions() {
     await this.fetchAllCapabilities()
     const grantsByActionAndType = this.assembleGrantsByActionAndType()
     const filters = {}

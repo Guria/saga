@@ -35,7 +35,7 @@ class SecurityManager {
     this.confirmStoresArePresent()
 
     const {globalUser, venueUser} = await this.userStore.fetchUsersForIdentity(identityId, venueId)
-    console.info('🦄', `hasGlobalUser: ${!!globalUser} // hasVenueUser: ${!!venueUser}`)
+    // console.info('🦄', `hasGlobalUser: ${!!globalUser} // hasVenueUser: ${!!venueUser}`)
 
     if (globalUser) {
       // Will there ever be a globalUser who is not admin?
@@ -43,7 +43,7 @@ class SecurityManager {
     }
     if (venueUser) {
       const permissionsBuilder = new PermissionsBuilder(venueUser._id, this.dataStore, venueId)
-      return venueUser.isAdmin ? adminPermissions : permissionsBuilder.determineFilters()
+      return venueUser.isAdmin ? adminPermissions : permissionsBuilder.determinePermissions()
     }
 
     return noPermissions

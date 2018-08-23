@@ -37,7 +37,7 @@ describe('accessFilterBuilder', () => {
 
   async function permissionsForUser(userId) {
     const permissionsBuilder = new PermissionsBuilder(userId, app.services.dataStore, 'saga-test')
-    const permissions = await permissionsBuilder.determineFilters()
+    const permissions = await permissionsBuilder.determinePermissions()
     return permissions
   }
 
