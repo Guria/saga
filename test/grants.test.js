@@ -71,4 +71,21 @@ describe('grants', () => {
         expect(userGrants.capabilities).toBeTruthy()
       })
   })
+
+  test('returns all grants for admin user', async () => {
+    const user = await createUser({isAdmin: true})
+
+    await request(app)
+      .get(`/v1/grants/${dataset}`)
+      .set('Cookie', getSessionCookie(app, user))
+      .expect(200)
+      .expect(result => {
+        const userGrants = result.body
+        expect(userGrants.read).toEqual({})
+        // expect(userGrants.create).toBeTruthy()
+        // expect(userGrants.update).toBeTruthy()
+        // expect(userGrants.delete).toBeTruthy()
+        // expect(userGrants.capabilities).toBeTruthy()
+      })
+  })
 })
