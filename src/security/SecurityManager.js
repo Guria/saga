@@ -1,12 +1,60 @@
 const LruCache = require('lru-cache')
 const PermissionsBuilder = require('./PermissionsBuilder')
 const {noPermissions, adminPermissions} = require('./securityConstants')
+import { union, difference, isEqual } from 'lodash'
+
+function extractUserIds(value) {
+  if (!value) return []
+  const refs = Array.isArray(value) ? value : [value]
+  return refs.map(item => item._ref).sort()
+}
+
+function oldAndNewValue(doc1, doc2, fieldName) {
+  let oldValue
+  let newValue
+  if (doc1) {
+    oldValue = doc1[fieldName]
+  }
+  if (doc2) {
+    newValue = doc2[fieldName]
+  }
+
+  return [oldValue, newValue]
+}
+
+function didChange(doc1, doc2, fieldName) {
+  const [oldValue, newValue] = oldAndNewValue(doc1, doc2, fieldName)
+  return !isEqual(oldValue, newValue)
+}
+
+// Returns the value of a field for the document at any time, preferring the newest value.
+// Used to extract values that you want regardless of whether the document has been deleted
+// or created.
+function valueAtAnyPoint(doc1, doc2, fieldName) {
+  const [oldValue, newValue] = oldAndNewValue(doc1, doc2, fieldName)
+  return newValue || oldValue
+}
+
+function differenceUserIds(doc1, doc2, fieldName) {
+  let uids1 = []
+  let uids2 = []
+
+  if (doc1) {
+    uids1 = extractUserIds(doc1[fieldName])
+  }
+  if (doc2) {
+    uids2 = extractUserIds(doc2[fieldName])
+  }
+  return union(difference(uids1, uids2), difference(uids2, uids1))
+}
 
 class SecurityManager {
   constructor(options = {}) {
     this.userStore = options.userStore
     this.dataStore = options.dataStore
-    this.cache = new LruCache({max: 500})
+    this.cache = new LruCache({
+      max: 500
+    })
     this.onMutation = this.onMutation.bind(this)
   }
 
@@ -23,7 +71,8 @@ class SecurityManager {
     }
   }
 
-  async getPermissionsForUser(venueId, identityId) {
+  async computePermissionsForUser(venueId, identityId) {
+    console.log("computePermissionsForUser")
     if (!identityId) {
       return noPermissions
     }
@@ -49,14 +98,69 @@ class SecurityManager {
     return noPermissions
   }
 
-  // Figure out which users must have their cached filters purged
-  accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) {
-    return []
+  async getPermissionsForUser(venueId, identityId) {
+    const key = getCacheKey(venueId, identityId)
+    let result = this.cache.get(key)
+    if (result) {
+      return result
+    }
+
+    result = await this.computePermissionsForUser(venueId, identityId)
+    this.cache.set(key, result)
+    return result
+  }
+
+  // Figure out which users must have their access privilege cache purged
+  accessFilterChangesForUserIds(venueId, previousDoc, nextDoc) { // eslint-disable-line class-methods-use-this
+    const _type = valueAtAnyPoint(previousDoc, nextDoc, '_type')
+
+    // If this is a user object, just invalidate the user regardless of what just happened
+    if (_type == 'user') {
+      return [valueAtAnyPoint(previousDoc, nextDoc, '_id')]
+    }
+
+    // Look for the fields that define roles across objects and invalidate any users
+    // that are added or removed from any such field.
+    const roleFields = ['editors', 'submitters', 'reviewer']
+    let usersToInvalidate = []
+    roleFields.forEach(fieldName => {
+      const uids = differenceUserIds(previousDoc, nextDoc, fieldName)
+      usersToInvalidate = union(usersToInvalidate, uids)
+    })
+    return usersToInvalidate
+  }
+
+  doesRequireFullCacheReset(venueId, previousDoc, nextDoc) { // eslint-disable-line class-methods-use-this
+    const _type = valueAtAnyPoint(previousDoc, nextDoc, '_type')
+    switch (_type) {
+      case 'issue':
+        if (didChange(previousDoc, nextDoc, 'content')) {
+          return true
+        }
+        break
+      default:
+        return false
+    }
+    return false
   }
 
   // Point of callback when a document changes
   onMutation(mutation) {
     const venueId = mutation.annotations.venueId
+
+    // Check if we should just reset the entire cache
+    if (this.doesRequireFullCacheReset(
+        venueId,
+        mutation.previous,
+        mutation.result
+      )) {
+      console.log("Did reset entire access cache")
+      this.cache.reset()
+      return
+    }
+
+    // If we did not have to throw out the entire cache: See if we can determine
+    // individual users.
     const changedFor = this.accessFilterChangesForUserIds(
       venueId,
       mutation.previous,
@@ -64,6 +168,7 @@ class SecurityManager {
     )
 
     changedFor.forEach(userId => {
+      console.log('Invalidating access cache for user', userId)
       this.cache.del(getCacheKey(venueId, userId))
     })
   }
