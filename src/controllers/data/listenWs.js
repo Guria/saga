@@ -84,11 +84,11 @@ function send(ws, data) {
 
 async function queryMatchesDocument(query, doc, params, filterOptions) {
   const {dataset, user, securityManager} = filterOptions
-  const {filters} = (await securityManager.getPermissionsForUser(dataset, user)).read
+  const {filters} = await securityManager.getPermissionsForUser(dataset, user)
 
   const results = await execQuery({
     source: query,
-    globalFilter: filters,
+    globalFilter: filters.read,
     params,
     fetcher: spec => ({
       results: [doc],
