@@ -123,7 +123,7 @@ class Store extends EventEmitter {
 
           if (operation === 'createIfNotExists') {
             const _id = idFromMutation(operation, body)
-            if (this.getDocumentById(_id)) {
+            if (await this.getDocumentById(_id)) {
               console.log(`Skipped createIfNotExists for ${_id} because it actually does exist.`)
               continue
             }
