@@ -1,5 +1,19 @@
 const {omit} = require('lodash')
 
+// Makes sure each document is only mentioned once for each operation
+function filterResults(results) {
+  const filtered = []
+  const mentions = {}
+  results.forEach(result => {
+    const key = `${result.id}!!!${result.operation}`
+    if (!mentions[key]) {
+      filtered.push(result)
+      mentions[key] = true
+    }
+  })
+  return filtered
+}
+
 module.exports = async (req, res, next) => {
   const {dataset} = req.params
   const {dataStore} = req.app.services
@@ -8,7 +22,11 @@ module.exports = async (req, res, next) => {
   const identity = req.user && req.user.id
 
   const store = await dataStore.forDataset(dataset)
-  const trx = store.newTransaction({transactionId, mutations, identity})
+  const trx = store.newTransaction({
+    transactionId,
+    mutations,
+    identity
+  })
 
   let commitResult
   try {
@@ -20,10 +38,14 @@ module.exports = async (req, res, next) => {
   const {results, ...rest} = commitResult
 
   if (returnIds && returnDocuments) {
-    return res.json({results, ...rest})
+    return res.json({
+      results, ...rest
+    })
   }
 
   const omitProps = [!returnIds && 'id', !returnDocuments && 'document'].filter(Boolean)
-  const mappedResults = results.map(result => omit(result, omitProps))
-  return res.json({results: mappedResults, ...rest})
+  const mappedResults = filterResults(results.map(result => omit(result, omitProps)))
+  return res.json({
+    results: mappedResults, ...rest
+  })
 }

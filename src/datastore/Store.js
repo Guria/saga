@@ -85,12 +85,17 @@ class Store extends EventEmitter {
     })
 
     // eslint-disable-next-line complexity
-    return this.mutationQueue.add(async () => {
+    return this.mutationQueue.add(async () => { // eslint-disable-line max-statements
       const documents = await this.adapter.getDocumentsById(ids)
       const transaction = await this.adapter.startTransaction()
 
-      // @todo refactor/test that patches are applied on _existing_ documents
+      // A list of all documents that will be created/patched during this transaction
       const patchDocs = mergeCreatedDocuments(mutations, documents)
+
+      const docsCache = {}
+      patchDocs.forEach(doc => {
+        docsCache[doc._id] = doc
+      })
 
       let results = []
       try {
@@ -103,11 +108,12 @@ class Store extends EventEmitter {
           // Apply patches with mutator to avoid having to the same work in each adapter
           const isDelete = operation === 'delete'
           const isPatch = operation === 'patch'
-          const targetDoc = isPatch && patchDocs.find(doc => doc._id === body.id)
+          const targetDoc = isPatch && docsCache[body.id]
           let next
           if (isPatch && targetDoc) {
             const patch = new Patcher(body)
             next = patch.apply(targetDoc)
+            docsCache[next._id] = next
           }
 
           // Permission and foreign keys checks
