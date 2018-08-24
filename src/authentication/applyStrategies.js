@@ -20,11 +20,16 @@ module.exports = function applyStrategies(app, config) {
     ])
 
     log.trace(`Found %d users`, users ? users.length : 0)
-    done(null, {id, identity, users})
+    done(null, {
+      id,
+      identity,
+      users
+    })
   })
 
   let providers
 
+  providers = require(config.auth.providersConfigPath)
   try {
     providers = require(config.auth.providersConfigPath)
   } catch (err) {
@@ -40,10 +45,9 @@ module.exports = function applyStrategies(app, config) {
   providers = providers || providersFallback
 
   return providers.map(provider => {
-    const Strategy =
-      config.env === 'test'
-        ? require('passport-mocked').Strategy
-        : require(`passport-${provider.strategy}`).Strategy
+    const Strategy = config.env === 'test'
+      ? require('passport-mocked').Strategy
+      : require(`passport-${provider.strategy}`).Strategy
 
     passport.use(new Strategy(provider.config, handleLogin.bind(null, app, provider)))
     return provider
