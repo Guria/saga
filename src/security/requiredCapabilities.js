@@ -49,6 +49,7 @@ const requiredCapabilities = {
     reviewItem: [
       'isAdminUser',
       'isEditorInVenue',
+      'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
     ]
