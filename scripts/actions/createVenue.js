@@ -11,9 +11,9 @@ const sluggedName = str =>
     .replace(/[^a-z0-9]/g, '')
 
 export async function createVenue({dataStore, userStore}) {
-  const rootIdentity = await userStore.getRootIdentity()
-  if (!rootIdentity) {
-    console.error(`Could not find root identity. Please run 'npm run setup' instead`)
+  const rootUser = await userStore.getRootUser()
+  if (!rootUser) {
+    console.error(`Could not find root user. Please run 'npm run setup' instead`)
     return
   }
 
@@ -42,11 +42,11 @@ export async function createVenue({dataStore, userStore}) {
   const store = await dataStore.forDataset(datasetName)
   await createAllIfNotExists(store.newTransaction(), docs).commit()
   // Make root identity admin in venue
-  await userStore.createVenueAdminFrom(rootIdentity, venue._id)
+  await userStore.createVenueAdminFrom(rootUser, venue._id)
   console.log(
     '✔ Venue %s created with %s as admin %s',
     venue.title,
-    rootIdentity.name,
+    rootUser.name,
     shouldCreateTracksAndStages ? 'and default tracks and stages' : ''
   )
 }
