@@ -2,7 +2,7 @@
 require('hard-rejection/register')
 
 const app = require('./app')
-const config = require('./config').default
+const config = require('./config')
 const wsServer = require('./wsServer')
 
 if (config.env === 'production' && config.session.secret === config.DEV_SESSION_SECRET) {

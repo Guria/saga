@@ -1,6 +1,6 @@
 // Config overrides for use when running tests
 
-export default {
+module.exports = {
   vega: {
     featurePlugins: ['checklist', 'declaration', 'dueDate']
   }

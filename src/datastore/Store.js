@@ -149,6 +149,7 @@ class Store extends EventEmitter {
 
           // Execute operation
           try {
+            console.log(next)
             results.push(
               await this.adapter[operation](body, {
                 transaction,
@@ -176,7 +177,7 @@ class Store extends EventEmitter {
         const refPatches = generateDocumentReferencePatches(results, documents)
         for (let i = 0; i < refPatches.length; i++) {
           const patch = refPatches[i]
-          await this.adapter.setReferences(patch.id, patch.references, {
+          await this.adapter.References(patch.id, patch.references, {
             transaction
           })
         }

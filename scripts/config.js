@@ -2,7 +2,7 @@ import { ensureConnected } from './utils'
 
 const StoreManager = require('../src/datastore/StoreManager')
 const {adminPermissions} = require('../src/security/securityConstants')
-const config = require('../src/config').default
+const config = require('../src/config')
 const url = require('url')
 const UserStore = require('../src/userstore')
 

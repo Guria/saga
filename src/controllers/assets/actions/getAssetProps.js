@@ -1,4 +1,4 @@
-const config = require('../../../config').default
+const config = require('../../../config')
 
 const getAssetProps = options => {
   const {type, sha1hash, imageData, extension, req, mimeType, size} = options

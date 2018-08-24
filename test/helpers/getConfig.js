@@ -2,7 +2,7 @@ const {merge, uniqueId} = require('lodash')
 const path = require('path')
 const os = require('os')
 const randomstring = require('randomstring').generate
-const defaultConfig = require('../../src/config').default
+const defaultConfig = require('../../src/config')
 
 const executionId = randomstring()
 

@@ -1,5 +1,5 @@
-import defaultConfig from './defaultConfig'
-import testConfig from './testConfig'
+const defaultConfig = require('./defaultConfig')
+const testConfig = require('./testConfig')
 const commander = require('commander')
 const fs = require('fs')
 
@@ -22,4 +22,4 @@ if (commander.config) {
   config = Object.assign(config, optionalConfig)
 }
 
-export default config
+module.exports = config
