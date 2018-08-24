@@ -22,6 +22,4 @@ if (commander.config) {
   config = Object.assign(config, optionalConfig)
 }
 
-console.log('config', config)
-
 export default config
