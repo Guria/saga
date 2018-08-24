@@ -1,5 +1,5 @@
 const {merge} = require('lodash')
-import config from '../config'
+const config = require('../config')
 
 const requiredCapabilities = {
   read: {
