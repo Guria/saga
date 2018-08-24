@@ -2,23 +2,8 @@
 require('hard-rejection/register')
 
 const app = require('./app')
-const defaultConfig = require('./config')
+const config = require('./config').default
 const wsServer = require('./wsServer')
-const commander = require('commander')
-const fs = require('fs')
-
-commander
-  .version('0.1.0')
-  .option('-c, --config [path]', 'Path to config file')
-  .parse(process.argv);
-
-let config = defaultConfig
-
-if (commander.config) {
-  console.log("Reading config from ", commander.config)
-  const optionalConfig = JSON.parse(fs.readFileSync(commander.config).toString())
-  config = Object.assign(config, optionalConfig)
-}
 
 if (config.env === 'production' && config.session.secret === config.DEV_SESSION_SECRET) {
   throw new Error('Cannot use default session secret in production')

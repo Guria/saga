@@ -1,5 +1,5 @@
 const {merge} = require('lodash')
-const config = require('../config')
+import config from '../config'
 
 const requiredCapabilities = {
   read: {
@@ -128,28 +128,36 @@ const features = {
       [`${documentType}Config`]: ['isLoggedInUser'],
       [`${documentType}State`]: ['isLoggedInUser']
     }
-    return {...obj, ...featureSet}
+    return {
+      ...obj, ...featureSet
+    }
   }, {}),
   create: config.vega.featurePlugins.reduce((obj, documentType) => {
     const featureSet = {
       [`${documentType}Config`]: ['isAdminUser', 'isEditorInVenue'],
       [`${documentType}State`]: ['isLoggedInUser']
     }
-    return {...obj, ...featureSet}
+    return {
+      ...obj, ...featureSet
+    }
   }, {}),
   update: config.vega.featurePlugins.reduce((obj, documentType) => {
     const featureSet = {
       [`${documentType}Config`]: ['isAdminUser', 'isEditorInVenue'],
       [`${documentType}State`]: ['isLoggedInUser']
     }
-    return {...obj, ...featureSet}
+    return {
+      ...obj, ...featureSet
+    }
   }, {}),
   delete: config.vega.featurePlugins.reduce((obj, documentType) => {
     const featureSet = {
       [`${documentType}Config`]: ['isAdminUser', 'isEditorInVenue'],
       [`${documentType}State`]: ['isLoggedInUser']
     }
-    return {...obj, ...featureSet}
+    return {
+      ...obj, ...featureSet
+    }
   }, {})
 }
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const MongoDbConnector = require('../../src/datastore/adapters/MongoDB/MongoDbConnector')
-const config = require('../../src/config')
+const config = require('../../src/config').default
 
 module.exports = async () => {
   const dbPrefix = 'saga-test-'

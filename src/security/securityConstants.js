@@ -1,4 +1,4 @@
-const config = require('../config')
+import config from '../config'
 const actions = ['read', 'create', 'update', 'delete']
 
 const additionalTypes = []
@@ -35,23 +35,52 @@ const fullAccessFilterExpressions = {
 const noPermissions = {
   filters: noAccessFilterExpressions,
   grants: {
-    read: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: false}), {}),
-    create: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: false}), {}),
-    update: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: false}), {}),
-    delete: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: false}), {})
+    read: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: false
+    }), {}),
+    create: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: false
+    }), {}),
+    update: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: false
+    }), {}),
+    delete: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: false
+    }), {})
   },
-  capabilities: {isLoggedInUser: [false]}
+  capabilities: {
+    isLoggedInUser: [false]
+  }
 }
 
 const adminPermissions = {
   filters: fullAccessFilterExpressions,
   grants: {
-    read: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: true}), {}),
-    create: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: true}), {}),
-    update: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: true}), {}),
-    delete: documentTypes.reduce((obj, documentType) => ({...obj, [documentType]: true}), {})
+    read: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: true
+    }), {}),
+    create: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: true
+    }), {}),
+    update: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: true
+    }), {}),
+    delete: documentTypes.reduce((obj, documentType) => ({
+      ...obj,
+      [documentType]: true
+    }), {})
   },
-  capabilities: {isLoggedInUser: [true], isAdminUser: [true]}
+  capabilities: {
+    isLoggedInUser: [true],
+    isAdminUser: [true]
+  }
 }
 
 module.exports = {
