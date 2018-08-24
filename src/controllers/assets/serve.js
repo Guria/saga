@@ -5,6 +5,6 @@ const serveImage = require('./serveImage')
 const data = express.Router()
 
 data.use('/files', serveFile)
-data.use('/images', serveImage)
+data.use('/', serveImage)
 
 module.exports = data
