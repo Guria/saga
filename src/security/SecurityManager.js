@@ -164,10 +164,18 @@ class SecurityManager {
       mutation.result
     )
 
-    changedFor.forEach(userId => {
-      console.log('Reset access cache for', userId)
-      this.cache.del(getCacheKey(venueId, userId))
-    })
+    if (changedFor.length > 0) {
+      // At this point we have an array of user IDs, but in order to invalidate them
+      // we'll have to retrieve the identity-ids of those users. In 99.972% of all cases
+      // it is cheaper to reset the cache, rather than hit the db to perform the conversion.
+      console.log('Reset entire access cache, because state changed for users', changedFor)
+      this.cache.reset()
+    }
+
+  // changedFor.forEach(userId => {
+  //   console.log('Reset access cache for', userId)
+  //   this.cache.del(getCacheKey(venueId, identityId))
+  // })
   }
 }
 
