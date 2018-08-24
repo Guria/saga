@@ -1,7 +1,7 @@
 const LruCache = require('lru-cache')
 const PermissionsBuilder = require('./PermissionsBuilder')
 const {noPermissions, adminPermissions} = require('./securityConstants')
-import {union, difference, isEqual} from 'lodash'
+import { union, difference, isEqual } from 'lodash'
 
 function extractUserIds(value) {
   if (!value) return []
@@ -151,6 +151,7 @@ class SecurityManager {
 
     // Check if we should just reset the entire cache
     if (this.doesRequireFullCacheReset(venueId, mutation.previous, mutation.result)) {
+      console.log('Reset entire access cache')
       this.cache.reset()
       return
     }
@@ -164,6 +165,7 @@ class SecurityManager {
     )
 
     changedFor.forEach(userId => {
+      console.log('Reset access cache for', userId)
       this.cache.del(getCacheKey(venueId, userId))
     })
   }
