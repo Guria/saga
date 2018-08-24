@@ -45,7 +45,7 @@ module.exports = {
     maxInputBytes: int(process.env.SAGA_ASSETS_MAX_INPUT_BYTES, FIFTEEN_MEGABYTES),
     adapter: 'fs',
     options: {
-      basePath: process.env.SAGA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', 'data', 'assets')
+      basePath: process.env.SAGA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', '..', 'data', 'assets')
     }
   },
 
