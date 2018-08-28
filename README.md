@@ -11,7 +11,7 @@ Saga is an abbreviation of Sagittarus A\* which is the radio source likely to be
 ## Terms
 
 - Capability. A single piece of access, e.g. user is editor in a specific issue
-- Grant. List of capabilities needed to perform an action on a document type, e.g. to update a comment you need to have capabilityX or capabilityY (say comment author or venue editor)
+- Grant. A permission to perform an action on a document with a given type. Grant are given based on a list of capabilities. E.g. to perform the `update` action on a `comment` you need to have capabilityX or capabilityY (say comment author or venue editor)
 
 `src/security/SecurityManager.js` is where we establishe who can perform what kind of CRUD action. Briefly, what happens is that a filter is applied to the queries or mutations a user wants to perform. Say we have a user who is submitter on article `article-123`, a simplified filter might look like this:
 
