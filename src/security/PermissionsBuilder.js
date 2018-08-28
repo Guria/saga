@@ -12,9 +12,10 @@ function arrayAsQuotedString(items) {
   return `[${items.map(quote).join(',')}]`
 }
 
-function querifyTuples(tuples) {
+function querify(tuples, additionalFilters) {
   const queryfied = tuples
     .map(tuple => `(${tuple[0]} in ${arrayAsQuotedString(tuple[1])})`)
+    .concat(additionalFilters)
     .join(' || ')
 
   return queryfied
@@ -71,23 +72,37 @@ class PermissionsBuilder {
     return allCapabilityTuples
   }
 
+  filtersByActionAndType(action, type, grantsByActionAndType) {
+    const specificGrants = grantsByActionAndType[action][type]
+    if (specificGrants === true) {
+      return `(_type == "${type}")`
+    }
+
+    // additionalFilters are used for those cases where the requiredCapabilities
+    // architecture is unable to specify what we want
+    // If we need more of these special-cases, move them to a separate file
+    const additionalFilters = []
+    if (action === 'update' && type === 'user') {
+      additionalFilters.push('(!defined(identity) && !isAdmin)')
+      additionalFilters.push(`(_id == "${this.userId}" && !isAdmin")`)
+    }
+
+    if (!specificGrants && additionalFilters.length === 0) {
+      return null
+    }
+
+    const grantTuples = specificGrants ? specificGrants : []
+    const query = [`_type == "${type}"`, querify(grantTuples, additionalFilters)].join(' && ')
+    return `(${query})`
+  }
+
   async determinePermissions() {
     await this.fetchAllCapabilities()
     const grantsByActionAndType = this.assembleGrantsByActionAndType()
     const filters = {}
     actions.forEach(action => {
       const queries = documentTypes
-        .map(type => {
-          const specificGrants = grantsByActionAndType[action][type]
-          if (!specificGrants) {
-            return null
-          }
-          if (specificGrants === true) {
-            return `(_type == "${type}")`
-          }
-          const query = [`_type == "${type}"`, querifyTuples(specificGrants)].join(' && ')
-          return `(${query})`
-        })
+        .map(type => this.filtersByActionAndType(action, type, grantsByActionAndType))
         .filter(Boolean)
       filters[action] = `(${queries.join(' || ')})`
     })

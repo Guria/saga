@@ -86,7 +86,9 @@ describe('permissionsBuilder', () => {
     })
     const {filters} = await permissionsForUser(author._id)
 
-    const expected = `((_type == "comment" && (author._ref in ["${
+    const expected = `((_type == "user" && (!defined(identity) && !isAdmin) || (_id == "${
+      author._id
+    }" && !isAdmin")) || (_type == "comment" && (author._ref in ["${
       author._id
     }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
       author._id
