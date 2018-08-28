@@ -119,6 +119,7 @@ async function emitOnMutationMatch(mut, options) {
     return
   }
 
+  const mutations = rewriteCreateMutations(mut.mutations, mut.previous)
   const data = omitProps.length > 0 ? omit(mut, omitProps) : mut
 
   send(
@@ -127,9 +128,21 @@ async function emitOnMutationMatch(mut, options) {
       {
         ...data,
         type: 'mutation',
+        mutations,
         transition
       },
       id
     )
   )
+}
+
+function rewriteCreateMutations(mutations, hasPrev) {
+  return mutations.map(mut => {
+    const op = Object.keys(mut)[0]
+    if (hasPrev || (op !== 'createOrReplace' && op !== 'createIfNotExists')) {
+      return mut
+    }
+
+    return {create: mut[op]}
+  })
 }
