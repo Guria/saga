@@ -4,15 +4,15 @@ const {query: execQuery} = require('../../../groq')
 const debug = require('debug')('groq-mongo')
 
 const log = (prefix, ast) =>
-// eslint-disable-next-line no-console
-console.log(
-  '%s: ',
-  prefix,
-  util.inspect(ast, {
-    colors: true,
-    depth: 15
-  })
-)
+  // eslint-disable-next-line no-console
+  console.log(
+    '%s: ',
+    prefix,
+    util.inspect(ast, {
+      colors: true,
+      depth: 15
+    })
+  )
 
 module.exports = {
   toMongo,
@@ -30,7 +30,6 @@ function query(collection, groqQuery, params = {}, options) {
 }
 
 async function fetchForSpec(collection, spec) {
-
   const sort = spec.ordering.map(fromNode)
   const canSort = sort.every(Boolean)
   const filter = spec.filter ? fromNode(spec.filter) : {}
@@ -40,16 +39,22 @@ async function fetchForSpec(collection, spec) {
   // start at index 0. In the future this result should be able to communicate to the run-time evaluator
   // when it has performed the range limitation here.
 
-  debug('mongo-fetch', util.inspect({
-    sort,
-    canSort,
-    filter,
-    start,
-    end,
-  // spec
-  }, {
-    depth: 10
-  }))
+  debug(
+    'mongo-fetch',
+    util.inspect(
+      {
+        sort,
+        canSort,
+        filter,
+        start,
+        end
+        // spec
+      },
+      {
+        depth: 10
+      }
+    )
+  )
 
   // Filter might be short-circuited to `false`,
   // don't query mongodb if this is the case
@@ -444,13 +449,15 @@ function fromDefinedFilter(node) {
 }
 
 function fromReferencesFilter(node) {
-  const [id] = node.arguments.map(fromNode)
+  const ids = node.arguments.map(fromNode)
   return {
-    '@refs': {
-      $elemMatch: {
-        id
+    $or: ids.map(id => ({
+      '@refs': {
+        $elemMatch: {
+          id
+        }
       }
-    }
+    }))
   }
 }
 
@@ -459,31 +466,37 @@ function fromMatchFilter(node) {
 
   if (Array.isArray(rhs)) {
     return {
-      '$and': rhs.map(term => fromMatchFilter(
-        Object.assign({}, node, {
-          rhs: {
-            op: 'literal',
-            type: 'string',
-            value: term
-          }
-        })
-      ))
+      $and: rhs.map(term =>
+        fromMatchFilter(
+          Object.assign({}, node, {
+            rhs: {
+              op: 'literal',
+              type: 'string',
+              value: term
+            }
+          })
+        )
+      )
     }
   }
 
   if (Array.isArray(lhs)) {
     return {
-      '$or': lhs.map(name => fromMatchFilter(
-        Object.assign({}, node, {
-          lhs: {
-            op: 'accessor',
-            path: [{
-              op: 'attribute',
-              name
-            }]
-          }
-        })
-      ))
+      $or: lhs.map(name =>
+        fromMatchFilter(
+          Object.assign({}, node, {
+            lhs: {
+              op: 'accessor',
+              path: [
+                {
+                  op: 'attribute',
+                  name
+                }
+              ]
+            }
+          })
+        )
+      )
     }
   }
 
@@ -493,17 +506,15 @@ function fromMatchFilter(node) {
     // Multiple occurences -> Single occurence (*** -> .*?)
     .replace(/(\.\*\?)+/g, '.*?')
 
-
   if (type === 'literalComparison') {
     const $regex = new RegExp(pattern, 'i')
     return $regex.test(lhs)
   }
 
-
   return {
     [lhs]: {
       $regex: pattern,
-      $options: "i"
+      $options: 'i'
     }
   }
 }
