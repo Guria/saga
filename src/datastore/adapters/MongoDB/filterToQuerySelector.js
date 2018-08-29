@@ -621,7 +621,7 @@ function filterParts(node) {
     rhs: node.rhs,
     node
   })
-
+  console.log(node)
   throw new Error('Unable to determine filter type')
 }
 

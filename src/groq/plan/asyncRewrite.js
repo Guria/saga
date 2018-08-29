@@ -1,0 +1,33 @@
+// A version of the tree rewriter that can deal with async
+
+async function rewriteAttributes(node, attributes, cb) {
+  // Rewrite all the attributes and wait for all the results to come in
+  const result = Object.assign({}, node)
+  await Promise.all(
+    attributes.map(
+      attribute => asyncRewrite(node[attribute], cb)
+        .then(value => {
+          result[attribute] = value
+        })
+    )
+  )
+  return result
+}
+
+async function asyncRewrite(node, cb) {
+  if (node === null || node === undefined) {
+    return null
+  }
+  if (Array.isArray(node)) {
+    return Promise.all(node.map(item => asyncRewrite(item, cb)))
+  }
+
+  let result = node
+  if (typeof node == 'object') {
+    result = await rewriteAttributes(node, ['lhs', 'rhs', 'filter', 'operations', 'terms'], cb)
+  }
+
+  return cb(result)
+}
+
+export default asyncRewrite

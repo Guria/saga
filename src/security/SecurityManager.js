@@ -151,7 +151,7 @@ class SecurityManager {
 
     // Check if we should just reset the entire cache
     if (this.doesRequireFullCacheReset(venueId, mutation.previous, mutation.result)) {
-      console.log('Reset entire access cache')
+      // console.log('Reset entire access cache')
       this.cache.reset()
       return
     }
@@ -168,7 +168,7 @@ class SecurityManager {
       // At this point we have an array of user IDs, but in order to invalidate them
       // we'll have to retrieve the identity-ids of those users. In 99.972% of all cases
       // it is cheaper to reset the cache, rather than hit the db to perform the conversion.
-      console.log('Reset entire access cache, because state changed for users', changedFor)
+      // console.log('Reset entire access cache, because state changed for users', changedFor)
       this.cache.reset()
     }
 
