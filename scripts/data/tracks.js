@@ -16,6 +16,7 @@ module.exports = [
         _key: 'a4ebe59a31e1d78e0aac38357cd8d23e',
         _type: 'trackStage',
         name: 'review_book-reviews',
+        isReviewEnabled: true,
         stage: {_ref: 'stage_review', _type: 'reference'}
       },
 
@@ -44,6 +45,7 @@ module.exports = [
         _key: '07882211ae8f',
         _type: 'trackStage',
         name: 'review_articles',
+        isReviewEnabled: true,
         stage: {_ref: 'stage_review', _type: 'reference'}
       },
       {
