@@ -96,7 +96,7 @@ async function queryMatchesDocument(query, doc, params, filterOptions) {
     })
   })
 
-  return Array.isArray(results) && results.length > 0
+  return Array.isArray(results) ? results.length > 0 : results !== null
 }
 
 async function emitOnMutationMatch(mut, options) {
