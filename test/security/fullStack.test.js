@@ -20,10 +20,10 @@ describe('fullStack', () => {
     return scopedDataStore
   }
 
-  async function createUser() {
+  async function createUser(options = {}) {
     const userStore = app.services.userStore
     const identity = await userStore.createIdentity(identityTemplate)
-    const user = await userStore.createUser(identity, 'saga-test')
+    const user = await userStore.createUser(identity, 'saga-test', options)
     const sessionId = getId()
     await createSession(app, sessionId, identity._id)
     user.sessionId = sessionId
@@ -222,6 +222,72 @@ describe('fullStack', () => {
       .expect(200, {
         transactionId,
         results: [{id: article._id, operation: 'create'}]
+      })
+  })
+
+  test('grants user access to update self', async () => {
+    const user = await createUser()
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, user))
+      .send({
+        mutations: [{patch: {id: user._id, set: {name: 'Doctor Newname'}}}],
+        transactionId
+      })
+      .expect(200, {
+        transactionId,
+        results: [{id: user._id, operation: 'update'}]
+      })
+  })
+
+  test('denies user access to update another user', async () => {
+    const user = await createUser()
+    const otherUser = await createUser()
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, user))
+      .send({
+        mutations: [{patch: {id: otherUser._id, set: {name: 'Doctor Newname'}}}],
+        transactionId
+      })
+      .expect(403)
+      .expect(result => {
+        expect(result.body).toMatchObject({error: 'Forbidden', type: 'mutationError'})
+      })
+  })
+
+  test('grants admin access to promote another user to admin', async () => {
+    const admin = await createUser({isAdmin: true})
+    const otherUser = await createUser()
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, admin))
+      .send({
+        mutations: [{patch: {id: otherUser._id, set: {isAdmin: true}}}],
+        transactionId
+      })
+      .expect(200, {
+        transactionId,
+        results: [{id: otherUser._id, operation: 'update'}]
+      })
+  })
+
+  test.skip('denies user ability to promote herself to admin', async () => {
+    const user = await createUser()
+    const transactionId = getId()
+    await request(app)
+      .post('/v1/data/mutate/saga-test?returnIds=true')
+      .set('Cookie', getSessionCookie(app, user))
+      .send({
+        mutations: [{patch: {id: user._id, set: {isAdmin: true}}}],
+        transactionId
+      })
+      .expect(403)
+      .expect(result => {
+        expect(result.body).toMatchObject({error: 'Forbidden', type: 'mutationError'})
       })
   })
 })

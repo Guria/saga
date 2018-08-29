@@ -3,6 +3,7 @@
 const UserCapabilityDiviner = require('./UserCapabilityDiviner')
 const requiredCapabilities = require('./requiredCapabilities')
 const {actions, documentTypes} = require('./securityConstants')
+const {fetchCurrentUser} = require('./util')
 
 function quote(item) {
   return `"${item}"`
@@ -17,8 +18,8 @@ function querify(tuples, additionalFilters) {
     .map(tuple => `(${tuple[0]} in ${arrayAsQuotedString(tuple[1])})`)
     .concat(additionalFilters)
     .join(' || ')
-
-  return queryfied
+  const itemCount = tuples.length + additionalFilters.length
+  return itemCount > 1 ? `(${queryfied})` : queryfied
 }
 
 // This class defines which capabilities a given user must have in order
@@ -29,6 +30,7 @@ class PermissionsBuilder {
     this.userId = userId
     this.venueId = venueId
     this.dataStore = dataStore
+    this.currentUser = null
   }
 
   async fetchAllCapabilities() {
@@ -37,6 +39,13 @@ class PermissionsBuilder {
       this.userCapabilities = await userCapabilities.runAll()
     }
     return this.userCapabilities
+  }
+
+  async getCurrentUser() {
+    if (!this.currentUser) {
+      this.currentUser = await fetchCurrentUser(this.userId, this.dataStore, this.venueId)
+    }
+    return this.currentUser
   }
 
   compressCapabilities(action, type) {
@@ -81,10 +90,14 @@ class PermissionsBuilder {
     // additionalFilters are used for those cases where the requiredCapabilities
     // architecture is unable to specify what we want
     // If we need more of these special-cases, move them to a separate file
+    // Keep in mind: These filters are for non-admins. Admins always get a free pass.
+
     const additionalFilters = []
     if (action === 'update' && type === 'user') {
-      additionalFilters.push('(!defined(identity) && !isAdmin)')
-      additionalFilters.push(`(_id == "${this.userId}" && !isAdmin")`)
+      const nonClaimedNonAdminUser = '(!defined(identity) && isAdmin != true)'
+      additionalFilters.push(nonClaimedNonAdminUser)
+      const ownUserNonAdmin = `(_id == "${this.userId}" && isAdmin != true)`
+      additionalFilters.push(ownUserNonAdmin)
     }
 
     if (!specificGrants && additionalFilters.length === 0) {
@@ -97,7 +110,9 @@ class PermissionsBuilder {
   }
 
   async determinePermissions() {
-    await this.fetchAllCapabilities()
+    await this.fetchAllCapabilities() // warm up needed data
+    await this.getCurrentUser() // warm up needed data
+
     const grantsByActionAndType = this.assembleGrantsByActionAndType()
     const filters = {}
     actions.forEach(action => {
