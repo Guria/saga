@@ -59,3 +59,21 @@ tests:
         issues:
           - _id: i1
           - _id: i2
+
+  - title: Article issues query (multiple issues)
+    only: true
+    query: |
+      *[_type == "article" && _id in ['a1', 'a2']]|order(_id){
+        _id, _type,
+        "issues": *[_type == "issue" && references(^._id)]{_id }
+      }
+    result:
+      - _id: a1
+        _type: article
+        issues:
+          - _id: i1
+          - _id: i2
+      - _id: a2
+        _type: article
+        issues:
+          - _id: i3
