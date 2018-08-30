@@ -19,6 +19,7 @@ const requiredCapabilities = {
       'isAdminUser',
       'isAuthorInComment',
       'isEditorInVenue',
+      'isEditorInIssueWithComment',
       'isSubmitterInArticleWithComment',
       'isEditorInTrackWithArticleWithComment',
       'isEditorInIssueWithArticleWithComment'
@@ -71,6 +72,7 @@ const requiredCapabilities = {
       'isAdminUser',
       'isAuthorInComment',
       'isEditorInVenue',
+      'isEditorInIssueWithComment',
       'isEditorInTrackWithArticleWithComment',
       'isEditorInIssueWithArticleWithComment'
     ],
@@ -104,6 +106,7 @@ const requiredCapabilities = {
       'isAdminUser',
       'isAuthorInComment',
       'isEditorInVenue',
+      'isEditorInIssueWithComment',
       'isEditorInTrackWithArticleWithComment',
       'isEditorInIssueWithArticleWithComment'
     ],
@@ -130,7 +133,8 @@ const features = {
       [`${documentType}State`]: ['isLoggedInUser']
     }
     return {
-      ...obj, ...featureSet
+      ...obj,
+      ...featureSet
     }
   }, {}),
   create: config.vega.featurePlugins.reduce((obj, documentType) => {
@@ -139,7 +143,8 @@ const features = {
       [`${documentType}State`]: ['isLoggedInUser']
     }
     return {
-      ...obj, ...featureSet
+      ...obj,
+      ...featureSet
     }
   }, {}),
   update: config.vega.featurePlugins.reduce((obj, documentType) => {
@@ -148,7 +153,8 @@ const features = {
       [`${documentType}State`]: ['isLoggedInUser']
     }
     return {
-      ...obj, ...featureSet
+      ...obj,
+      ...featureSet
     }
   }, {}),
   delete: config.vega.featurePlugins.reduce((obj, documentType) => {
@@ -157,7 +163,8 @@ const features = {
       [`${documentType}State`]: ['isLoggedInUser']
     }
     return {
-      ...obj, ...featureSet
+      ...obj,
+      ...featureSet
     }
   }, {})
 }

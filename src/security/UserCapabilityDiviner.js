@@ -238,6 +238,12 @@ class UserCapabilityDiviner {
       .then(articleIds => isValueInArrayTuple('subject._ref', articleIds))
   }
 
+  isEditorInIssueWithComment() {
+    return this.issuesWhereUserIsEditor()
+      .then(issues => issues.map(issue => issue._id))
+      .then(issueIds => isValueInArrayTuple('subject._ref', issueIds))
+  }
+
   runAll() {
     return Promise.all([
       this.isEditorInVenue(),
@@ -246,6 +252,7 @@ class UserCapabilityDiviner {
       this.isEditorInIssueWithArticle(),
       this.isSubmitterInArticle(),
       this.isAuthorInComment(),
+      this.isEditorInIssueWithComment(),
       this.isEditorInIssueWithArticleWithComment(),
       this.isEditorInTrackWithArticleWithComment(),
       this.isEditorInIssueWithArticleInReviewProcess(),
@@ -267,6 +274,7 @@ class UserCapabilityDiviner {
         isEditorInIssueWithArticle,
         isSubmitterInArticle,
         isAuthorInComment,
+        isEditorInIssueWithComment,
         isEditorInIssueWithArticleWithComment,
         isEditorInTrackWithArticleWithComment,
         isEditorInIssueWithArticleInReviewProcess,
@@ -289,6 +297,7 @@ class UserCapabilityDiviner {
           isEditorInIssueWithArticle,
           isSubmitterInArticle,
           isAuthorInComment,
+          isEditorInIssueWithComment,
           isEditorInIssueWithArticleWithComment,
           isEditorInTrackWithArticleWithComment,
           isEditorInIssueWithArticleInReviewProcess,

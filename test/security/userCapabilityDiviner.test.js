@@ -189,7 +189,7 @@ describe('userCapabilityDiviner', () => {
     })
   })
 
-  test('recognizes issue editors in comment', async () => {
+  test('recognizes issue editors in comment on article', async () => {
     const issueEditor = await createUser()
 
     const article = await createDocument({
@@ -232,6 +232,33 @@ describe('userCapabilityDiviner', () => {
     const capabilities = await capabilitiesForUser(issueEditor._id)
     expect(capabilities).toMatchObject({
       isEditorInIssueWithArticleWithComment: ['subject._ref', ['ARTICLEID1234', 'ARTICLEID12345']]
+    })
+  })
+
+  test('recognizes issue editors in comment on issue', async () => {
+    const issueEditor = await createUser()
+
+    const issue = await createDocument({
+      _id: 'ISSUEID1234',
+      _type: 'issue',
+      content: [
+        {
+          _type: 'section',
+          title: 'A Section'
+        }
+      ],
+      editors: [{_type: 'reference', _ref: issueEditor._id}]
+    })
+
+    await createDocument({
+      _id: 'COMMENTID1234',
+      _type: 'comment',
+      subject: {_type: 'reference', _ref: issue._id}
+    })
+
+    const capabilities = await capabilitiesForUser(issueEditor._id)
+    expect(capabilities).toMatchObject({
+      isEditorInIssueWithComment: ['subject._ref', ['ISSUEID1234']]
     })
   })
 
