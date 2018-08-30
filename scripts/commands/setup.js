@@ -1,13 +1,13 @@
 /* eslint-disable no-console,no-process-exit */
-import {setup} from '../actions/setup'
-import {
+const {setup} = require('../actions/setup')
+const {
   ROOT_CLAIM_URL,
   ROOT_INVITE_URL,
   withFullAccessDataStore,
   connect,
   withUserStore
-} from '../config'
-import {existsSync} from 'fs'
+} = require('../config')
+const {existsSync} = require('fs')
 
 async function run() {
   if (!existsSync('./config/oauth.json')) {

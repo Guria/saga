@@ -1,4 +1,4 @@
-import { ensureConnected } from './utils'
+const {ensureConnected} = require('./utils')
 
 const StoreManager = require('../src/datastore/StoreManager')
 const {adminPermissions} = require('../src/security/securityConstants')
@@ -12,14 +12,14 @@ const SERVER_URL = url.format({
   port: config.port
 })
 
-export const ROOT_CLAIM_URL = url.format({
+exports.ROOT_CLAIM_URL = url.format({
   protocol: 'http',
   hostname: config.hostname,
   port: config.port,
   pathname: `/v1/invitations/root/login`
 })
 
-export const ROOT_INVITE_URL = url.format({
+exports.ROOT_INVITE_URL = url.format({
   protocol: 'http',
   hostname: config.hostname,
   port: config.port,
@@ -36,13 +36,13 @@ const userStore = new UserStore({
   db: config.datastore.options.systemDb
 })
 
-export function withFullAccessDataStore(task) {
+exports.withFullAccessDataStore = function withFullAccessDataStore(task) {
   return task(fullAccessDatastore).finally(() => fullAccessDatastore.disconnect())
 }
-export function withUserStore(task) {
+exports.withUserStore = function withUserStore(task) {
   return task(userStore).finally(() => fullAccessDatastore.disconnect())
 }
 
-export function connect() {
+exports.connect = function connect() {
   return ensureConnected(SERVER_URL)
 }

@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import {prompt} from '../utils'
-import {createVenue} from './createVenue'
-import {claimRoot} from './claimRoot'
+const {prompt} = require('../utils')
+const {createVenue} = require('./createVenue')
+const {claimRoot} = require('./claimRoot')
 
-export async function setup({dataStore, userStore, rootInviteUrl, claimUrl}) {
+exports.setup = async function setup({dataStore, userStore, rootInviteUrl, claimUrl}) {
   await claimRoot({claimUrl, rootInviteUrl})
 
   const shouldCreateVenue = await prompt.single({

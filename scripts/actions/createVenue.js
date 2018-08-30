@@ -1,16 +1,16 @@
-import {createAllIfNotExists} from '../utils'
+const {createAllIfNotExists} = require('../utils')
 
 const tracks = require('../data/tracks')
 const stages = require('../data/stages')
 const deburr = require('lodash/deburr')
-import {prompt} from '../utils'
+const {prompt} = require('../utils')
 
 const sluggedName = str =>
   deburr(str.toLowerCase())
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9]/g, '')
 
-export async function createVenue({dataStore, userStore}) {
+exports.createVenue = async function createVenue({dataStore, userStore}) {
   const rootUser = await userStore.getRootUser()
   if (!rootUser) {
     console.error(`Could not find root user. Please run 'npm run setup' instead`)

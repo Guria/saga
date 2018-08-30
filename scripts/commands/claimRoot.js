@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import {claimRoot} from '../actions/claimRoot'
-import {connect, ROOT_CLAIM_URL, ROOT_INVITE_URL} from '../config'
+const {claimRoot} = require('../actions/claimRoot')
+const {connect, ROOT_CLAIM_URL, ROOT_INVITE_URL} = require('../config')
 
 async function run() {
   await connect()
