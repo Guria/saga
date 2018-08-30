@@ -275,7 +275,7 @@ describe('fullStack', () => {
       })
   })
 
-  test.skip('denies user ability to promote herself to admin', async () => {
+  test('denies user ability to promote herself to admin', async () => {
     const user = await createUser()
     const transactionId = getId()
     await request(app)
