@@ -119,15 +119,14 @@ module.exports = class MongoDbAdapter {
 
     return this.collection
       .findOneAndReplace({_id: next._id}, next, withSession(options, {upsert: true}))
-      .then(res => ({
+      .then(() => ({
         id: next._id,
         document: next,
         operation: 'update'
       }))
   }
 
-  setReferences(documentId, references, options) {
-    const {transaction} = options
+  setReferences(documentId, references) {
     return this.collection.findOneAndUpdate({_id: documentId}, {$set: {'@refs': references}})
   }
 

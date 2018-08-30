@@ -84,8 +84,8 @@ class Store extends EventEmitter {
       dataset: this.dataset
     })
 
-    // eslint-disable-next-line complexity
-    return this.mutationQueue.add(async () => { // eslint-disable-line max-statements
+    // eslint-disable-next-line complexity, max-statements
+    return this.mutationQueue.add(async () => {
       const documents = await this.adapter.getDocumentsById(ids)
       const transaction = await this.adapter.startTransaction()
 
@@ -114,11 +114,12 @@ class Store extends EventEmitter {
             const patch = new Patcher(body)
             next = patch.apply(targetDoc)
             docsCache[next._id] = next
-          }
 
-          // Permission and foreign keys checks
-          if (isPatch && targetDoc) {
-            await checkPermissions(filters.update, targetDoc, 'update', m)
+            // Permission and foreign keys checks
+            await Promise.all([
+              checkPermissions(filters.update, targetDoc, 'update', m),
+              checkPermissions(filters.update, next, 'update', m)
+            ])
           }
 
           if (operation === 'createIfNotExists') {
@@ -137,9 +138,9 @@ class Store extends EventEmitter {
             const prev = documents.find(doc => doc._id === body._id)
             await (prev
               ? Promise.all([
-                checkPermissions(filters.delete, prev, 'delete', m),
-                checkPermissions(filters.create, body, 'create', m)
-              ])
+                  checkPermissions(filters.delete, prev, 'delete', m),
+                  checkPermissions(filters.create, body, 'create', m)
+                ])
               : checkPermissions(filters.create, body, 'create', m))
           }
 
@@ -218,7 +219,7 @@ class Store extends EventEmitter {
     }
 
     const description = `Document "${
-    targetDoc._id
+      targetDoc._id
     }" cannot be deleted as there are references to it from "${referencingIDs[0]}"`
 
     throw new TransactionError({
@@ -351,18 +352,18 @@ function idFromMutation(operation, body) {
 
 function mergeCreatedDocuments(mutations, existing) {
   return (
-  mutations
-    // Remove non-create (or id-less) mutations
-    .filter(mut => mut.operation.startsWith('create') && mut.body._id)
-    // Remove create/createIfNotExists if document exists
-    .filter(mut => isReplace(mut) || !existing.find(doc => doc._id === mut.body._id))
-    // Remove creates that exist later in mutation array
-    .filter((mut, i, muts) => !find(muts, item => item.body._id === mut.body._id, i + 1))
-    // Merge remaining mutations, make sure to override existing documents with same ID
-    .reduce((docs, mut) => {
-      const prev = existing.findIndex(doc => doc._id === mut._id)
-      return prev === -1 ? docs.concat(mut.body) : docs.splice(prev, 1, mut.body) && docs
-    }, existing.slice())
+    mutations
+      // Remove non-create (or id-less) mutations
+      .filter(mut => mut.operation.startsWith('create') && mut.body._id)
+      // Remove create/createIfNotExists if document exists
+      .filter(mut => isReplace(mut) || !existing.find(doc => doc._id === mut.body._id))
+      // Remove creates that exist later in mutation array
+      .filter((mut, i, muts) => !find(muts, item => item.body._id === mut.body._id, i + 1))
+      // Merge remaining mutations, make sure to override existing documents with same ID
+      .reduce((docs, mut) => {
+        const prev = existing.findIndex(doc => doc._id === mut._id)
+        return prev === -1 ? docs.concat(mut.body) : docs.splice(prev, 1, mut.body) && docs
+      }, existing.slice())
   )
 }
 
@@ -382,9 +383,10 @@ function generateDocumentReferencePatches(results, prevDocs) {
       return false
     }
 
-    const hasDiff = !prevDoc ||
-    prevRefs.length !== newRefs.length ||
-    prevRefs.some((prevRef, idx) => !isEqual(prevRef, newRefs[idx]))
+    const hasDiff =
+      !prevDoc ||
+      prevRefs.length !== newRefs.length ||
+      prevRefs.some((prevRef, idx) => !isEqual(prevRef, newRefs[idx]))
 
     return (
       hasDiff && {
