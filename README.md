@@ -1,33 +1,51 @@
 # Saga
 
-Backend for Vega.
+Backend for [Vega](https://github.com/vegapublish/vega)
 
 # About the name
 
 Saga is an abbreviation of Sagittarus A\* which is the radio source likely to be the supermassive black hole at the center of the milky way galaxy ♐
 
-# Security
+# Getting started
 
-## Terms
+## Prerequisites
+- MongoDB v3.x or newer
+- Node.js v8.x or newer
+- npm v6.x or newer
 
-- Capability. A single piece of access, e.g. user is editor in a specific issue
-- Grant. A permission to perform an action on a document with a given type. Grant are given based on a list of capabilities. E.g. to perform the `update` action on a `comment` you need to have capabilityX or capabilityY (say comment author or venue editor)
-
-`src/security/SecurityManager.js` is where we establishe who can perform what kind of CRUD action. Briefly, what happens is that a filter is applied to the queries or mutations a user wants to perform. Say we have a user who is submitter on article `article-123`, a simplified filter might look like this:
-
+To setup a new instance of `saga`, start by cloning this repo with:
 ```
-{
-  read: '(_type == "article" && _id in ["article-123"]) || (_type == "venue")',
-  update: '(_type == "article" && _id in ["article-123"])',
-  create: 'false',
-  delete: 'false'
-}
+git clone https://github.com/VegaPublish/saga.git
 ```
 
-(There will also be filters concerning the other docment types, not included here for brevity)
+## Configure oauth for root user claiming
+As a part of the initial setup, a root user needs to be added to the system.
+In order to claim the root user, a oauth config file must be created in `./config/oauth.json` (take a look at `./config/oauth.fallback.json` for an example.
 
-This filter is applied to any actions the user performs, giving her read access to her own article and all venues. She also has update access to her own article, but not the venue. Create and delete access is denied on all articles and venues.
+## First setup
+Once oauth is configured you can proceed with first time setup. Before you continue, make sure the server is running in the background with `npm run start`.
+`npm run setup`. This will guide you through the process of claiming a root user and setting up the default venue.
 
-Under the hood the, `src/security/AccessFilterBuilder.js` decides which capabilities a user needs to perform CRUD actions on the various document types. Which capabilities a given user has is defined in `src/security/requiredCapabilities.js`
+## Adding a new journal or conference (a.k.a. _venue_)
+After first setup, you can create new venues by running `npm run create-venue`. This will guide you through the necessary steps.
 
-UserCapabilityDiviner has extensive tests. If something seems amiss, this is probably good place to start debugging.
+## Running the server
+`npm run start`
+
+# Config options
+### List of possible environment variables:
+
+- `SAGA_HTTP_PORT`: The port to run the backend on (default `4000`)
+- `SAGA_HTTP_HOST`: Which HTTP host to run on: (default `127.0.0.1`)
+- `SAGA_LOG_LEVEL`: The loglevel to use (passed on to `pino` which is used for logging) (default `info`)
+- `SAGA_SESSION_NAME`: Session name (default `sagaSession`)
+- `SAGA_SESSION_SECRET`: Session secret
+- `SAGA_SESSION_TTL_MS`: Session cookie TTL 
+- `SAGA_AUTH_PROVIDERS_CONFIG_PATH`: Path to oauth provider config (default `./config/oauth.json`)
+- `SAGA_DATA_MAX_INPUT_BYTE`: Payload size limit for posted data (default 2MB)  
+- `SAGA_ASSETS_MAX_INPUT_BYTE`: Size limit for uploaded assets (default 15MB) 
+- `SAGA_ASSETS_FS_BASE_PATH`: The base path of assets stored on disk (default `./data/assets/`)
+- `SAGA_CORS_MAX_AGE`: Configures the Access-Control-Max-Age CORS header (default `600` ms) 
+- `SAGA_CORS_ORIGIN`: A comma delimited string with all the allowed CORS origins.
+- `SAGA_CORS_EXPOSED_HEADER`: Configures the Access-Control-Expose-Headers CORS headers. This will be added in addition to `Content-Type`, `Content-Length` and `ETag`
+- `SAGA_MONGODB_URL`: URL to MongoDB instance (default `mongodb://localhost:27017`)
