@@ -145,7 +145,7 @@ class UserCapabilityDiviner {
   }
 
   isReviewerInReviewItem() {
-    return isValueInArrayTuple('reviewer._ref', [this.userId])
+    return this.reviewItemsWhereUserIsReviewer().then(reviewItems => [reviewItems.length > 0])
   }
 
   isReviewerInArticle() {

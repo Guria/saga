@@ -378,7 +378,7 @@ describe('userCapabilityDiviner', () => {
 
     const capabilities = await capabilitiesForUser(reviewer._id)
     expect(capabilities).toMatchObject({
-      isReviewerInReviewItem: ['reviewer._ref', [reviewer._id]]
+      isReviewerInReviewItem: [true]
     })
   })
 
