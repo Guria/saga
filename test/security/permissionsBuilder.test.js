@@ -70,8 +70,6 @@ describe('permissionsBuilder', () => {
     expect(filters).toBeTruthy()
     const expected = `((_type == "venue") || (_type == "issue") || (_type == "track") || (_type == "stage") || (_type == "user") || (_type == "comment" && (author._ref in ["${
       unprivilegedUser._id
-    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
-      unprivilegedUser._id
     }"])) || (_type == "checklistConfig") || (_type == "checklistState") || (_type == "declarationConfig") || (_type == "declarationState") || (_type == "dueDateConfig") || (_type == "dueDateState"))`
 
     expect(filters.read).toEqual(expected)
@@ -89,8 +87,6 @@ describe('permissionsBuilder', () => {
     const expected = `((_type == "user" && ((!defined(identity) && isAdmin != true) || (_id == "${
       author._id
     }" && isAdmin != true))) || (_type == "comment" && (author._ref in ["${
-      author._id
-    }"])) || (_type == "reviewItem" && (reviewer._ref in ["${
       author._id
     }"])) || (_type == "checklistState") || (_type == "declarationState") || (_type == "dueDateState"))`
     expect(filters.update).toEqual(expected)
