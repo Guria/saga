@@ -2,6 +2,7 @@
 # then switches to scroll-based pagination. These tests are for
 # various edge cases.
 title: ElasticSearch pagination
+only: true
 tests:
 - title: Pagination
   query: |

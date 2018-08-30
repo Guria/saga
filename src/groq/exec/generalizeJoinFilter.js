@@ -1,21 +1,78 @@
-/* eslint-disable require-await */
+/* eslint-disable require-await, max-depth */
 
-import rewrite from '../plan/rewrite'
+import rewrite from '../plan/asyncRewrite'
 import debug from '../debug'
 import util from 'util'
+import { isEqual } from 'lodash'
 
 export default async function generalizeJoinFilter(node, scope) {
   debug('generalizeJoinFilter()', util.inspect(node, {
     depth: 10
   }), scope)
-  return rewrite(node, operation => {
+  const result = await rewrite(node, operation => {
     switch (operation.op) {
       case 'eq':
+        debug('generalizing!!', operation)
         return generalizeEQ(operation, scope)
+      case 'functionCall': {
+        debug('generalizing!!', operation)
+        return generalizeFn(operation, scope)
+      }
       default:
         return operation
     }
   })
+
+  if (isEqual(node, result)) {
+    debug('generalizeJoinFilter() did nothing', isEqual(node, result), util.inspect(node, {
+      depth: 10
+    }), '\n--\n', util.inspect(result, {
+      depth: 10
+    }))
+    return node
+  }
+
+  debug('generalizeJoinFilter() rewritten', isEqual(node, result), '\n', util.inspect(node, {
+    depth: 10
+  }), '\n--\n', util.inspect(result, {
+    depth: 10
+  }), scope)
+  return result
+}
+
+async function generalizeFn(operation, scope) {
+  let didRewrite = false
+  if (operation.name == 'references') {
+    const generalizedArgs = []
+    for (let i = 0; i < operation.arguments.length; i++) {
+      const arg = operation.arguments[i]
+      if (isJoinAccessor(arg)) {
+        didRewrite = true
+        const joinScopes = await scope.child({
+          value: {}
+        }).resolveAccessorForAll(arg.path)
+        joinScopes.forEach(scope => {
+          generalizedArgs.push({
+            op: 'literal',
+            value: scope.value
+          })
+        })
+      } else {
+        generalizedArgs.push(arg)
+      }
+    }
+    if (!didRewrite) {
+      return operation
+    }
+    const generalizedFn = Object.assign({}, operation, {
+      arguments: generalizedArgs
+    })
+    debug('BZOZO', util.inspect(generalizedFn, {
+      depth: 10
+    }))
+    return generalizedFn
+  }
+  return operation
 }
 
 async function generalizeEQ(operation, scope) {
