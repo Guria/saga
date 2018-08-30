@@ -41,7 +41,7 @@ module.exports = {
   },
 
   assets: {
-    baseUrl: 'http://localhost:4000',
+    baseUrl: removeTrailingSlash(process.env.SAGA_BASE_URL || 'http://localhost:4000'),
     maxInputBytes: int(process.env.SAGA_ASSETS_MAX_INPUT_BYTES, FIFTEEN_MEGABYTES),
     adapter: 'fs',
     options: {
@@ -87,6 +87,10 @@ module.exports = {
 
   DEV_SESSION_SECRET,
   DEFAULT_AUTH_PROVIDER_CONFIG_PATH
+}
+
+function removeTrailingSlash(url) {
+  return url.replace(/\/+/, '')
 }
 
 function split(val, by = ',') {
