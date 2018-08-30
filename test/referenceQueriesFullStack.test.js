@@ -21,7 +21,7 @@ describe('Reference queries (through the full stack, including MongoDB driver)',
   afterAll(() => close(app))
 
   const suites = glob.sync(path.join(__dirname, 'reference_queries', '*.yml'))
-    // .filter(filename => filename.match(/vega_specific\.yml/))
+    // .filter(filename => filename.match(/es_pagination\.yml/))
     .map(filename => {
       try {
         const yamlSrc = fs.readFileSync(filename, {
@@ -43,7 +43,7 @@ function runSuite(suite) {
   describe(`${suite.title} (fullstack)`, () => {
 
     beforeAll(async () => {
-      jest.setTimeout(15000)
+      jest.setTimeout(30000)
 
       const dataStore = app.services.dataStore
       await Promise.all([
