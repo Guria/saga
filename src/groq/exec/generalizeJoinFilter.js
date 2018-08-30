@@ -3,6 +3,7 @@
 import rewrite from '../plan/asyncRewrite'
 import debug from '../debug'
 import util from 'util'
+import { isEqual } from 'lodash'
 
 export default async function generalizeJoinFilter(node, scope) {
   debug('generalizeJoinFilter()', util.inspect(node, {
@@ -21,18 +22,32 @@ export default async function generalizeJoinFilter(node, scope) {
         return operation
     }
   })
-  debug('generalizeJoinFilter() rewritten => ', util.inspect(result, {
+
+  if (isEqual(node, result)) {
+    debug('generalizeJoinFilter() did nothing', isEqual(node, result), util.inspect(node, {
+      depth: 10
+    }), '\n--\n', util.inspect(result, {
+      depth: 10
+    }))
+    return node
+  }
+
+  debug('generalizeJoinFilter() rewritten', isEqual(node, result), '\n', util.inspect(node, {
+    depth: 10
+  }), '\n--\n', util.inspect(result, {
     depth: 10
   }), scope)
   return result
 }
 
 async function generalizeFn(operation, scope) {
+  let didRewrite = false
   if (operation.name == 'references') {
     const generalizedArgs = []
     for (let i = 0; i < operation.arguments.length; i++) {
       const arg = operation.arguments[i]
       if (isJoinAccessor(arg)) {
+        didRewrite = true
         const joinScopes = await scope.child({
           value: {}
         }).resolveAccessorForAll(arg.path)
@@ -45,14 +60,17 @@ async function generalizeFn(operation, scope) {
       } else {
         generalizedArgs.push(arg)
       }
-      const generalizedFn = Object.assign({}, operation, {
-        arguments: generalizedArgs
-      })
-      debug('BZOZO', util.inspect(generalizedFn, {
-        depth: 10
-      }))
-      return generalizedFn
     }
+    if (!didRewrite) {
+      return operation
+    }
+    const generalizedFn = Object.assign({}, operation, {
+      arguments: generalizedArgs
+    })
+    debug('BZOZO', util.inspect(generalizedFn, {
+      depth: 10
+    }))
+    return generalizedFn
   }
   return operation
 }

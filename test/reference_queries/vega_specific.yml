@@ -61,7 +61,6 @@ tests:
           - _id: i2
 
   - title: Article issues query (multiple issues)
-    only: true
     query: |
       *[_type == "article" && _id in ['a1', 'a2']]|order(_id){
         _id, _type,
