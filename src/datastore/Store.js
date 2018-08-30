@@ -50,6 +50,10 @@ class Store extends EventEmitter {
     return this.adapter.fetch(query, params, options)
   }
 
+  getAllDocuments() {
+    return this.adapter.getAllDocuments()
+  }
+
   /* eslint-disable no-await-in-loop, max-depth, id-length */
   async executeTransaction(trx, options = {}) {
     if (!this.securityManager) {

@@ -1,9 +1,11 @@
 const {noop, uniq} = require('lodash')
+const EventEmitter = require('events')
 const {query} = require('./filterToQuerySelector')
 const MutationError = require('../../errors/MutationError')
 
 // eslint-disable-next-line id-length
 const getIds = docs => docs.map(doc => doc._id)
+class DocumentEmitter extends EventEmitter {}
 const writeOptions = {w: 'majority', j: true}
 const supportsSession = false
 const withSession = ({transaction}, options = {}) =>
@@ -139,6 +141,22 @@ module.exports = class MongoDbAdapter {
       .toArray()
       .then(getIds)
       .then(uniq)
+  }
+
+  getAllDocuments() {
+    const emitter = new DocumentEmitter()
+    process.nextTick(() =>
+      this.collection.find().forEach(
+        doc => emitter.emit('document', doc),
+        err => {
+          emitter.emit(err ? 'error' : 'end', err)
+          emitter.removeAllListeners('document')
+          emitter.removeAllListeners('error')
+          emitter.removeAllListeners('end')
+        }
+      )
+    )
+    return emitter
   }
 
   truncate() {
