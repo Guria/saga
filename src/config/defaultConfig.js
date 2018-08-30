@@ -90,7 +90,7 @@ module.exports = {
 }
 
 function removeTrailingSlash(url) {
-  return url.replace(/\/+/, '')
+  return url.replace(/\/+$/, '')
 }
 
 function split(val, by = ',') {
