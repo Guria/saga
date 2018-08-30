@@ -36,7 +36,9 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
-    ]
+    ],
+    'lyra.imageAsset': ['isLoggedInUser'],
+    'lyra.fileAsset': ['isLoggedInUser']
   },
   create: {
     venue: [],
@@ -53,7 +55,9 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewProcess',
       'isEditorInTrackWithArticleInReviewProcess'
-    ]
+    ],
+    'lyra.imageAsset': ['isLoggedInUser'],
+    'lyra.fileAsset': ['isLoggedInUser']
   },
   update: {
     venue: ['isAdminUser', 'isEditorInVenue'],
@@ -88,7 +92,9 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
-    ]
+    ],
+    'lyra.imageAsset': ['isLoggedInUser'],
+    'lyra.fileAsset': ['isLoggedInUser']
   },
   delete: {
     venue: [],
@@ -122,7 +128,9 @@ const requiredCapabilities = {
       'isReviewerInReviewItem',
       'isEditorInIssueWithArticleInReviewItem',
       'isEditorInTrackWithArticleInReviewItem'
-    ]
+    ],
+    'lyra.imageAsset': ['isLoggedInUser'],
+    'lyra.fileAsset': ['isLoggedInUser']
   }
 }
 

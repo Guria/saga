@@ -236,7 +236,7 @@ describe('asset image uploads', () => {
 
         const doc = await getDocument(res.body.document._id)
         expect(doc).toMatchObject({
-          _type: 'saga.imageAsset',
+          _type: 'lyra.imageAsset',
           assetId: '89174d1b2cd414d46910dd68bc93839492c6bd42',
           extension: 'png',
           sha1hash: '89174d1b2cd414d46910dd68bc93839492c6bd42',
@@ -303,7 +303,7 @@ describe('asset image uploads', () => {
       .send(webpImage)
       .then(res => {
         expect(res.body.document).toMatchObject({
-          _type: 'saga.imageAsset',
+          _type: 'lyra.imageAsset',
           metadata: {dimensions: {width: 506, height: 900, aspectRatio: 0.5622222222222222}},
           extension: 'webp',
           mimeType: 'image/webp'
