@@ -33,7 +33,11 @@ exports.claimRoot = async function claimRoot({claimUrl, rootInviteUrl}) {
   }
 
   const spinner = ora(`Log in from the browser at ${claimUrl}`).start()
-  open(claimUrl)
+  try {
+    open(claimUrl)
+  } catch (err) {
+    spinner.text = `Please navigate your browser of choice to http://<saga-host>${url.parse(claimUrl).pathname}`
+  }
   await waitForRootClaimed(rootInviteUrl)
   spinner.stop()
   console.log('✔ ︎Success')
