@@ -62,3 +62,11 @@ After first setup, you can create new venues by running `npm run create-venue`. 
 # About the name
 
 Saga is an abbreviation of Sagittarus A\* which is the radio source likely to be the supermassive black hole at the center of the milky way galaxy ♐
+
+# Data import
+
+A quick note on data import: You may find yourself in the situation that you need to pour some raw data into mongo. Try this
+
+```
+mongoimport --host localhost:27017 --db saga-MYJOURNAL --collection documents --mode upsert --file ./MYJOURNAL-dump.ndjson
+```
