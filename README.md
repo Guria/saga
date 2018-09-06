@@ -16,6 +16,12 @@ To setup a new instance of `saga`, start by cloning this repo with:
 git clone https://github.com/VegaPublish/saga.git
 ```
 
+Then install dependencies with
+
+```
+npm install
+```
+
 ## Configure oauth for root user claiming
 
 As a part of the initial setup, a root user needs to be added to the system.
