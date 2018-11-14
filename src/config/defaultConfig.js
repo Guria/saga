@@ -33,7 +33,8 @@ module.exports = {
   },
 
   auth: {
-    providersConfigPath: process.env.SAGA_AUTH_PROVIDERS_CONFIG_PATH || DEFAULT_AUTH_PROVIDER_CONFIG_PATH
+    providersConfigPath:
+      process.env.SAGA_AUTH_PROVIDERS_CONFIG_PATH || DEFAULT_AUTH_PROVIDER_CONFIG_PATH
   },
 
   data: {
@@ -45,7 +46,8 @@ module.exports = {
     maxInputBytes: int(process.env.SAGA_ASSETS_MAX_INPUT_BYTES, FIFTEEN_MEGABYTES),
     adapter: 'fs',
     options: {
-      basePath: process.env.SAGA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', '..', 'data', 'assets')
+      basePath:
+        process.env.SAGA_ASSETS_FS_BASE_PATH || path.join(__dirname, '..', '..', 'data', 'assets')
     }
   },
 
@@ -53,18 +55,18 @@ module.exports = {
     credentials: true,
     maxAge: int(process.env.SAGA_CORS_MAX_AGE, 600),
     origin: split(process.env.SAGA_CORS_ORIGINS) || [
-        'http://localhost:3333',
-        'http://127.0.0.1:3333',
-        'http://0.0.0.0:3333',
-        'http://localhost:1234',
-        'http://127.0.0.1:1234',
-        'http://0.0.0.0:1234',
-        'http://localhost:1235',
-        'http://127.0.0.1:1235',
-        'http://0.0.0.0:1235',
-        'http://localhost:1236',
-        'http://127.0.0.1:1236',
-        'http://0.0.0.0:1236'
+      'http://localhost:3333',
+      'http://127.0.0.1:3333',
+      'http://0.0.0.0:3333',
+      'http://localhost:1234',
+      'http://127.0.0.1:1234',
+      'http://0.0.0.0:1234',
+      'http://localhost:1235',
+      'http://127.0.0.1:1235',
+      'http://0.0.0.0:1235',
+      'http://localhost:1236',
+      'http://127.0.0.1:1236',
+      'http://0.0.0.0:1236'
     ],
     exposedHeaders: ['Content-Type', 'Content-Length', 'ETag']
       .concat(split(process.env.SAGA_CORS_EXPOSED_HEADERS))
@@ -73,7 +75,8 @@ module.exports = {
 
   datastore: {
     adapter: 'MongoDB',
-    url: process.env.SAGA_MONGODB_URL || 'mongodb://localhost:27017',
+    zurl: process.env.SAGA_MONGODB_URL || 'mongodb://localhost:27017',
+    url: 'mongodb://gke-kubernetes03-eu-w1-0-default-pool-512be798-g5h3:31640',
     options: {
       dbPrefix: 'saga-',
       collection: 'documents',
