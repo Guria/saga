@@ -58,6 +58,7 @@ After first setup, you can create new venues by running `npm run create-venue`. 
 - `SAGA_CORS_ORIGIN`: A comma delimited string with all the allowed CORS origins.
 - `SAGA_CORS_EXPOSED_HEADER`: Configures the Access-Control-Expose-Headers CORS headers. This will be added in addition to `Content-Type`, `Content-Length` and `ETag`
 - `SAGA_MONGODB_URL`: URL to MongoDB instance (default `mongodb://localhost:27017`)
+- `SAGA_BASE_URL` : The base URL where Saga is publicly available, (default: `'http://localhost:4000'`)
 
 # About the name
 
